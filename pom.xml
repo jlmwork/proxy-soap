@@ -180,14 +180,38 @@
                             <value>8083</value>
                         </systemProperty>
                     </systemProperties>
-                    <!-- hack for Windows development -->
-                    <!-- work around against file locking on windows -->
                     <webApp>
                         <contextPath>/proxy-soap</contextPath>
-                        <defaultsDescriptor>${project.basedir}/src/test/resources/jetty/webdefault.xml</defaultsDescriptor>
                     </webApp>
                 </configuration>
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>jetty-maven-plugin</artifactId>
+                        <version>9.2.3.v20140905</version>
+                        <configuration>
+                            <!-- hack for Windows development -->
+                            <!-- work around against file locking on windows -->
+                            <webApp>
+                                <contextPath>/proxy-soap</contextPath>
+                                <defaultsDescriptor>${project.basedir}/src/test/resources/jetty/webdefault.xml</defaultsDescriptor>
+                            </webApp>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

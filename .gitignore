@@ -13,3 +13,4 @@ hs_err_pid*
 /src/test/resources/TUBE-1.3.0-SGEL-20140129/Tube/
 /src/test/resources/wsdl/affaire/
 /src/test/resources/xsd/
+/target/
