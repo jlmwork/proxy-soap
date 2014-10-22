@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ent="http://www.erdfdistribution.fr/tube/exposition/v2/entete" xmlns:v2="http://www.erdfdistribution.fr/tube/propagerdonneespointetaffaire/v2">
+   <soapenv:Header>
+      <ent:enteteLP soapenv:mustUnderstand="1">
+         <infoFonctionnelles>
+            <!--Optional:-->
+            <affaireId>12345678</affaireId>
+            <pointId>50095768285080</pointId>
+         </infoFonctionnelles>
+         <infoDemandeur>
+            <codeDemandeur>123</codeDemandeur>
+            <loginDemandeur>JL06436S</loginDemandeur>
+         </infoDemandeur>
+      </ent:enteteLP>
+   </soapenv:Header>
+   <soapenv:Body>
+      <v2:propagerDonneesPointEtAffaire>
+         <pointId>12345678911111</pointId>
+         <demandeUtilisateur>true</demandeUtilisateur>
+         <envoiAnticipe>true</envoiAnticipe>
+      </v2:propagerDonneesPointEtAffaire>
+   </soapenv:Body>
+</soapenv:Envelope>

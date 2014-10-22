@@ -1,0 +1,64 @@
+/*********************************************
+ * COOKIE MANAGEMENT
+ *********************************************/
+var Cookie = {
+    set: function(name, value) {
+        document.cookie = name + "=" + value + "; max-age=" + (60 * 60 * 24 * 10);
+    },
+    get: function(name) {
+        var cookies = document.cookie.split(';');
+
+        for (var i in cookies) {
+            var c = cookies[i].trim().split('=');
+            if (c[0] == name)
+                return c[1];
+        }
+
+        return null;
+    }
+};
+
+/*********************************************
+ * COOKIE MANAGEMENT
+ *********************************************/
+
+$(function() {
+    var timer = 0;
+
+    $('#export').click(function() {
+        $('#preparing-file-modal').modal('show');
+
+        $.fileDownload($(this).attr('href'), {
+            successCallback: function(url) {
+                console.log("download success");
+                $('#preparing-file-modal').modal('hide');
+            },
+            failCallback: function(responseHtml, url) {
+                console.log("download failed");
+                $('#preparing-file-modal').modal('hide');
+                $("#error-modal").modal('show');
+            }
+        });
+        return false; //this is critical to stop the click event which will trigger a normal file download!
+    });
+
+    $('.autorefresh')
+            .click(function() {
+                console.log($(this));
+                if ($(this).data('enabled')) {
+                    clearTimeout(timer);
+                    $(this).data('enabled', false);
+                    $('span', this).text('off');
+                } else {
+                    timer = setTimeout(function() {
+                        window.location.reload();
+                    }, 4000);
+                    $(this).data('enabled', true);
+                    $('span', this).text('on');
+                }
+
+                Cookie.set('autorefresh', $(this).data('enabled'));
+            })
+            .data('enabled', Cookie.get('autorefresh') != "true")
+            .click();
+});

@@ -1,0 +1,23 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<div class="footer">
+    <div class="container text-right">
+        <%
+            int mb = 1024 * 1024;
+            //Getting the runtime reference from system
+            Runtime runtime = Runtime.getRuntime();
+            //Print used memory
+            long usedMemory = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / mb;
+            long freeMemory = runtime.freeMemory() / mb;
+            long totalMemory = runtime.totalMemory() / mb;
+            long maxMemory = runtime.maxMemory() / mb;
+        %>
+        <p class="text-muted">
+            <fmt:message key="footer.jvm.status"/> : (<%=usedMemory%> MB used,<%=freeMemory%> MB free, Total : <%=totalMemory%>MB, Max : <%=maxMemory%>MB)
+            <c:set var="startUpDate" ><%=java.lang.management.ManagementFactory.getRuntimeMXBean().getStartTime()%></c:set>
+            <jsp:useBean id="dateValue" class="java.util.Date" scope="page" />
+            <jsp:setProperty name="dateValue" property="time" value="${startUpDate}" />
+            - <fmt:message key="footer.jvm.started"/> <fmt:formatDate pattern="dd/MM/yyyy HH:mm:ss"  value="${dateValue}" />
+        </p>
+    </div>
+</div>
