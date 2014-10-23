@@ -11,7 +11,7 @@ import prototypes.ws.proxy.soap.xml.XmlUtils;
 
 public class SoapRequestMonitor {
 
-    public static final String KEY = "proxy.soap.requestmonitor";
+    public static final String UID = "proxy.soap.requestmonitor";
 
     private Calendar time = new GregorianCalendar();
     // give the request an unique attribute id

@@ -18,7 +18,7 @@ public class ProxyConfiguration extends HashMap<String, Object> {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(ProxyConfiguration.class);
 
-    public static String KEY = "proxy.soap.config";
+    public static String UID = "proxy.soap.config";
 
     private final AtomicBoolean validationActive = new AtomicBoolean(true);
     private final AtomicBoolean inBlockingMode = new AtomicBoolean(true);
@@ -26,6 +26,7 @@ public class ProxyConfiguration extends HashMap<String, Object> {
     private String wsdlDirs = "";
     private final AtomicBoolean isPersisted = new AtomicBoolean(false);
     private String persistPath = System.getProperty("java.io.tmpdir") + File.separator + "proxy-soap.properties";
+    private final AtomicInteger env = new AtomicInteger(ApplicationConfig.ENV_PROD);
 
     /**
      * Load default configuration from system properties
@@ -34,7 +35,7 @@ public class ProxyConfiguration extends HashMap<String, Object> {
     }
 
     public ProxyConfiguration(String validation, String blockingMode,
-            String wsdlDirs, String maxRequests) {
+            String wsdlDirs, String maxRequests, String env) {
         // check if a persisted configuration is available
         boolean persistedConf = (new File(persistPath)).exists();
         if (persistedConf) {
@@ -109,6 +110,22 @@ public class ProxyConfiguration extends HashMap<String, Object> {
                 setNbMaxRequests(value);
             }
         }
+    }
+
+    public void setEnv(String env) {
+        try {
+            this.env.set(Integer.parseInt(env));
+        } catch (Exception e) {
+            this.env.set(ApplicationConfig.ENV_PROD);
+        }
+    }
+
+    public boolean isEnvDev() {
+        return (this.env.get() == ApplicationConfig.ENV_DEV);
+    }
+
+    public boolean isEnvProd() {
+        return (this.env.get() == ApplicationConfig.ENV_PROD);
     }
 
     public boolean isValidationActive() {

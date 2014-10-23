@@ -18,4 +18,9 @@ public class ApplicationConfig {
     // on preivous installed proxies
     public static String PROP_WSDL_DIRS = "proxy.soap.wsdls";
     public static String PROP_MAX_REQUESTS = "proxy.soap.maxrequests";
+
+    public static String PROP_ENV = "proxy.soap.env";
+
+    public static Integer ENV_PROD = 0;
+    public static Integer ENV_DEV = 1;
 }

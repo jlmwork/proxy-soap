@@ -1,13 +1,27 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright 2014 jlamande.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package prototypes.ws.proxy.soap.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import javax.json.Json;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
@@ -19,6 +33,7 @@ import prototypes.ws.proxy.soap.io.Requests;
 import prototypes.ws.proxy.soap.io.Strings;
 import prototypes.ws.proxy.soap.monitor.MonitorManager;
 import prototypes.ws.proxy.soap.monitor.SoapRequestMonitor;
+import prototypes.ws.proxy.soap.time.Dates;
 
 /**
  *
@@ -40,35 +55,89 @@ public class RequestsServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Content-negotiation
-        String hAccept = request.getHeader("Accept");
-        String format = (Strings.isNullOrEmpty(hAccept)) ? hAccept : "";
+        LOGGER.info("Requests");
 
-        response.setContentType("text/csv;charset=UTF-8");
-        response.setHeader(null, null);
-        Cookie cookie = new Cookie("fileDownload", "true");
-        cookie.setPath("/");
-        response.addCookie(cookie);
-        response.setHeader("Content-Description", "File Transfer");
-        response.setHeader("Content-Type", "application/octet-stream");
-        response.setHeader("Content-Disposition", "attachment; filename=requests_export.csv");
-        response.setHeader("Content-Transfer-Encoding", "binary");
-        response.setHeader("Expires", "0");
-        response.setHeader("Cache-Control", "must-revalidate");
-        response.setHeader("Pragma", "public");
-        PrintWriter out = response.getWriter();
-        try {
-            String csvTitle = "ID;Date;From;To;URI;Request XML Errors;Request SOAP Errors;Response SOAP errors";
-            out.println((new CsvBuilder()).append(csvTitle).toString());
+        // Content-negotiation
+        // as ajax does not support file download very well
+        // the application accept a request parameter called accept
+        String pAccept = request.getParameter("accept");
+        String hAccept = request.getHeader("Accept");
+        String askedFormat = (!Strings.isNullOrEmpty(pAccept))
+                ? pAccept : ((!Strings.isNullOrEmpty(hAccept)) ? hAccept : "");
+        LOGGER.debug("Asked format : " + askedFormat);
+
+        if ("text/csv".equals(askedFormat.toLowerCase())) {
+            LOGGER.debug("CSV format");
+            response.setContentType("text/csv;charset=UTF-8");
+            response.setHeader(null, null);
+            Cookie cookie = new Cookie("fileDownload", "true");
+            cookie.setPath("/");
+            response.addCookie(cookie);
+            response.setHeader("Content-Description", "File Transfer");
+            response.setHeader("Content-Type", "application/octet-stream");
+            response.setHeader("Content-Disposition", "attachment; filename=" + generateFilename());
+            response.setHeader("Content-Transfer-Encoding", "binary");
+            response.setHeader("Expires", "0");
+            response.setHeader("Cache-Control", "must-revalidate");
+            response.setHeader("Pragma", "public");
+            PrintWriter out = response.getWriter();
+            try {
+                String csvTitle = "ID;Date;From;To;Request XML Errors;Request SOAP Errors;Response SOAP errors";
+                out.println((new CsvBuilder()).append(csvTitle).toString());
+                MonitorManager monitor = (MonitorManager) Requests.getMonitorManager(this.getServletContext());
+                List<SoapRequestMonitor> soapRequests = monitor.getRequests();
+                LOGGER.debug("Export " + soapRequests.size() + " soapRequests");
+                for (SoapRequestMonitor soapRequest : soapRequests) {
+                    out.println((new CsvBuilder()).append(soapRequest).toString());
+                }
+            } finally {
+                out.close();
+            }
+        } else if ("application/json".equals(askedFormat.toLowerCase())) {
+            //JsonGenerator jg = jsonF.createJsonGenerator(new File("result.json"), JsonEncoding.UTF8);
+            /*JsonObject model = Json.createObjectBuilder()
+             .add("firstName", "Duke")
+             .add("lastName", "Java")
+             .add("age", 18)
+             .add("streetAddress", "100 Internet Dr")
+             .add("city", "JavaTown")
+             .add("state", "JA")
+             .add("postalCode", "12345")
+             .add("phoneNumbers", Json.createArrayBuilder()
+             .add(Json.createObjectBuilder()
+             .add("type", "mobile")
+             .add("number", "111-111-1111"))
+             .add(Json.createObjectBuilder()
+             .add("type", "home")
+             .add("number", "222-222-2222")))
+             .build();*/
+            PrintWriter out = response.getWriter();
+            JsonWriter jsonWriter = Json.createWriter(out);
             MonitorManager monitor = (MonitorManager) Requests.getMonitorManager(this.getServletContext());
             List<SoapRequestMonitor> soapRequests = monitor.getRequests();
             LOGGER.debug("Export " + soapRequests.size() + " soapRequests");
+            JsonObjectBuilder oBuilder = Json.createObjectBuilder();
+            JsonArrayBuilder aBuilder = Json.createArrayBuilder();
             for (SoapRequestMonitor soapRequest : soapRequests) {
-                out.println((new CsvBuilder()).append(soapRequest).toString());
+                aBuilder.add(Json.createObjectBuilder()
+                        .add("ID", soapRequest.getId())
+                        .add("Date", soapRequest.getDate())
+                        .add("From", soapRequest.getFrom())
+                        .add("To", soapRequest.getUri())
+                );
             }
-        } finally {
+            oBuilder.add("requests", aBuilder.build());
+            jsonWriter.write(oBuilder.build());
+            jsonWriter.close();
             out.close();
         }
+    }
+
+    private String generateFilename() {
+        StringBuilder sb = new StringBuilder("requests_export_");
+        sb.append(Dates.getFormattedDate(Dates.YYYYMMDD_HHMMSS));
+        sb.append(".csv");
+        return sb.toString();
     }
 
     private static class CsvBuilder {
@@ -85,24 +154,31 @@ public class RequestsServlet extends HttpServlet {
             return this;
         }
 
+        private String cleanupField(String field) {
+            String cleanField = field.replaceAll(separator, "#");
+            return cleanField;
+        }
+
         public CsvBuilder append(String field) {
-            sb.append(field).append(separator);
+            sb.append(cleanupField(field)).append(separator);
             return this;
         }
 
         public CsvBuilder append(List<?> field) {
             if (field != null && field.size() > 0) {
-                sb.append(field.toString());
+                this.append(field.toString());
+            } else {
+                this.append("");
             }
-            sb.append(separator);
             return this;
         }
 
         public CsvBuilder append(Object field) {
             if (field != null) {
-                sb.append(field.toString());
+                this.append(field.toString());
+            } else {
+                this.append("");
             }
-            sb.append(separator);
             return this;
         }
 

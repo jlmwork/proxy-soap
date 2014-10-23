@@ -25,14 +25,15 @@ public class ApplicationInitListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         LOGGER.info("Application starting");
-        // load configuration 
+        // load configuration
         ProxyConfiguration proxy = new ProxyConfiguration(
                 get(ApplicationConfig.PROP_VALIDATION, "true"),
                 get(ApplicationConfig.PROP_BLOCKING_MODE, "false"),
                 get(ApplicationConfig.PROP_WSDL_DIRS, ""),
-                get(ApplicationConfig.PROP_MAX_REQUESTS, "50"));
+                get(ApplicationConfig.PROP_MAX_REQUESTS, "50"),
+                get(ApplicationConfig.PROP_MAX_REQUESTS, ""));
         LOGGER.debug(proxy.toString());
-        sce.getServletContext().setAttribute(ProxyConfiguration.KEY, proxy);
+        sce.getServletContext().setAttribute(ProxyConfiguration.UID, proxy);
         Requests.getMonitorManager(sce.getServletContext());
         SoapValidatorFactory.listValidators();
     }

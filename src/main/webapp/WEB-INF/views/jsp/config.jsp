@@ -9,7 +9,7 @@
 <h2><fmt:message key="config.pagetitle"/></h2>
 <%
     // TODO : looks like some PHP app ! :-)
-    ProxyConfiguration proxy = (ProxyConfiguration) application.getAttribute(ProxyConfiguration.KEY);
+    ProxyConfiguration proxy = (ProxyConfiguration) application.getAttribute(ProxyConfiguration.UID);
 
     pageContext.setAttribute("settings", ProxyConfiguration.getKeys());
     pageContext.setAttribute("proxy", proxy);

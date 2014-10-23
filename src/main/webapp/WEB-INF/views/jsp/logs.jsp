@@ -7,9 +7,9 @@
 <%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <fmt:setBundle basename="messages"/>
 <%
-    ProxyConfiguration proxy = (ProxyConfiguration) application.getAttribute(ProxyConfiguration.KEY);
+    ProxyConfiguration proxy = (ProxyConfiguration) application.getAttribute(ProxyConfiguration.UID);
     pageContext.setAttribute("proxy", proxy);
-    MonitorManager monitor = (MonitorManager) application.getAttribute(MonitorManager.KEY);
+    MonitorManager monitor = (MonitorManager) application.getAttribute(MonitorManager.UID);
     request.setAttribute("requestList", monitor.getRequests());
 %>
 
@@ -18,7 +18,7 @@
     <c:if test="${!empty requestList}">
         <small class="goright">
             <a href="ui/action/clearRequests" class="goright" title="<fmt:message key="requests.clear"/>"><span class="glyphicon glyphicon-trash"></span></a>
-            <a href="requests" id="export" class="goright glyphicon glyphicon-cloud-download" title="<fmt:message key="requests.export"/>"></a>
+            <a href="requests?accept=text/csv" id="export" class="goright glyphicon glyphicon-cloud-download" title="<fmt:message key="requests.export"/>"></a>
         </small>
     </c:if>
 </h2>

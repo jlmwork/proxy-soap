@@ -26,21 +26,21 @@ public class Requests {
 
     public static ProxyConfiguration getProxy(ServletContext servletContext) {
         ProxyConfiguration proxy = (ProxyConfiguration) servletContext
-                .getAttribute(ProxyConfiguration.KEY);
+                .getAttribute(ProxyConfiguration.UID);
         // if not found, create it and references it in application scope
         if (proxy == null) {
             proxy = new ProxyConfiguration();
-            servletContext.setAttribute(ProxyConfiguration.KEY, proxy);
+            servletContext.setAttribute(ProxyConfiguration.UID, proxy);
         }
         return proxy;
     }
 
     public static MonitorManager getMonitorManager(ServletContext servletContext) {
         MonitorManager manager = (MonitorManager) servletContext
-                .getAttribute(MonitorManager.KEY);
+                .getAttribute(MonitorManager.UID);
         if (manager == null) {
             manager = new MonitorManager(getProxy(servletContext));
-            servletContext.setAttribute(MonitorManager.KEY, manager);
+            servletContext.setAttribute(MonitorManager.UID, manager);
         }
         return manager;
     }
@@ -48,19 +48,19 @@ public class Requests {
     public static SoapRequestMonitor getRequestMonitor(
             ServletContext servletContext, HttpServletRequest request) {
         SoapRequestMonitor monitor = (SoapRequestMonitor) request
-                .getAttribute(SoapRequestMonitor.KEY);
+                .getAttribute(SoapRequestMonitor.UID);
         if (monitor == null) {
             monitor = getMonitorManager(servletContext).monitor();
-            request.setAttribute(SoapRequestMonitor.KEY, monitor);
+            request.setAttribute(SoapRequestMonitor.UID, monitor);
         }
         return monitor;
     }
 
     public static ProxyMonitor getProxyMonitor(HttpServletRequest request) {
-        ProxyMonitor proxyMonitor = (ProxyMonitor) request.getAttribute(ProxyMonitor.KEY);
+        ProxyMonitor proxyMonitor = (ProxyMonitor) request.getAttribute(ProxyMonitor.UID);
         if (proxyMonitor == null) {
             proxyMonitor = new ProxyMonitor();
-            request.setAttribute(ProxyMonitor.KEY, proxyMonitor);
+            request.setAttribute(ProxyMonitor.UID, proxyMonitor);
         }
         return proxyMonitor;
     }

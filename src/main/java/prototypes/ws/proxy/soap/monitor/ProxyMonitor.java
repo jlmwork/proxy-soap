@@ -6,7 +6,6 @@ package prototypes.ws.proxy.soap.monitor;
 
 import java.util.List;
 import java.util.Map;
-
 import prototypes.ws.proxy.soap.io.Strings;
 
 /**
@@ -15,7 +14,7 @@ import prototypes.ws.proxy.soap.io.Strings;
  */
 public class ProxyMonitor {
 
-    public static final String KEY = "proxy.soap.proxy-result";
+    public static final String UID = "proxy.soap.proxy-result";
 
     private int responseCode;
     private String responseMessage;
@@ -33,8 +32,7 @@ public class ProxyMonitor {
     }
 
     /**
-     * @param responseCode
-     *            the responseCode to set
+     * @param responseCode the responseCode to set
      */
     public void setResponseCode(int responseCode) {
         this.responseCode = responseCode;
@@ -48,8 +46,7 @@ public class ProxyMonitor {
     }
 
     /**
-     * @param responseMessage
-     *            the responseMessage to set
+     * @param responseMessage the responseMessage to set
      */
     public void setResponseMessage(String responseMessage) {
         this.responseMessage = responseMessage;
@@ -63,8 +60,7 @@ public class ProxyMonitor {
     }
 
     /**
-     * @param responseBody
-     *            the responseBody to set
+     * @param responseBody the responseBody to set
      */
     public void setResponseBody(String responseBody) {
         this.responseBody = responseBody;
@@ -78,8 +74,7 @@ public class ProxyMonitor {
     }
 
     /**
-     * @param gzipped
-     *            the gzipped to set
+     * @param gzipped the gzipped to set
      */
     public void setGzipped(boolean gzipped) {
         this.gzipped = gzipped;
@@ -93,8 +88,7 @@ public class ProxyMonitor {
     }
 
     /**
-     * @param headers
-     *            the headers to set
+     * @param headers the headers to set
      */
     public void setHeaders(Map<String, List<String>> headers) {
         this.headers = headers;
@@ -108,8 +102,7 @@ public class ProxyMonitor {
     }
 
     /**
-     * @param contentType
-     *            the contentType to set
+     * @param contentType the contentType to set
      */
     public void setContentType(String contentType) {
         this.contentType = contentType;
@@ -123,8 +116,7 @@ public class ProxyMonitor {
     }
 
     /**
-     * @param contentEncoding
-     *            the contentEncoding to set
+     * @param contentEncoding the contentEncoding to set
      */
     public void setContentEncoding(String contentEncoding) {
         this.contentEncoding = contentEncoding;

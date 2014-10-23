@@ -1,3 +1,18 @@
+/*
+ * Copyright 2014 jlamande.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package prototypes.ws.proxy.soap.servlet;
 
 import java.io.IOException;
@@ -78,7 +93,7 @@ public class ProxyServlet extends AbstractServlet {
 
         byte[] body = Streams.getBytes(request.getInputStream());
 
-        ProxyMonitor proxyResult = Requests.getProxyMonitor(request);
+        ProxyMonitor proxyMonitor = Requests.getProxyMonitor(request);
         HttpURLConnection httpConn = null;
 
         try {
@@ -102,22 +117,22 @@ public class ProxyServlet extends AbstractServlet {
 
             // Get response. If response is gzipped, uncompress it
             try {
-                proxyResult.setResponseBody(Streams.getString(
+                proxyMonitor.setResponseBody(Streams.getString(
                         httpConn.getInputStream(), gzipped));
             } catch (IOException e) {
                 LOGGER.debug("Failed to read target response body", e);
             }
 
             // Make Proxy Result
-            proxyResult.setResponseCode(httpConn.getResponseCode());
-            proxyResult.setResponseMessage(httpConn.getResponseMessage());
-            proxyResult.setHeaders(httpConn.getHeaderFields());
-            proxyResult.setContentType(httpConn.getContentType());
-            proxyResult.setContentEncoding(httpConn.getContentEncoding());
-            proxyResult.setGzipped(gzipped);
+            proxyMonitor.setResponseCode(httpConn.getResponseCode());
+            proxyMonitor.setResponseMessage(httpConn.getResponseMessage());
+            proxyMonitor.setHeaders(httpConn.getHeaderFields());
+            proxyMonitor.setContentType(httpConn.getContentType());
+            proxyMonitor.setContentEncoding(httpConn.getContentEncoding());
+            proxyMonitor.setGzipped(gzipped);
 
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Proxy result : " + proxyResult);
+                LOGGER.debug("Proxy result : " + proxyMonitor);
             }
 
         } catch (IOException e) {
@@ -128,7 +143,7 @@ public class ProxyServlet extends AbstractServlet {
         }
 
         // Specific error code treatment
-        switch (proxyResult.getResponseCode()) {
+        switch (proxyMonitor.getResponseCode()) {
             case 0:
                 // No response
                 LOGGER.debug("ResponseCode =  0 !!!");
@@ -146,11 +161,11 @@ public class ProxyServlet extends AbstractServlet {
         }
 
         // return response with filtered headers
-        addResponseHeaders(response, proxyResult, RESP_HEADERS_TO_IGNORE);
-        response.setStatus(proxyResult.getResponseCode());
+        addResponseHeaders(response, proxyMonitor, RESP_HEADERS_TO_IGNORE);
+        response.setStatus(proxyMonitor.getResponseCode());
         // send service request body
         Streams.putStringAndClose(response.getOutputStream(),
-                proxyResult.getResponseBody());
+                proxyMonitor.getResponseBody());
     }
 
     /**
