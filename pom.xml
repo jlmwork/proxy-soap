@@ -12,6 +12,7 @@
         <maven.compiler.source>1.6</maven.compiler.source>
         <maven.compiler.target>1.6</maven.compiler.target>
         <servlet.version>2.5</servlet.version>
+        <eclipselink.version>2.3.3-patch20121205</eclipselink.version>
     </properties>
     <repositories>
         <repository>
@@ -164,11 +165,43 @@
             <artifactId>commons-httpclient</artifactId>
             <version>3.1</version>
         </dependency>
-        <!-- this plugin provide required http-client-contrib-ssl classes for soapui -->
+        <!-- this plugin provides the required http-client-contrib-ssl classes for soapui -->
         <dependency>
             <groupId>maven-plugins</groupId>
             <artifactId>maven-sourceforge-plugin</artifactId>
             <version>1.1</version>
+        </dependency>
+        <!-- JPA -->
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>javax.persistence</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>eclipselink</artifactId>
+            <version>${eclipselink.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commonj.sdo</artifactId>
+                    <groupId>commonj.sdo</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+            <version>1.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+            <version>2.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <version>10.6.2.1</version>
         </dependency>
     </dependencies>
     <build>
