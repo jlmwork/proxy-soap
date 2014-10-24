@@ -130,6 +130,9 @@ public class RequestsServlet extends HttpServlet {
             jsonWriter.write(oBuilder.build());
             jsonWriter.close();
             out.close();
+        } else {
+            request.setAttribute("requestList", Requests.getMonitorManager(this.getServletContext()).getRequests());
+            request.getRequestDispatcher("/WEB-INF/views/jsp/requests.jsp").forward(request, response);
         }
     }
 

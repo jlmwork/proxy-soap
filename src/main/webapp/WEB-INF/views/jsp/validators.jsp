@@ -1,13 +1,8 @@
-<%@page import="prototypes.ws.proxy.soap.validation.SoapValidatorFactory"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <fmt:setBundle basename="messages"/>
 <style>.anchor{position:relative;top:-60px;}</style>
-<%
-    pageContext.setAttribute("validators", SoapValidatorFactory.getValidators());
-%>
-
 <h2><fmt:message key="validators.title"/></h2>
 <p><em><fmt:message key="validators.description"/></em></p>
 <table class="table table-bordered" id="logs">

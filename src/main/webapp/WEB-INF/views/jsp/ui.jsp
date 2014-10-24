@@ -24,7 +24,16 @@
           <script src="<%=request.getContextPath()%>/res/js/html5shiv.js"></script>
         <![endif]-->
     </head>
-
+    <c:choose>
+        <c:when test="${action == 'config'}">
+            <c:set var="requestsActive" value="" />
+            <c:set var="configActive" value="active in" />
+        </c:when>
+        <c:otherwise>
+            <c:set var="requestsActive" value="active in" />
+            <c:set var="configActive" value="" />
+        </c:otherwise>
+    </c:choose>
     <body>
         <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
             <div class="container">
@@ -40,8 +49,8 @@
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav nav-pills" role="tablist">
                         <!-- nav -->
-                        <li class="active"><a href="#logs" role="tab" data-toggle="tab"><fmt:message key="logs.pagetitle"/></a></li>
-                        <li><a href="#config" role="tab" data-toggle="tab"><fmt:message key="config.pagetitle"/></a></li>
+                        <li class="${requestsActive}"><a href="#requests" role="tab" data-toggle="tab"><fmt:message key="requests.pagetitle"/></a></li>
+                        <li class="${configActive}"><a href="#config" role="tab" data-toggle="tab"><fmt:message key="config.pagetitle"/></a></li>
                         <li><a href="#validators" role="tab" data-toggle="tab"><fmt:message key="validators.title"/></a></li>
                         <li><a href="#help" role="tab" data-toggle="tab"><fmt:message key="help.pagetitle"/></a></li>
                     </ul>
@@ -50,16 +59,16 @@
         </div>
         <div class="container">
             <div class="tab-content">
-                <div class="tab-pane active" id="logs">
-                    <jsp:include page="./logs.jsp"/>
+                <div class="tab-pane ${requestsActive} fade" id="requests">
+                    <jsp:include page="./requests.jsp"/>
                 </div>
-                <div class="tab-pane" id="config">
+                <div class="tab-pane ${configActive} fade" id="config">
                     <jsp:include page="./config.jsp"/>
                 </div>
-                <div class="tab-pane" id="validators">
+                <div class="tab-pane fade" id="validators">
                     <jsp:include page="./validators.jsp"/>
                 </div>
-                <div class="tab-pane" id="help">
+                <div class="tab-pane fade" id="help">
                     <jsp:include page="./help.jsp"/>
                 </div>
             </div> <!-- /container -->
@@ -82,7 +91,7 @@
                             e.preventDefault()
                         })
             });</script>
-        <script src="res/js/logs.js"></script>
+        <script src="res/js/requests.js"></script>
         <script src="res/js/config.js"></script>
         <script src="res/js/validators.js"></script>
         <script src="res/js/help.js"></script>

@@ -27,6 +27,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
+import prototypes.ws.proxy.soap.io.Requests;
 import prototypes.ws.proxy.soap.io.Streams;
 import prototypes.ws.proxy.soap.monitor.MonitorManager;
 import prototypes.ws.proxy.soap.validation.SoapValidatorFactory;
@@ -41,7 +43,7 @@ public class UiServlet extends AbstractServlet {
      */
     private static final long serialVersionUID = 1L;
 
-    private final String PATH = "ui/action";
+    private final String ACTION_PATH = "ui/action";
 
     private MonitorManager monitor;
 
@@ -52,9 +54,16 @@ public class UiServlet extends AbstractServlet {
 
         // Extract service url
         String action = request.getRequestURI().replace(
-                request.getContextPath() + "/" + PATH + "/", "");
+                request.getContextPath() + "/" + ACTION_PATH + "/", "");
+        request.setAttribute("action", action);
 
         LOGGER.info("UiServlet : uri = " + action);
+        ProxyConfiguration proxy = (ProxyConfiguration) Requests.getProxy(this.getServletContext());
+        request.setAttribute("settings", ProxyConfiguration.getKeys());
+        request.setAttribute("proxy", proxy);
+
+        request.setAttribute("requestList", monitor.getRequests());
+        request.setAttribute("validators", SoapValidatorFactory.getValidators());
 
         if ("clearRequests".equals(action)) {
             clearRequests(request, response);
@@ -62,6 +71,22 @@ public class UiServlet extends AbstractServlet {
         } else if ("viewWSDL".equals(action)) {
             viewWSDL(request, response);
             return;
+        } else if ("config".equals(action)) {
+            boolean saved = false;
+            for (String key : ProxyConfiguration.getKeys()) {
+                if (request.getParameter(key) != null) {
+                    proxy.setProperty(key, request.getParameter(key));
+                    saved = true;
+                }
+            }
+            if (saved) {
+                request.setAttribute("success", "panel-success");
+                request.setAttribute("message", "config.saved");
+            }
+            if (request.getParameter("persist") != null) {
+                proxy.persist();
+                request.setAttribute("message", "config.persisted");
+            }
         }
 
         LOGGER.info("UiServlet getRequestURI:" + request.getRequestURI()
@@ -110,7 +135,6 @@ public class UiServlet extends AbstractServlet {
     @Override
     public void init(ServletConfig sconfig) throws ServletException {
         super.init(sconfig);
-        monitor = (MonitorManager) this.getServletContext().getAttribute(
-                MonitorManager.UID);
+        monitor = Requests.getMonitorManager(this.getServletContext());
     }
 }

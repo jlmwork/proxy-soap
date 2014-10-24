@@ -1,62 +1,56 @@
-<%@page import="prototypes.ws.proxy.soap.constantes.ApplicationConfig"%>
-<%@page import="prototypes.ws.proxy.soap.configuration.ProxyConfiguration"%>
-<%@page import="prototypes.ws.proxy.soap.monitor.SoapRequestMonitor"%>
-<%@page import="prototypes.ws.proxy.soap.monitor.MonitorManager"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <fmt:setBundle basename="messages"/>
-<%
-    ProxyConfiguration proxy = (ProxyConfiguration) application.getAttribute(ProxyConfiguration.UID);
-    pageContext.setAttribute("proxy", proxy);
-    MonitorManager monitor = (MonitorManager) application.getAttribute(MonitorManager.UID);
-    request.setAttribute("requestList", monitor.getRequests());
-%>
-
 <style>.white,.white:hover,.white:visited{color:white;}</style>
-<h2><fmt:message key="logs.pagetitle"/> <small class="autorefresh"><fmt:message key="logs.autorefresh"/> [<span>off</span>]</small>
-    <c:if test="${!empty requestList}">
-        <small class="goright">
-            <a href="ui/action/clearRequests" class="goright" title="<fmt:message key="requests.clear"/>"><span class="glyphicon glyphicon-trash"></span></a>
-            <a href="requests?accept=text/csv" id="export" class="goright glyphicon glyphicon-cloud-download" title="<fmt:message key="requests.export"/>"></a>
-        </small>
+<h2><fmt:message key="requests.pagetitle"/>
+    <%--<small class="autorefresh"><fmt:message key="requests.autorefresh"/> [<span>off</span>]</small>--%>
+    <small>
+        <a href="requests" id="refresh" class="goright" title="<fmt:message key="requests.reload"/>"><span class="glyphicon glyphicon-refresh"></span></a>
+    </small>
+    <c:if test="${empty requestList}">
+        <c:set var="displayActionButtons">style="display: none;"</c:set>
     </c:if>
+    <small id="actionButtons" ${displayActionButtons}>
+        <a href="ui/action/clearRequests" id="clear" class="goright" title="<fmt:message key="requests.clear"/>"><span class="glyphicon glyphicon-trash"></span></a>
+        <a href="requests?accept=text/csv" id="export" class="goright glyphicon glyphicon-cloud-download" title="<fmt:message key="requests.export"/>"></a>
+    </small>
 </h2>
 <c:choose>
     <c:when test="${!proxy.validationActive}">
-        <c:set var="messageType" value="panel-danger" />
-        <c:set var="message"><fmt:message key="config.proxy.soap.validate"/> <fmt:message key="config.proxy.soap.validate.false"/></c:set>
+        <c:set var="panelMessageType" value="panel-danger" />
+        <c:set var="panelMessage"><fmt:message key="config.proxy.soap.validate"/> <fmt:message key="config.proxy.soap.validate.false"/></c:set>
     </c:when>
     <c:when test="${proxy.blockingMode}">
-        <c:set var="messageType" value="panel-warning" />
-        <c:set var="message"><fmt:message key="config.proxy.soap.blockingmode"/> <fmt:message key="config.proxy.soap.blockingmode.true"/></c:set>
+        <c:set var="panelMessageType" value="panel-warning" />
+        <c:set var="panelMessage"><fmt:message key="config.proxy.soap.blockingmode"/> <fmt:message key="config.proxy.soap.blockingmode.true"/></c:set>
     </c:when>
 </c:choose>
-<div class="panel ${messageType}">
+<div class="panel ${panelMessageType}">
     <%-- Panel header --%>
-    <div class="panel-heading">${message}</div>
-    <table class="table table-bordered table-striped table-hover table-condensed" id="logs">
+    <div class="panel-heading">${panelMessage}</div>
+    <table class="table table-bordered table-striped table-hover table-condensed" id="requeststable">
         <thead>
             <tr class="text-center">
                 <th>#</th>
-                <th><fmt:message key="logs.request.date"/></th>
-                <th><fmt:message key="logs.request.from"/></th>
-                <th><fmt:message key="logs.request.to"/></th>
-                <th><fmt:message key="logs.request.validator"/></th>
-                <th><fmt:message key="logs.request.operation"/></th>
-                <th><fmt:message key="logs.request.request"/></th>
-                <th><fmt:message key="logs.request.response"/></th>
-                <th><fmt:message key="logs.request.response.time"/></th>
+                <th><fmt:message key="requests.request.date"/></th>
+                <th><fmt:message key="requests.request.from"/></th>
+                <th><fmt:message key="requests.request.to"/></th>
+                <th><fmt:message key="requests.request.validator"/></th>
+                <th><fmt:message key="requests.request.operation"/></th>
+                <th><fmt:message key="requests.request.request"/></th>
+                <th><fmt:message key="requests.request.response"/></th>
+                <th><fmt:message key="requests.request.response.time"/></th>
             </tr>
         </thead>
         <tbody>
             <c:forEach var="call" items="${requestList}" varStatus="loop">
                 <c:choose>
                     <c:when test="${ ! empty call.request && ! empty call.validatorId }">
-                        <c:set var="viewWsdl"><a target="_blank" href="ui/action/viewWSDL?validator=${call.validatorId}" title="<fmt:message key="logs.request.validated.by"/> ${call.validatorId} (<fmt:message key="logs.request.click.viewwsdl" />)" class="glyphicon glyphicon-file"></a></c:set>
+                        <c:set var="viewWsdl"><a target="_blank" href="ui/action/viewWSDL?validator=${call.validatorId}" title="<fmt:message key="requests.request.validated.by"/> ${call.validatorId} (<fmt:message key="requests.request.click.viewwsdl" />)" class="glyphicon glyphicon-file"></a></c:set>
                 </c:when>
                 <c:otherwise>
-                    <c:set var="viewWsdl"><span title="<fmt:message key="logs.request.error.nowsdl" />" class="glyphicon glyphicon-remove-sign"></span></c:set>
+                    <c:set var="viewWsdl"><span title="<fmt:message key="requests.request.error.nowsdl" />" class="glyphicon glyphicon-remove-sign"></span></c:set>
                 </c:otherwise>
             </c:choose>
             <c:choose>
@@ -76,7 +70,12 @@
                 <td><small>${call.date}</small></td>
                 <td><small>${call.from}</small></td>
                 <td><small>${call.uri}</small></td>
-                <td><small><a href="ui/validators#${call.validatorId}">${call.validatorId}</a></small></td>
+                <td>
+                    <small>
+                        <%-- TODO : activate validators tab on click --%>
+                        <a class="viewvalidator" href="#${call.validatorId}">${call.validatorId}</a>
+                    </small>
+                </td>
                 <td><small>${call.operation}</small></td>
 
                 <%--  ================================ --%>
@@ -115,7 +114,7 @@
                         <c:if test="${ ! empty call.requestSoapErrors || ! empty call.requestXmlErrors}">
                             <a class="glyphicon error glyphicon-exclamation-sign"
                                data-toggle="modal" href="#reqErrors_${loop.index}"
-                               title="<fmt:message key="logs.request.view.errors" />"></a>
+                               title="<fmt:message key="requests.request.view.errors" />"></a>
                         </c:if>
 
                         <div class="modal fade" id="reqModal_${loop.index}">
@@ -214,7 +213,7 @@
                         <c:if test="${ ! empty call.responseSoapErrors || ! empty call.responseXmlErrors}">
                             <a class="glyphicon error glyphicon-exclamation-sign"
                                data-toggle="modal" href="#respErrors_${loop.index}"
-                               title="<fmt:message key="logs.request.view.errors" />"></a>
+                               title="<fmt:message key="requests.request.view.errors" />"></a>
                         </c:if>
 
                         <div class="modal fade" id="respModal_${loop.index}">

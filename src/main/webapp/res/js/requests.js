@@ -25,6 +25,50 @@ var Cookie = {
 $(function() {
     var timer = 0;
 
+    $('#refresh').click(function() {
+        $.ajax($(this).attr('href'))
+                .done(function(msg) {
+                    console.log("refresh requests");
+                    var div = $('<div>');
+                    div.html(msg);
+                    var content = div.find('#requeststable tbody tr');
+                    var previousLength = $('#requeststable tbody tr').length;
+                    $('#requeststable tbody').hide().html(content).fadeIn('slow');
+                    if (previousLength === 0) {
+                        var newLength = $('#requeststable tbody tr').length;
+                        if (newLength > 0) {
+                            $("#actionButtons").fadeIn('slow').show();
+                        }
+                    }
+                    // reload highlighting
+                    $('pre code').each(function(i, block) {
+                        hljs.highlightBlock(block);
+                    });
+                    // TODO : reload links to validators tab
+                })
+                .fail(function() {
+                    console.log("error on refresh");
+                });
+        return false;
+    });
+
+    $('.viewvalidator').click(function() {
+        $('#myTab a[href="#validators"]').tab('show');
+    });
+
+    $('#clear').click(function() {
+        $.ajax($(this).attr('href'))
+                .done(function() {
+                    console.log("requests cleared");
+                    $('#requeststable tbody').fadeOut('slow').html();
+                    $("#actionButtons").fadeOut('slow').hide();
+                })
+                .fail(function() {
+                    console.log("error on refresh");
+                });
+        return false;
+    });
+
     $('#export').click(function() {
         $('#preparing-file-modal').modal('show');
 

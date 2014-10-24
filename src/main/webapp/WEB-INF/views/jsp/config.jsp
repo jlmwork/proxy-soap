@@ -7,31 +7,8 @@
 <%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <fmt:setBundle basename="messages"/>
 <h2><fmt:message key="config.pagetitle"/></h2>
-<%
-    // TODO : looks like some PHP app ! :-)
-    ProxyConfiguration proxy = (ProxyConfiguration) application.getAttribute(ProxyConfiguration.UID);
 
-    pageContext.setAttribute("settings", ProxyConfiguration.getKeys());
-    pageContext.setAttribute("proxy", proxy);
-
-    boolean saved = false;
-    for (String key : ProxyConfiguration.getKeys()) {
-        if (request.getParameter(key) != null) {
-            proxy.setProperty(key, request.getParameter(key));
-            saved = true;
-        }
-    }
-    if (saved) {
-        pageContext.setAttribute("success", "panel-success");
-        pageContext.setAttribute("message", "config.saved");
-    }
-    if (request.getParameter("persist") != null) {
-        proxy.persist();
-        pageContext.setAttribute("message", "config.persisted");
-    }
-%>
-
-<form method="post">
+<form method="post" action="ui/action/config">
     <div class="panel ${success}">
         <c:if test="${!empty message}">
             <div class="panel-heading">
