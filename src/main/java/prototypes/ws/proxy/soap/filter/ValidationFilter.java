@@ -61,7 +61,7 @@ public class ValidationFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
-        HttpServletResponse httpresponse = (HttpServletResponse) response;
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
         httpRequest.getSession().getServletContext();
 
         if (proxy.isValidationActive() && "POST".equals(httpRequest.getMethod())) {
@@ -76,7 +76,7 @@ public class ValidationFilter implements Filter {
             // This wrapping must occur in the first called ServletFilter
             httpRequest = new MultiReadHttpServletRequest(httpRequest);
             // wraps response for post processing
-            httpresponse = new BufferedHttpResponseWrapper(httpresponse);
+            httpResponse = new BufferedHttpResponseWrapper(httpResponse);
             OutputStream out = response.getOutputStream();
 
             // creates a SoapValidator
@@ -86,30 +86,35 @@ public class ValidationFilter implements Filter {
             boolean requestValid = validateInput(httpRequest, validator,
                     monitor);
             if (!requestValid && proxy.isInBlockingMode()) {
-                httpresponse.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,
                         "Request message invalid");
                 return;
             }
 
             // 2] pass the request along the filter chain
             long start = System.currentTimeMillis();
-            chain.doFilter(httpRequest, httpresponse);
+            chain.doFilter(httpRequest, httpResponse);
             long stop = System.currentTimeMillis();
             monitor.setResponseTime(stop - start);
 
             // 3] Response validation
-            boolean responseValid = validateOutput(httpRequest, httpresponse,
+            boolean responseValid = validateOutput(httpRequest, httpResponse,
                     out, validator, monitor);
             if (!responseValid && proxy.isInBlockingMode()) {
                 LOGGER.info("Proxy is in blocking mode.");
-                httpresponse.sendError(HttpServletResponse.SC_BAD_GATEWAY,
+                httpResponse.sendError(HttpServletResponse.SC_BAD_GATEWAY,
                         "Response message invalid");
                 return;
             }
-
+            if (requestValid && responseValid && proxy.isIgnoreValidRequests()) {
+                Requests.getMonitorManager(this.config.getServletContext()).getRequests().remove(monitor);
+            }
+            // send response back to the client
+            httpResponse.addHeader("X-Filtered-By", "proxy-soap");
+            out.write(monitor.getResponse().getBytes());
         } else {
             // pass the request along the filter chain
-            chain.doFilter(httpRequest, httpresponse);
+            chain.doFilter(httpRequest, httpResponse);
         }
     }
 
@@ -207,9 +212,6 @@ public class ValidationFilter implements Filter {
             }
         }
         monitor.setResponse(responseBodyContent);
-        httpResponse.addHeader("X-Filtered-By", "proxy-soap");
-        out.write(responseBodyContent.getBytes());
-
         return valid;
     }
 

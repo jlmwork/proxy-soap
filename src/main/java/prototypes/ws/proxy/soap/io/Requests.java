@@ -1,10 +1,13 @@
 package prototypes.ws.proxy.soap.io;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
+import prototypes.ws.proxy.soap.constantes.ProxyErrorConstantes;
 import prototypes.ws.proxy.soap.monitor.MonitorManager;
 import prototypes.ws.proxy.soap.monitor.ProxyMonitor;
 import prototypes.ws.proxy.soap.monitor.SoapRequestMonitor;
@@ -73,6 +76,29 @@ public class Requests {
     public static String resolveSoapServiceFromRequest(
             HttpServletRequest request) {
         return resolveSoapServiceFromURL(Requests.getTarget(request));
+    }
+
+    public static URL resolveTargetUrl(HttpServletRequest request) {
+        String uri = Requests.getTarget(request);
+        if (Strings.isNullOrEmpty(uri)) {
+            throw new IllegalStateException(
+                    ProxyErrorConstantes.TARGET_IS_EMPTY);
+        }
+        if (!uri.matches("^\\w+://.*")) {
+            LOGGER.debug("URI doesnt match URL pattern. So add current request host");
+            uri = Requests.getHost(request) + "/" + uri;
+        }
+
+        // TODO :
+        LOGGER.debug("Target uri : " + uri);
+        URL targetUrl;
+        try {
+            targetUrl = new URL(uri);
+        } catch (MalformedURLException e) {
+            throw new IllegalStateException(String.format(
+                    ProxyErrorConstantes.INVALID_TARGET, uri));
+        }
+        return targetUrl;
     }
 
     public static String resolveSoapServiceFromURL(String url) {

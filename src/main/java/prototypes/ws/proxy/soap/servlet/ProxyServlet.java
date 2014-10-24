@@ -17,7 +17,6 @@ package prototypes.ws.proxy.soap.servlet;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -46,29 +45,6 @@ public class ProxyServlet extends AbstractServlet {
             .asList(new String[]{"transfer-encoding", "content-encoding",
                 "set-cookie", "x-powered-by"});
 
-    private URL resolveTargetUrl(HttpServletRequest request) {
-        String uri = Requests.getTarget(request);
-        if (Strings.isNullOrEmpty(uri)) {
-            throw new IllegalStateException(
-                    ProxyErrorConstantes.TARGET_IS_EMPTY);
-        }
-        if (!uri.matches("^\\w+://.*")) {
-            LOGGER.debug("URI doesnt match URL pattern. So add current request host");
-            uri = Requests.getHost(request) + "/" + uri;
-        }
-
-        // TODO :
-        LOGGER.debug("Target uri : " + uri);
-        URL targetUrl;
-        try {
-            targetUrl = new URL(uri);
-        } catch (MalformedURLException e) {
-            throw new IllegalStateException(String.format(
-                    ProxyErrorConstantes.INVALID_TARGET, uri));
-        }
-        return targetUrl;
-    }
-
     /**
      * Recept all request.
      *
@@ -84,7 +60,7 @@ public class ProxyServlet extends AbstractServlet {
 
         URL targetUrl = null;
         try {
-            targetUrl = resolveTargetUrl(request);
+            targetUrl = Requests.resolveTargetUrl(request);
         } catch (IllegalStateException e1) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST,
                     e1.getMessage());
@@ -102,6 +78,12 @@ public class ProxyServlet extends AbstractServlet {
 
             this.addRequestHeaders(request, httpConn);
             httpConn.setRequestMethod(request.getMethod());
+            String reqContentType = (!Strings.isNullOrEmpty(request.getContentType()))
+                    ? request.getContentType()
+                    : (!Strings.isNullOrEmpty(request.getHeader("Content-Type"))
+                    ? request.getHeader("Content-Type")
+                    : "text/xml");
+            httpConn.setRequestProperty("Content-Type", reqContentType);
             httpConn.setDoOutput(true);
 
             if (LOGGER.isDebugEnabled()) {
@@ -182,10 +164,11 @@ public class ProxyServlet extends AbstractServlet {
             // unactivate gzipped request with remote host
             if ((headerName == null)
                     || headerName.toLowerCase().equals("transfer-encoding")) {
+                LOGGER.debug("Ignore Request header [" + headerName + "=" + req.getHeader(headerName) + "]");
                 continue;
             }
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Request header [" + headerName + "=" + req.getHeader(headerName) + "]");
+                LOGGER.debug("Add Request header [" + headerName + "=" + req.getHeader(headerName) + "]");
             }
             httpConn.setRequestProperty(headerName, req.getHeader(headerName));
         }

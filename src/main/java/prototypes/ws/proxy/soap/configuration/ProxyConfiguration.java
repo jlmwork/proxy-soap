@@ -40,8 +40,9 @@ public class ProxyConfiguration extends HashMap<String, Object> {
     private final AtomicInteger nbMaxRequests = new AtomicInteger(50);
     private String wsdlDirs = "";
     private final AtomicBoolean isPersisted = new AtomicBoolean(false);
+    private final AtomicBoolean ignoreValidRequests = new AtomicBoolean(false);
     private String persistPath = System.getProperty("java.io.tmpdir") + File.separator + "proxy-soap.properties";
-    private final AtomicInteger env = new AtomicInteger(ApplicationConfig.ENV_PROD);
+    private final AtomicInteger runMode = new AtomicInteger(ApplicationConfig.RUN_MODE_PROD);
 
     /**
      * Load default configuration from system properties
@@ -50,7 +51,7 @@ public class ProxyConfiguration extends HashMap<String, Object> {
     }
 
     public ProxyConfiguration(String validation, String blockingMode,
-            String wsdlDirs, String maxRequests, String env) {
+            String wsdlDirs, String maxRequests, String ignoreValidRequests, String runMode) {
         // check if a persisted configuration is available
         boolean persistedConf = (new File(persistPath)).exists();
         if (persistedConf) {
@@ -63,22 +64,35 @@ public class ProxyConfiguration extends HashMap<String, Object> {
             setValidationActive(Boolean.parseBoolean(validation));
             setWsdlDirs(wsdlDirs);
             setNbMaxRequests(maxRequests);
+            setRunMode(runMode);
+            setIgnoreValidRequests(Boolean.parseBoolean(ignoreValidRequests));
         }
     }
 
     public ProxyConfiguration(boolean validation, boolean blockingMode,
-            String wsdlDirs, int maxRequests) {
+            String wsdlDirs, int maxRequests, boolean ignoreValidRequests, String runMode) {
         setBlockingMode(blockingMode);
         setValidationActive(validation);
         setWsdlDirs(wsdlDirs);
         setNbMaxRequests(maxRequests);
+        setIgnoreValidRequests(ignoreValidRequests);
     }
 
     public static String[] getKeys() {
         return new String[]{ApplicationConfig.PROP_BLOCKING_MODE,
             ApplicationConfig.PROP_VALIDATION,
             ApplicationConfig.PROP_WSDL_DIRS,
-            ApplicationConfig.PROP_MAX_REQUESTS};
+            ApplicationConfig.PROP_MAX_REQUESTS,
+            ApplicationConfig.PROP_IGNORE_VALID_REQUESTS};
+    }
+
+    private static String[] getAllKeys() {
+        return new String[]{ApplicationConfig.PROP_BLOCKING_MODE,
+            ApplicationConfig.PROP_VALIDATION,
+            ApplicationConfig.PROP_WSDL_DIRS,
+            ApplicationConfig.PROP_MAX_REQUESTS,
+            ApplicationConfig.PROP_IGNORE_VALID_REQUESTS,
+            ApplicationConfig.PROP_RUN_MODE};
     }
 
     public Object get(Object obj) {
@@ -89,12 +103,14 @@ public class ProxyConfiguration extends HashMap<String, Object> {
         } else if ("validationActive".equals(key)
                 || ApplicationConfig.PROP_VALIDATION.equals(key)) {
             return isValidationActive();
-        } else if ("wsdls".equals(key)
-                || ApplicationConfig.PROP_WSDL_DIRS.equals(key)) {
+        } else if (ApplicationConfig.PROP_WSDL_DIRS.equals(key)) {
             return getWsdlDirs();
-        } else if ("nbMaxRequests".equals(key)
-                || ApplicationConfig.PROP_MAX_REQUESTS.equals(key)) {
+        } else if (ApplicationConfig.PROP_MAX_REQUESTS.equals(key)) {
             return getNbMaxRequests();
+        } else if (ApplicationConfig.PROP_IGNORE_VALID_REQUESTS.equals(key)) {
+            return isIgnoreValidRequests();
+        } else if (ApplicationConfig.PROP_RUN_MODE.equals(key)) {
+            return this.runMode;
         } else if ("persisted".equals(key)) {
             return isPersisted();
         } else if ("persistPath".equals(key)) {
@@ -111,36 +127,35 @@ public class ProxyConfiguration extends HashMap<String, Object> {
 
     public void setProperty(String key, String value) {
         if (key != null && value != null) {
-            if ("blockingMode".equals(key)
-                    || ApplicationConfig.PROP_BLOCKING_MODE.equals(key)) {
+            if (ApplicationConfig.PROP_BLOCKING_MODE.equals(key)) {
                 setBlockingMode(Boolean.parseBoolean(value));
-            } else if ("validationActive".equals(key)
-                    || ApplicationConfig.PROP_VALIDATION.equals(key)) {
+            } else if (ApplicationConfig.PROP_VALIDATION.equals(key)) {
                 setValidationActive(Boolean.parseBoolean(value));
             } else if ("wsdls".equals(key)
                     || ApplicationConfig.PROP_WSDL_DIRS.equals(key)) {
                 setWsdlDirs(value);
-            } else if ("nbMaxRequests".equals(key)
-                    || ApplicationConfig.PROP_MAX_REQUESTS.equals(key)) {
+            } else if (ApplicationConfig.PROP_MAX_REQUESTS.equals(key)) {
                 setNbMaxRequests(value);
+            } else if (ApplicationConfig.PROP_IGNORE_VALID_REQUESTS.equals(key)) {
+                setIgnoreValidRequests(Boolean.parseBoolean(value));
             }
         }
     }
 
-    public void setEnv(String env) {
+    public void setRunMode(String env) {
         try {
-            this.env.set(Integer.parseInt(env));
+            this.runMode.set(Integer.parseInt(env));
         } catch (Exception e) {
-            this.env.set(ApplicationConfig.ENV_PROD);
+            this.runMode.set(ApplicationConfig.RUN_MODE_PROD);
         }
     }
 
-    public boolean isEnvDev() {
-        return (this.env.get() == ApplicationConfig.ENV_DEV);
+    public boolean runInDevMode() {
+        return (this.runMode.get() == ApplicationConfig.RUN_MODE_DEV);
     }
 
-    public boolean isEnvProd() {
-        return (this.env.get() == ApplicationConfig.ENV_PROD);
+    public boolean runInProdMode() {
+        return (this.runMode.get() == ApplicationConfig.RUN_MODE_PROD);
     }
 
     public boolean isValidationActive() {
@@ -212,6 +227,14 @@ public class ProxyConfiguration extends HashMap<String, Object> {
         }
     }
 
+    public boolean isIgnoreValidRequests() {
+        return this.ignoreValidRequests.get();
+    }
+
+    public void setIgnoreValidRequests(boolean ignore) {
+        this.ignoreValidRequests.set(ignore);
+    }
+
     public boolean isPersisted() {
         return this.isPersisted.get();
     }
@@ -231,7 +254,7 @@ public class ProxyConfiguration extends HashMap<String, Object> {
         Properties props = new Properties();
         try {
             props.load(new FileInputStream(new File(persistPath)));
-            for (String key : getKeys()) {
+            for (String key : getAllKeys()) {
                 this.setProperty(key, props.getProperty(key));
             }
         } catch (IOException ex) {
@@ -241,7 +264,7 @@ public class ProxyConfiguration extends HashMap<String, Object> {
 
     public String toProperties() {
         StringBuilder sb = new StringBuilder();
-        for (String key : getKeys()) {
+        for (String key : getAllKeys()) {
             sb.append(key);
             sb.append("=");
             sb.append(this.get(key));
@@ -252,9 +275,7 @@ public class ProxyConfiguration extends HashMap<String, Object> {
 
     @Override
     public String toString() {
-        return "ProxyConfiguration [validationActive=" + validationActive
-                + ", inBlockingMode=" + inBlockingMode + ", nbMaxRequests="
-                + nbMaxRequests + ", wsdlDirs=" + wsdlDirs + "]";
+        return "ProxyConfiguration{" + "validationActive=" + validationActive + ", inBlockingMode=" + inBlockingMode + ", nbMaxRequests=" + nbMaxRequests + ", wsdlDirs=" + wsdlDirs + ", isPersisted=" + isPersisted + ", ignoreValidRequests=" + ignoreValidRequests + ", persistPath=" + persistPath + ", runMode=" + runMode + '}';
     }
 
 }

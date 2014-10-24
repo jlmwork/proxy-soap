@@ -31,7 +31,8 @@ public class ApplicationInitListener implements ServletContextListener {
                 get(ApplicationConfig.PROP_BLOCKING_MODE, "false"),
                 get(ApplicationConfig.PROP_WSDL_DIRS, ""),
                 get(ApplicationConfig.PROP_MAX_REQUESTS, "50"),
-                get(ApplicationConfig.PROP_MAX_REQUESTS, ""));
+                get(ApplicationConfig.PROP_IGNORE_VALID_REQUESTS, "false"),
+                get(ApplicationConfig.PROP_RUN_MODE, ""));
         LOGGER.debug(proxy.toString());
         sce.getServletContext().setAttribute(ProxyConfiguration.UID, proxy);
         Requests.getMonitorManager(sce.getServletContext());
