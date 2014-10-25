@@ -41,7 +41,7 @@ public class ProxyConfiguration extends HashMap<String, Object> {
     private String wsdlDirs = "";
     private final AtomicBoolean isPersisted = new AtomicBoolean(false);
     private final AtomicBoolean ignoreValidRequests = new AtomicBoolean(false);
-    private String persistPath = System.getProperty("java.io.tmpdir") + File.separator + "proxy-soap.properties";
+    private final String persistPath = System.getProperty("java.io.tmpdir") + File.separator + "proxy-soap.properties";
     private final AtomicInteger runMode = new AtomicInteger(ApplicationConfig.RUN_MODE_PROD);
 
     /**
