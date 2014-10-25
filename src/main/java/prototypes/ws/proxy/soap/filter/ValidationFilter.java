@@ -1,3 +1,18 @@
+/*
+ * Copyright 2014 jlamande.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package prototypes.ws.proxy.soap.filter;
 
 import java.io.IOException;
@@ -33,12 +48,10 @@ import prototypes.ws.proxy.soap.xml.XmlUtils;
 /**
  * Servlet Filter implementation class ValidationFilter
  */
-public class ValidationFilter implements Filter {
+public class ValidationFilter extends HttpServletFilter {
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(ValidationFilter.class);
-
-    private FilterConfig config;
 
     private ProxyConfiguration proxy;
 
@@ -47,9 +60,8 @@ public class ValidationFilter implements Filter {
      */
     @Override
     public void init(FilterConfig config) throws ServletException {
-        // retrieve config object from application scope
+        super.init(config);
         proxy = Requests.getProxy(config.getServletContext());
-        this.config = config;
     }
 
     /**
@@ -58,51 +70,48 @@ public class ValidationFilter implements Filter {
      *
      */
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response,
+    public void doFilter(HttpServletRequest request, HttpServletResponse response,
             FilterChain chain) throws IOException, ServletException {
-        HttpServletRequest httpRequest = (HttpServletRequest) request;
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
-        httpRequest.getSession().getServletContext();
 
-        if (proxy.isValidationActive() && "POST".equals(httpRequest.getMethod())) {
+        if (proxy.isValidationActive() && "POST".equals(request.getMethod())) {
             SoapRequestMonitor monitor = Requests.getRequestMonitor(
-                    this.config.getServletContext(), httpRequest);
-            monitor.setUri(Requests.getTarget(httpRequest));
-            monitor.setFrom(httpRequest.getRemoteAddr());
+                    this.config.getServletContext(), request);
+            monitor.setUri(Requests.getTarget(request));
+            monitor.setFrom(request.getRemoteAddr());
             LOGGER.info("Validation is active.");
 
             // Prepare Objects
             // wraps request for allowing to read request body more than once
             // This wrapping must occur in the first called ServletFilter
-            httpRequest = new MultiReadHttpServletRequest(httpRequest);
+            request = new MultiReadHttpServletRequest(request);
             // wraps response for post processing
-            httpResponse = new BufferedHttpResponseWrapper(httpResponse);
+            response = new BufferedHttpResponseWrapper(response);
             OutputStream out = response.getOutputStream();
 
             // creates a SoapValidator
-            SoapValidator validator = getSoapValidator(httpRequest);
+            SoapValidator validator = getSoapValidator(request);
 
             // 1] Request validation
-            boolean requestValid = validateInput(httpRequest, validator,
+            boolean requestValid = validateInput(request, validator,
                     monitor);
             if (!requestValid && proxy.isInBlockingMode()) {
-                httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST,
                         "Request message invalid");
                 return;
             }
 
             // 2] pass the request along the filter chain
             long start = System.currentTimeMillis();
-            chain.doFilter(httpRequest, httpResponse);
+            chain.doFilter(request, response);
             long stop = System.currentTimeMillis();
             monitor.setResponseTime(stop - start);
 
             // 3] Response validation
-            boolean responseValid = validateOutput(httpRequest, httpResponse,
+            boolean responseValid = validateOutput(request, response,
                     out, validator, monitor);
             if (!responseValid && proxy.isInBlockingMode()) {
                 LOGGER.info("Proxy is in blocking mode.");
-                httpResponse.sendError(HttpServletResponse.SC_BAD_GATEWAY,
+                response.sendError(HttpServletResponse.SC_BAD_GATEWAY,
                         "Response message invalid");
                 return;
             }
@@ -110,26 +119,26 @@ public class ValidationFilter implements Filter {
                 Requests.getMonitorManager(this.config.getServletContext()).getRequests().remove(monitor);
             }
             // send response back to the client
-            httpResponse.addHeader("X-Filtered-By", "proxy-soap");
+            response.addHeader("X-Filtered-By", "proxy-soap");
             out.write(monitor.getResponse().getBytes());
         } else {
             // pass the request along the filter chain
-            chain.doFilter(httpRequest, httpResponse);
+            chain.doFilter(request, response);
         }
     }
 
     /**
      * called before the Filter chain if validation is active
      *
-     * @param httpRequest
+     * @param request
      * @param soapValidator
      * @return
      * @throws IOException
      */
-    private boolean validateInput(HttpServletRequest httpRequest,
+    private boolean validateInput(HttpServletRequest request,
             SoapValidator soapValidator, SoapRequestMonitor monitor)
             throws IOException {
-        String requestBodyContent = new String(Streams.getBytes(httpRequest
+        String requestBodyContent = new String(Streams.getBytes(request
                 .getInputStream()));
 
         // 1] XML Well formed ?
@@ -143,7 +152,7 @@ public class ValidationFilter implements Filter {
             monitor.setValidatorId(soapValidator.getId());
             SoapMessage message = soapValidator
                     .newRequestMessage(requestBodyContent);
-            httpRequest.setAttribute("requestMessage", message);
+            request.setAttribute("requestMessage", message);
             monitor.setOperation(message.getOperation().getBindingOperationName());
             List<com.eviware.soapui.model.testsuite.AssertionError> soapErrors = new ArrayList<com.eviware.soapui.model.testsuite.AssertionError>();
             valid = valid && soapValidator.validateRequest(message, soapErrors);
@@ -165,20 +174,20 @@ public class ValidationFilter implements Filter {
     /**
      * called after the Filter chain if validation is active
      *
-     * @param httpResponse
+     * @param response
      * @param out
      * @param soapValidator
      * @throws IOException
      */
-    private boolean validateOutput(HttpServletRequest httpRequest,
-            HttpServletResponse httpResponse, OutputStream out,
+    private boolean validateOutput(HttpServletRequest request,
+            HttpServletResponse response, OutputStream out,
             SoapValidator soapValidator, SoapRequestMonitor monitor)
             throws IOException {
         boolean valid = false;
         String responseBodyContent = new String(
-                ((BufferedHttpResponseWrapper) httpResponse).getBuffer());
+                ((BufferedHttpResponseWrapper) response).getBuffer());
 
-        ProxyMonitor proxyResult = Requests.getProxyMonitor(httpRequest);
+        ProxyMonitor proxyResult = Requests.getProxyMonitor(request);
 
         if (proxyResult != null && proxyResult.getResponseCode() == HttpServletResponse.SC_OK) {
             // 1] XML Well formed ?
@@ -190,7 +199,7 @@ public class ValidationFilter implements Filter {
             // 2] Soap Valid ?
             if (valid && (soapValidator != null)) {
                 List<com.eviware.soapui.model.testsuite.AssertionError> soapErrors = new ArrayList<com.eviware.soapui.model.testsuite.AssertionError>();
-                SoapMessage requestMessage = (SoapMessage) httpRequest
+                SoapMessage requestMessage = (SoapMessage) request
                         .getAttribute("requestMessage");
                 if (requestMessage != null) {
                     SoapMessage message = soapValidator.newResponseMessage(
@@ -229,13 +238,6 @@ public class ValidationFilter implements Filter {
             soapValidator = SoapValidatorFactory.createSoapValidator(service);
         }
         return soapValidator;
-    }
-
-    /**
-     * @see Filter#destroy()
-     */
-    @Override
-    public void destroy() {
     }
 
 }
