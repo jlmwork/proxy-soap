@@ -18,10 +18,6 @@
         <servlet-class>prototypes.ws.proxy.soap.servlet.UiServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ReloadServlet</servlet-name>
-        <servlet-class>prototypes.ws.proxy.soap.servlet.ReloadServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>RequestsServlet</servlet-name>
         <servlet-class>prototypes.ws.proxy.soap.servlet.RequestsServlet</servlet-class>
     </servlet>
@@ -40,10 +36,6 @@
     <servlet-mapping>
         <servlet-name>UiServlet</servlet-name>
         <url-pattern>/ui/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ReloadServlet</servlet-name>
-        <url-pattern>/reload</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>RequestsServlet</servlet-name>

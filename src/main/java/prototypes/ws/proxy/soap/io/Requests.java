@@ -2,15 +2,10 @@ package prototypes.ws.proxy.soap.io;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
 import prototypes.ws.proxy.soap.constantes.ProxyErrorConstantes;
-import prototypes.ws.proxy.soap.monitor.MonitorManager;
-import prototypes.ws.proxy.soap.monitor.ProxyMonitor;
-import prototypes.ws.proxy.soap.monitor.SoapRequestMonitor;
 
 public class Requests {
 
@@ -25,47 +20,6 @@ public class Requests {
     public static String getHost(HttpServletRequest request) {
         return request.getScheme() + "://" + request.getServerName() + ":"
                 + request.getServerPort();
-    }
-
-    public static ProxyConfiguration getProxy(ServletContext servletContext) {
-        ProxyConfiguration proxy = (ProxyConfiguration) servletContext
-                .getAttribute(ProxyConfiguration.UID);
-        // if not found, create it and references it in application scope
-        if (proxy == null) {
-            proxy = new ProxyConfiguration();
-            servletContext.setAttribute(ProxyConfiguration.UID, proxy);
-        }
-        return proxy;
-    }
-
-    public static MonitorManager getMonitorManager(ServletContext servletContext) {
-        MonitorManager manager = (MonitorManager) servletContext
-                .getAttribute(MonitorManager.UID);
-        if (manager == null) {
-            manager = new MonitorManager(getProxy(servletContext));
-            servletContext.setAttribute(MonitorManager.UID, manager);
-        }
-        return manager;
-    }
-
-    public static SoapRequestMonitor getRequestMonitor(
-            ServletContext servletContext, HttpServletRequest request) {
-        SoapRequestMonitor monitor = (SoapRequestMonitor) request
-                .getAttribute(SoapRequestMonitor.UID);
-        if (monitor == null) {
-            monitor = getMonitorManager(servletContext).monitor();
-            request.setAttribute(SoapRequestMonitor.UID, monitor);
-        }
-        return monitor;
-    }
-
-    public static ProxyMonitor getProxyMonitor(HttpServletRequest request) {
-        ProxyMonitor proxyMonitor = (ProxyMonitor) request.getAttribute(ProxyMonitor.UID);
-        if (proxyMonitor == null) {
-            proxyMonitor = new ProxyMonitor();
-            request.setAttribute(ProxyMonitor.UID, proxyMonitor);
-        }
-        return proxyMonitor;
     }
 
     public static String getTarget(HttpServletRequest request) {

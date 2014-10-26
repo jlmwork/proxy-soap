@@ -15,6 +15,8 @@
  */
 package prototypes.ws.proxy.soap.constantes;
 
+import java.io.File;
+
 /**
  *
  * @author JL06436S
@@ -32,6 +34,16 @@ public class ApplicationConfig {
 
     public static String PROP_RUN_MODE = "proxy.soap.run.mode";
 
+    public static final String DEFAULT_STORAGE_PATH = System.getProperty("java.io.tmpdir") + File.separator + "proxy-soap" + File.separator;
+
+    static {
+        // create the default storage path
+        (new File(DEFAULT_STORAGE_PATH)).mkdirs();
+    }
+
     public static Integer RUN_MODE_PROD = 0;
     public static Integer RUN_MODE_DEV = 1;
+
+    public static final String EM = "EM";
+
 }

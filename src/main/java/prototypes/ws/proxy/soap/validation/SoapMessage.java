@@ -9,7 +9,7 @@ import org.xml.sax.SAXException;
 
 import prototypes.ws.proxy.soap.constantes.ProxyErrorConstantes;
 import prototypes.ws.proxy.soap.constantes.SoapConstantes;
-import prototypes.ws.proxy.soap.xml.XmlUtils;
+import prototypes.ws.proxy.soap.xml.XmlStrings;
 
 import com.eviware.soapui.impl.wsdl.WsdlInterface;
 import com.eviware.soapui.impl.wsdl.WsdlOperation;
@@ -37,7 +37,7 @@ public class SoapMessage implements WsdlMessageExchange {
         this.request = requestBody;
         this.wsdlInterface = wsdlInterface;
 
-        Node opNode = XmlUtils.firstChild(request, SoapConstantes.BODY);
+        Node opNode = XmlStrings.firstChild(request, SoapConstantes.BODY);
 
         /*
          * No body, or no body's children
@@ -51,7 +51,7 @@ public class SoapMessage implements WsdlMessageExchange {
     }
 
     public NodeList getHeaders() throws SAXException, IOException {
-        return XmlUtils.children(request, SoapConstantes.HEADER);
+        return XmlStrings.children(request, SoapConstantes.HEADER);
     }
 
     @Override

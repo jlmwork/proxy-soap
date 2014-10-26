@@ -21,16 +21,15 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
-import prototypes.ws.proxy.soap.io.Requests;
+import prototypes.ws.proxy.soap.context.ApplicationContext;
 import prototypes.ws.proxy.soap.io.Streams;
-import prototypes.ws.proxy.soap.monitor.MonitorManager;
+import prototypes.ws.proxy.soap.repository.SoapExchangeRepository;
 import prototypes.ws.proxy.soap.validation.SoapValidatorFactory;
 
 public class UiServlet extends AbstractServlet {
@@ -45,7 +44,15 @@ public class UiServlet extends AbstractServlet {
 
     private final String ACTION_PATH = "ui/action";
 
-    private MonitorManager monitor;
+    private ProxyConfiguration proxyConfig;
+    private SoapExchangeRepository exchangeRepository;
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        proxyConfig = ApplicationContext.getProxyConfiguration(this.getServletContext());
+        exchangeRepository = ApplicationContext.getSoapExchangeRepository(this.getServletContext());
+    }
 
     @Override
     protected void doRequest(HttpServletRequest request,
@@ -58,11 +65,10 @@ public class UiServlet extends AbstractServlet {
         request.setAttribute("action", action);
 
         LOGGER.info("UiServlet : uri = " + action);
-        ProxyConfiguration proxy = (ProxyConfiguration) Requests.getProxy(this.getServletContext());
         request.setAttribute("settings", ProxyConfiguration.getKeys());
-        request.setAttribute("proxy", proxy);
+        request.setAttribute("proxy", proxyConfig);
 
-        request.setAttribute("requestList", monitor.getRequests());
+        request.setAttribute("requestList", exchangeRepository.list());
         request.setAttribute("validators", SoapValidatorFactory.getValidators());
 
         if ("clearRequests".equals(action)) {
@@ -75,7 +81,7 @@ public class UiServlet extends AbstractServlet {
             boolean saved = false;
             for (String key : ProxyConfiguration.getKeys()) {
                 if (request.getParameter(key) != null) {
-                    proxy.setProperty(key, request.getParameter(key));
+                    proxyConfig.setProperty(key, request.getParameter(key));
                     saved = true;
                 }
             }
@@ -84,7 +90,7 @@ public class UiServlet extends AbstractServlet {
                 request.setAttribute("message", "config.saved");
             }
             if (request.getParameter("persist") != null) {
-                proxy.persist();
+                proxyConfig.persist();
                 request.setAttribute("message", "config.persisted");
             }
         }
@@ -100,7 +106,7 @@ public class UiServlet extends AbstractServlet {
 
     public void clearRequests(HttpServletRequest request,
             HttpServletResponse response) throws IOException {
-        monitor.clear();
+        exchangeRepository.removeAll();
         response.sendRedirect(request.getContextPath() + "/ui/logs");
     }
 
@@ -132,9 +138,4 @@ public class UiServlet extends AbstractServlet {
         }
     }
 
-    @Override
-    public void init(ServletConfig sconfig) throws ServletException {
-        super.init(sconfig);
-        monitor = Requests.getMonitorManager(this.getServletContext());
-    }
 }

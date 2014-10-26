@@ -22,8 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import prototypes.ws.proxy.soap.io.Requests;
-import prototypes.ws.proxy.soap.monitor.SoapRequestMonitor;
 
 public class ErrorServlet extends HttpServlet {
 
@@ -59,11 +57,6 @@ public class ErrorServlet extends HttpServlet {
         }
 
         // Error Monitoring
-        SoapRequestMonitor monitor = Requests.getRequestMonitor(this.getServletContext(), request);
-        if (monitor != null) {
-            monitor.setMessage(error);
-        }
-
         response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, error);
     }
 

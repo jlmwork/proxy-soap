@@ -16,7 +16,7 @@ import prototypes.ws.proxy.soap.constantes.SoapConstantes;
 import prototypes.ws.proxy.soap.constantes.SoapErrorConstantes;
 import prototypes.ws.proxy.soap.io.Requests;
 import prototypes.ws.proxy.soap.reflect.Classes;
-import prototypes.ws.proxy.soap.xml.XmlUtils;
+import prototypes.ws.proxy.soap.xml.XmlStrings;
 
 import com.eviware.soapui.impl.WsdlInterfaceFactory;
 import com.eviware.soapui.impl.support.definition.InterfaceDefinition;
@@ -144,7 +144,7 @@ public class SoapValidatorSoapUI implements SoapValidator {
 
     @Override
     public boolean validateXml(String xml, List<AssertionError> errors) {
-        List<XmlError> errs = XmlUtils.validateXml(xml);
+        List<XmlError> errs = XmlStrings.validateXml(xml);
         if (errors == null) {
             errors = new ArrayList<AssertionError>();
         }
@@ -198,7 +198,7 @@ public class SoapValidatorSoapUI implements SoapValidator {
         // Fault test
         Node opNode;
         try {
-            opNode = XmlUtils.firstChild(responseMessage.getResponseContent(),
+            opNode = XmlStrings.firstChild(responseMessage.getResponseContent(),
                     SoapConstantes.BODY);
         } catch (Exception e) {
             LOGGER.error("Response get body first child fail", e);

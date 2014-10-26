@@ -1,7 +1,7 @@
 package fr.erdf.nsge.sgel.proxy.soap.xml;
 
 import org.junit.Test;
-import prototypes.ws.proxy.soap.xml.XmlUtils;
+import prototypes.ws.proxy.soap.xml.XmlStrings;
 
 public class XmlUtilsTest {
 
@@ -12,10 +12,10 @@ public class XmlUtilsTest {
                 + "   <soapenv:Body>\r\n"
                 + "   </soapenv:Body>\r\n" + "</soapenv:Envelope>";
         // bypass first one
-        XmlUtils.cleanXmlRequest(str);
+        XmlStrings.cleanXmlRequest(str);
         for (int i = 0; i < 1; i++) {
             long start = System.currentTimeMillis();
-            XmlUtils.cleanXmlRequest(str);
+            XmlStrings.cleanXmlRequest(str);
             System.out
                     .println("Time : " + (System.currentTimeMillis() - start));
             str = new StringBuilder(str).toString();

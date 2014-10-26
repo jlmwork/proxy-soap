@@ -27,11 +27,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
 import prototypes.ws.proxy.soap.constantes.ProxyErrorConstantes;
+import prototypes.ws.proxy.soap.context.ApplicationContext;
+import prototypes.ws.proxy.soap.context.RequestContext;
+import prototypes.ws.proxy.soap.io.ProxyExchange;
 import prototypes.ws.proxy.soap.io.Requests;
 import prototypes.ws.proxy.soap.io.Streams;
 import prototypes.ws.proxy.soap.io.Strings;
-import prototypes.ws.proxy.soap.monitor.ProxyMonitor;
 
 public class ProxyServlet extends AbstractServlet {
 
@@ -44,6 +47,14 @@ public class ProxyServlet extends AbstractServlet {
     private static final List<String> RESP_HEADERS_TO_IGNORE = Arrays
             .asList(new String[]{"transfer-encoding", "content-encoding",
                 "set-cookie", "x-powered-by"});
+
+    private ProxyConfiguration proxyConfig;
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        proxyConfig = ApplicationContext.getProxyConfiguration(this.getServletContext());
+    }
 
     /**
      * Recept all request.
@@ -69,11 +80,14 @@ public class ProxyServlet extends AbstractServlet {
 
         byte[] body = Streams.getBytes(request.getInputStream());
 
-        ProxyMonitor proxyMonitor = Requests.getProxyMonitor(request);
+        ProxyExchange proxyExchange = RequestContext.getProxyExchange(request);
         HttpURLConnection httpConn = null;
 
         try {
             httpConn = (HttpURLConnection) targetUrl.openConnection();
+            // timeouts
+            httpConn.setConnectTimeout(proxyConfig.getConnectTimeout());
+            httpConn.setReadTimeout(proxyConfig.getReadTimeout());
             httpConn.setDoOutput(false);
 
             this.addRequestHeaders(request, httpConn);
@@ -92,29 +106,29 @@ public class ProxyServlet extends AbstractServlet {
 
             // Send request
             if (body.length > 0) {
-                LOGGER.warn("Body Content is Empty");
+                LOGGER.warn("Body Content not Empty");
                 httpConn.getOutputStream().write(body);
             }
             boolean gzipped = "gzip".equals(httpConn.getContentEncoding());
 
             // Get response. If response is gzipped, uncompress it
             try {
-                proxyMonitor.setResponseBody(Streams.getString(
+                proxyExchange.setResponseBody(Streams.getString(
                         httpConn.getInputStream(), gzipped));
             } catch (IOException e) {
                 LOGGER.debug("Failed to read target response body", e);
             }
 
             // Make Proxy Result
-            proxyMonitor.setResponseCode(httpConn.getResponseCode());
-            proxyMonitor.setResponseMessage(httpConn.getResponseMessage());
-            proxyMonitor.setHeaders(httpConn.getHeaderFields());
-            proxyMonitor.setContentType(httpConn.getContentType());
-            proxyMonitor.setContentEncoding(httpConn.getContentEncoding());
-            proxyMonitor.setGzipped(gzipped);
+            proxyExchange.setResponseCode(httpConn.getResponseCode());
+            proxyExchange.setResponseMessage(httpConn.getResponseMessage());
+            proxyExchange.setHeaders(httpConn.getHeaderFields());
+            proxyExchange.setContentType(httpConn.getContentType());
+            proxyExchange.setContentEncoding(httpConn.getContentEncoding());
+            proxyExchange.setGzipped(gzipped);
 
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Proxy result : " + proxyMonitor);
+                LOGGER.debug("Proxy result : " + proxyExchange);
             }
 
         } catch (IOException e) {
@@ -125,7 +139,7 @@ public class ProxyServlet extends AbstractServlet {
         }
 
         // Specific error code treatment
-        switch (proxyMonitor.getResponseCode()) {
+        switch (proxyExchange.getResponseCode()) {
             case 0:
                 // No response
                 LOGGER.debug("ResponseCode =  0 !!!");
@@ -143,11 +157,11 @@ public class ProxyServlet extends AbstractServlet {
         }
 
         // return response with filtered headers
-        addResponseHeaders(response, proxyMonitor, RESP_HEADERS_TO_IGNORE);
-        response.setStatus(proxyMonitor.getResponseCode());
+        addResponseHeaders(response, proxyExchange, RESP_HEADERS_TO_IGNORE);
+        response.setStatus(proxyExchange.getResponseCode());
         // send service request body
         Streams.putStringAndClose(response.getOutputStream(),
-                proxyMonitor.getResponseBody());
+                proxyExchange.getResponseBody());
     }
 
     /**
@@ -183,7 +197,7 @@ public class ProxyServlet extends AbstractServlet {
      * @param headersToIgnore allow filtering of headers
      */
     private void addResponseHeaders(HttpServletResponse resp,
-            ProxyMonitor proxyResult, List<String> headersToIgnore) {
+            ProxyExchange proxyResult, List<String> headersToIgnore) {
 
         if (proxyResult.getHeaders() == null) {
             return;

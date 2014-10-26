@@ -1,30 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
-    <persistence-unit name="persistenceUnitMesure" transaction-type="RESOURCE_LOCAL">
+    <persistence-unit name="ProxyPU" transaction-type="RESOURCE_LOCAL">
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
         <!-- unactivate L2 cache-->
         <shared-cache-mode>NONE</shared-cache-mode>
-        <!-- -->
-        <class>prototypes.db.indexes.IndexEntity</class>
+        <!--
+        <class>prototypes.ws.proxy.soap.monitor.SoapRequestMonitor</class>-->
+        <mapping-file>META-INF/mapping.xml</mapping-file>
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <properties>
             <!-- derby local -->
             <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver"/>
-            <property name="javax.persistence.jdbc.url" value="jdbc:derby:indexes_derby.db;create=true"/>
-            <property name="javax.persistence.jdbc.user" value="test"/>
-            <property name="javax.persistence.jdbc.password" value="test"/>
-            <!--<property name="eclipselink.ddl-generation" value="drop-and-create-tables"/>-->
-            <!-- remote oracle
-            <property name="javax.persistence.jdbc.driver" value="oracle.jdbc.OracleDriver"/>
-            <property name="javax.persistence.jdbc.url" value="jdbc:oracle:thin:@zed307j2.distribution.edf.fr:1521:SGELDEV2"/>
-            <property name="javax.persistence.jdbc.user" value="SGEL_MESURE_APPLICATIF"/>
-            <property name="javax.persistence.jdbc.password" value="Userappmesure1*"/>-->
-            <property name="showSql" value="true"/>
-            <property name="eclipselink.deploy-on-startup" value="true"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:derby:proxy-soap_derby.db;create=true"/>
+            <property name="javax.persistence.jdbc.user" value="proxy"/>
+            <property name="javax.persistence.jdbc.password" value="soap"/>
+            <!--<property name="showSql" value="true"/>-->
+            <property name="eclipselink.logging.logger" value="prototypes.ws.proxy.soap.logging.Slf4jEclipseLinkSessionLogger"/>
             <property name="eclipselink.logging.level" value="FINEST"/>
-            <property name="eclipselink.logging.logger" value="DefaultLogger"/>
-            <property name="eclipselink.weaving" value="static"/>
+            <property name="eclipselink.logging.level.sql" value="FINE"/>
             <property name="eclipselink.logging.parameters" value="true"/>
-            <property name="eclipselink.ddl-generation" value="drop-and-create-tables"/>
+            <property name="eclipselink.deploy-on-startup" value="true"/>
+            <property name="eclipselink.weaving" value="static"/>
+            <property name="eclipselink.ddl-generation" value="create-tables"/>
         </properties>
     </persistence-unit>
 </persistence>

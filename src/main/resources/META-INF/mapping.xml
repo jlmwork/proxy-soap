@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="1.0"
+                 xmlns="http://java.sun.com/xml/ns/persistence/orm"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_1_0.xsd">
+    <description>The minimal mappings for a persistent entity in XML.</description>
+    <entity name="SoapRequestMonitor" class="prototypes.ws.proxy.soap.io.SoapExchange" access="FIELD">
+        <table name="T_SOAPEXCHANGE"/>
+        <attributes>
+            <!-- just specified special columns or ignored fields -->
+            <id name="id"/>
+            <basic name="time">
+                <temporal>DATE</temporal>
+            </basic>
+            <basic name="from">
+                <column name="ipFrom" />
+            </basic>
+            <transient name="request"/>
+            <transient name="response"/>
+            <transient name="requestSoapErrors"/>
+            <transient name="responseSoapErrors"/>
+            <transient name="requestXmlErrors"/>
+            <transient name="responseXmlErrors"/>
+        </attributes>
+    </entity>
+</entity-mappings>

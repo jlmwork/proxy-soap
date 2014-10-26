@@ -9,6 +9,7 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.ErrorListener;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -31,9 +32,9 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-public class XmlUtils {
+public class XmlStrings {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(XmlUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XmlStrings.class);
 
     private static String SOAP_SCHEMA = "http://schemas.xmlsoap.org/soap/envelope/";
 
@@ -111,8 +112,8 @@ public class XmlUtils {
     public static Node first(String xmlContent, String tagName)
             throws SAXException, IOException {
 
-        xmlContent = XmlUtils.cleanXmlRequest(xmlContent);
-        Node xml = XmlUtils.parseXML(xmlContent);
+        xmlContent = XmlStrings.cleanXmlRequest(xmlContent);
+        Node xml = XmlStrings.parseXML(xmlContent);
 
         Document root = xml.getOwnerDocument();
         NodeList bodyNodes = root.getElementsByTagNameNS(SOAP_SCHEMA, tagName);
@@ -126,8 +127,8 @@ public class XmlUtils {
 
     public static NodeList children(String xmlContent, String tagName)
             throws SAXException, IOException {
-        xmlContent = XmlUtils.cleanXmlRequest(xmlContent);
-        Node xml = XmlUtils.parseXML(xmlContent);
+        xmlContent = XmlStrings.cleanXmlRequest(xmlContent);
+        Node xml = XmlStrings.parseXML(xmlContent);
 
         Document root = xml.getOwnerDocument();
         NodeList bodyNodes = root.getElementsByTagNameNS(SOAP_SCHEMA, tagName);
@@ -173,20 +174,47 @@ public class XmlUtils {
 
         try {
             xml = cleanXmlRequest(xml);
-
+            LOGGER.debug("create sax transformer");
             Transformer serializer = SAXTransformerFactory.newInstance()
                     .newTransformer();
+            LOGGER.debug(serializer.getClass().getName());
+            LOGGER.debug("set output prop");
+            serializer.setErrorListener(new ErrorListener() {
+
+                @Override
+                public void warning(TransformerException exception) throws TransformerException {
+                    LOGGER.warn(exception.getMessage());
+                }
+
+                @Override
+                public void error(TransformerException exception) throws TransformerException {
+                    LOGGER.error(exception.getMessage());
+                }
+
+                @Override
+                public void fatalError(TransformerException exception) throws TransformerException {
+                    LOGGER.error(exception.getMessage());
+                }
+            });
             serializer.setOutputProperty(OutputKeys.INDENT, "yes");
             // serializer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,
             // "yes");
+
+            LOGGER.debug("set output prop");
             serializer.setOutputProperty(
                     "{http://xml.apache.org/xslt}indent-amount", "4");
             // serializer.setOutputProperty("{http://xml.customer.org/xslt}indent-amount",
             // "2");
+
+            LOGGER.debug("create sax source");
             Source xmlSource = new SAXSource(new InputSource(
                     new ByteArrayInputStream(xml.getBytes())));
             StreamResult res = new StreamResult(new ByteArrayOutputStream());
+
+            LOGGER.debug("sax transform");
             serializer.transform(xmlSource, res);
+
+            LOGGER.debug("get res");
             return new String(
                     ((ByteArrayOutputStream) res.getOutputStream())
                     .toByteArray());
@@ -213,7 +241,7 @@ public class XmlUtils {
             xmlOptions
                     .setLoadLineNumbers(XmlOptions.LOAD_LINE_NUMBERS_END_ELEMENT);
             // XmlObject.Factory.parse( request, xmlOptions );
-            XmlUtils.createXmlObject(xml, xmlOptions);
+            XmlStrings.createXmlObject(xml, xmlOptions);
         } catch (XmlException e) {
             if (e.getErrors() != null) {
                 errs.addAll(e.getErrors());

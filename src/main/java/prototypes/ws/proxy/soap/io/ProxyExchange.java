@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package prototypes.ws.proxy.soap.monitor;
+package prototypes.ws.proxy.soap.io;
 
 import java.util.List;
 import java.util.Map;
@@ -12,9 +12,9 @@ import prototypes.ws.proxy.soap.io.Strings;
  *
  * @author julamand
  */
-public class ProxyMonitor {
+public class ProxyExchange {
 
-    public static final String UID = "proxy.soap.proxy-result";
+    public static final String UID = "proxy.soap.proxy-exchange";
 
     private int responseCode;
     private String responseMessage;

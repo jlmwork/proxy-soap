@@ -1,4 +1,4 @@
-package prototypes.ws.proxy.soap.monitor;
+package prototypes.ws.proxy.soap.io;
 
 import com.eaio.uuid.UUID;
 import com.eviware.soapui.model.testsuite.AssertionError;
@@ -7,9 +7,9 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
-import prototypes.ws.proxy.soap.xml.XmlUtils;
+import prototypes.ws.proxy.soap.xml.XmlStrings;
 
-public class SoapRequestMonitor {
+public class SoapExchange {
 
     public static final String UID = "proxy.soap.requestmonitor";
 
@@ -83,13 +83,13 @@ public class SoapRequestMonitor {
      * @return
      */
     public String getRequestAsXML() {
-        return XmlUtils.format(request);
+        return XmlStrings.format(request);
     }
 
     /**
      * @param request the request to set
      */
-    public SoapRequestMonitor setRequest(String request) {
+    public SoapExchange setRequest(String request) {
         this.request = request;
         return this;
     }
@@ -107,13 +107,13 @@ public class SoapRequestMonitor {
      * @return
      */
     public String getResponseAsXML() {
-        return XmlUtils.format(response);
+        return XmlStrings.format(response);
     }
 
     /**
      * @param response the response to set
      */
-    public SoapRequestMonitor setResponse(String response) {
+    public SoapExchange setResponse(String response) {
         this.response = response;
         return this;
     }
@@ -128,7 +128,7 @@ public class SoapRequestMonitor {
     /**
      * @param message the message to set
      */
-    public SoapRequestMonitor setMessage(String message) {
+    public SoapExchange setMessage(String message) {
         this.message = message;
         return this;
     }
@@ -157,7 +157,7 @@ public class SoapRequestMonitor {
     /**
      * @param requestValid the requestValid to set
      */
-    public SoapRequestMonitor setRequestSoapValid(Boolean requestValid) {
+    public SoapExchange setRequestSoapValid(Boolean requestValid) {
         this.requestSoapValid = requestValid;
         return this;
     }
@@ -177,7 +177,7 @@ public class SoapRequestMonitor {
     /**
      * @param responseValid the responseValid to set
      */
-    public SoapRequestMonitor setResponseSoapValid(Boolean responseValid) {
+    public SoapExchange setResponseSoapValid(Boolean responseValid) {
         this.responseSoapValid = responseValid;
         return this;
     }
@@ -192,7 +192,7 @@ public class SoapRequestMonitor {
     /**
      * @param reponseTime the reponseTime to set
      */
-    public SoapRequestMonitor setResponseTime(long reponseTime) {
+    public SoapExchange setResponseTime(long reponseTime) {
         this.responseTime = reponseTime;
         return this;
     }

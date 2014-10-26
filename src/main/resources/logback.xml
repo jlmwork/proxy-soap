@@ -6,6 +6,7 @@
         </encoder>
     </appender>
     <logger name="prototypes" level="debug"/>
+    <logger name="org.eclipse.persistence" level="info"/>
     <root level="error">
         <appender-ref ref="STDOUT" />
     </root>

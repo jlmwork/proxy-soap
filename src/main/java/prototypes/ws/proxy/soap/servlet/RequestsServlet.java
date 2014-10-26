@@ -29,10 +29,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import prototypes.ws.proxy.soap.io.Requests;
+import prototypes.ws.proxy.soap.context.ApplicationContext;
 import prototypes.ws.proxy.soap.io.Strings;
-import prototypes.ws.proxy.soap.monitor.MonitorManager;
-import prototypes.ws.proxy.soap.monitor.SoapRequestMonitor;
+import prototypes.ws.proxy.soap.io.SoapExchange;
+import prototypes.ws.proxy.soap.repository.SoapExchangeRepository;
 import prototypes.ws.proxy.soap.time.Dates;
 
 /**
@@ -66,6 +66,9 @@ public class RequestsServlet extends HttpServlet {
                 ? pAccept : ((!Strings.isNullOrEmpty(hAccept)) ? hAccept : "");
         LOGGER.debug("Asked format : " + askedFormat);
 
+        SoapExchangeRepository repository = ApplicationContext.getSoapExchangeRepository(this.getServletContext());
+        List<SoapExchange> soapExchanges = repository.list();
+
         if ("text/csv".equals(askedFormat.toLowerCase())) {
             LOGGER.debug("CSV format");
             response.setContentType("text/csv;charset=UTF-8");
@@ -84,10 +87,8 @@ public class RequestsServlet extends HttpServlet {
             try {
                 String csvTitle = "ID;Date;From;To;Request XML Errors;Request SOAP Errors;Response SOAP errors";
                 out.println((new CsvBuilder()).append(csvTitle).toString());
-                MonitorManager monitor = (MonitorManager) Requests.getMonitorManager(this.getServletContext());
-                List<SoapRequestMonitor> soapRequests = monitor.getRequests();
-                LOGGER.debug("Export " + soapRequests.size() + " soapRequests");
-                for (SoapRequestMonitor soapRequest : soapRequests) {
+                LOGGER.debug("Export " + soapExchanges.size() + " soapRequests");
+                for (SoapExchange soapRequest : soapExchanges) {
                     out.println((new CsvBuilder()).append(soapRequest).toString());
                 }
             } finally {
@@ -113,12 +114,10 @@ public class RequestsServlet extends HttpServlet {
              .build();*/
             PrintWriter out = response.getWriter();
             JsonWriter jsonWriter = Json.createWriter(out);
-            MonitorManager monitor = (MonitorManager) Requests.getMonitorManager(this.getServletContext());
-            List<SoapRequestMonitor> soapRequests = monitor.getRequests();
-            LOGGER.debug("Export " + soapRequests.size() + " soapRequests");
+            LOGGER.debug("Export " + soapExchanges.size() + " soapRequests");
             JsonObjectBuilder oBuilder = Json.createObjectBuilder();
             JsonArrayBuilder aBuilder = Json.createArrayBuilder();
-            for (SoapRequestMonitor soapRequest : soapRequests) {
+            for (SoapExchange soapRequest : soapExchanges) {
                 aBuilder.add(Json.createObjectBuilder()
                         .add("ID", soapRequest.getId())
                         .add("Date", soapRequest.getDate())
@@ -131,7 +130,7 @@ public class RequestsServlet extends HttpServlet {
             jsonWriter.close();
             out.close();
         } else {
-            request.setAttribute("requestList", Requests.getMonitorManager(this.getServletContext()).getRequests());
+            request.setAttribute("requestList", soapExchanges);
             request.getRequestDispatcher("/WEB-INF/views/jsp/requests.jsp").forward(request, response);
         }
     }
@@ -148,7 +147,7 @@ public class RequestsServlet extends HttpServlet {
         String separator = ";";
         StringBuilder sb = new StringBuilder();
 
-        public CsvBuilder append(SoapRequestMonitor s) {
+        public CsvBuilder append(SoapExchange s) {
             this.append(s.getId()).append(s.getDate()).append(s.getFrom()).append(s.getUri());
             this.append(s.getRequestXmlErrors());
             this.append(s.getRequestSoapErrors());
