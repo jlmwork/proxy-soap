@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?><saml1:Assertion xmlns:saml1="urn:oasis:names:tc:SAML:1.0:assertion" AssertionID="IDbbdd2d38-3f83-4220-bdac-e828d777378d" IssueInstant="2014-06-05T00:37:36.941Z" Issuer="www.edf.fr/saml" MajorVersion="1" MinorVersion="1">
+   <saml1:Conditions NotBefore="2014-06-04T00:37:36.906Z" NotOnOrAfter="2014-07-08T00:37:36.906Z"/>
+   <saml1:AuthenticationStatement AuthenticationInstant="2014-06-05T00:37:36.856Z" AuthenticationMethod="urn:oasis:names:tc:SAML:1.1:am:unspecified">
+      <saml1:Subject>
+         <saml1:NameIdentifier Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">test</saml1:NameIdentifier>
+         <saml1:SubjectConfirmation>
+            <saml1:ConfirmationMethod>urn:oasis:names:tc:SAML:1.0:cm:sender-vouches</saml1:ConfirmationMethod>
+         </saml1:SubjectConfirmation>
+      </saml1:Subject>
+   </saml1:AuthenticationStatement>
+</saml1:Assertion>

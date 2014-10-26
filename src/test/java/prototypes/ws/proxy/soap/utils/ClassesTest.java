@@ -1,4 +1,4 @@
-package fr.erdf.nsge.sgel.proxy.soap.utils;
+package prototypes.ws.proxy.soap.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

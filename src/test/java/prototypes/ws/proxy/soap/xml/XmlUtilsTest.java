@@ -1,4 +1,4 @@
-package fr.erdf.nsge.sgel.proxy.soap.xml;
+package prototypes.ws.proxy.soap.xml;
 
 import org.junit.Test;
 import prototypes.ws.proxy.soap.xml.XmlStrings;

@@ -1,4 +1,4 @@
-package fr.erdf.nsge.sgel.proxy.soap.validation;
+package prototypes.ws.proxy.soap.validation;
 
 import static org.junit.Assert.fail;
 

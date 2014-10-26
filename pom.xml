@@ -203,6 +203,22 @@
             <artifactId>derby</artifactId>
             <version>10.6.2.1</version>
         </dependency>
+        <!-- SAML -->
+        <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+            <version>1.4.01</version>
+        </dependency>
+        <dependency>
+            <groupId>xfire</groupId>
+            <artifactId>opensaml</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml</artifactId>
+            <version>2.6.1</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

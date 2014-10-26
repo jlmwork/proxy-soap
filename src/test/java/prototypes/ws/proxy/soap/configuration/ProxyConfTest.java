@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fr.erdf.nsge.sgel.proxy.soap.configuration;
+package prototypes.ws.proxy.soap.configuration;
 
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
