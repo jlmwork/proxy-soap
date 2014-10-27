@@ -23,8 +23,17 @@ public class Requests {
     }
 
     public static String getTarget(HttpServletRequest request) {
-        return request.getRequestURI().replace(
-                request.getContextPath() + "/p/", "");
+        StringBuilder sbToExtract = new StringBuilder();
+        sbToExtract.append(request.getContextPath())
+                .append(request.getServletPath())
+                .append("/");
+        String target = request.getRequestURI().replaceFirst(sbToExtract.toString(), "");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Find Target - RequestURI=" + request.getRequestURI());
+            LOGGER.debug("Find Target - Extracted=" + sbToExtract.toString());
+            LOGGER.debug("Find Target - Target=" + target);
+        }
+        return target;
     }
 
     public static String resolveSoapServiceFromRequest(
