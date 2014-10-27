@@ -15,6 +15,7 @@
  */
 package prototypes.ws.proxy.soap.repository.jpa;
 
+import java.io.File;
 import java.util.List;
 import java.util.Properties;
 import javax.persistence.EntityManager;
@@ -25,8 +26,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
 import prototypes.ws.proxy.soap.constantes.ApplicationConfig;
+import prototypes.ws.proxy.soap.io.Files;
 import prototypes.ws.proxy.soap.io.SoapExchange;
 import prototypes.ws.proxy.soap.repository.SoapExchangeRepository;
+import prototypes.ws.proxy.soap.time.Dates;
 
 /**
  *
@@ -70,7 +73,7 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
 
     @Override
     public SoapExchange get(String id) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return emf.createEntityManager().createQuery("select s from SoapExchange s where id=:id", SoapExchange.class).setParameter("id", id).getSingleResult();
     }
 
     @Override
@@ -88,6 +91,11 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
                 em.getTransaction().begin();
                 em.persist(exchange);
                 em.getTransaction().commit();
+                String dirPath = ApplicationConfig.DEFAULT_STORAGE_PATH + Dates.getFormattedDate(exchange.getTime(), Dates.YYYYMMDD_HH) + File.separator;
+                LOGGER.debug("Save files path : " + dirPath);
+                (new File(dirPath)).mkdirs();
+                Files.write(dirPath + exchange.getId() + "-request.xml", exchange.getRequestAsXML());
+                Files.write(dirPath + exchange.getId() + "-response.xml", exchange.getResponseAsXML());
             } catch (Exception e) {
                 LOGGER.error(e.getMessage());
             } finally {

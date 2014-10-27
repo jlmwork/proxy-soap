@@ -22,7 +22,7 @@ import prototypes.ws.proxy.soap.io.SoapExchange;
 import prototypes.ws.proxy.soap.repository.SoapExchangeRepository;
 
 /**
- * Repository implementation based on Memory Storage
+ * Memory Storage Repository implementation based on simple internal cache
  *
  * @author jlamande
  */
