@@ -43,6 +43,7 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
         String derbyHome = ApplicationConfig.DEFAULT_STORAGE_PATH;
         LOGGER.info("DERBY HOME : " + derbyHome);
         System.setProperty("derby.system.home", derbyHome);
+        System.setProperty("derby.database.forceDatabaseLock", "false");
         emf = (EntityManagerFactory) Persistence.createEntityManagerFactory("ProxyPU");
 
     }
@@ -54,13 +55,14 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
 
     @Override
     public List<SoapExchange> list() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        EntityManager em = emf.createEntityManager();
+        return em.createQuery("select s from SoapExchange s", SoapExchange.class).getResultList();
     }
 
     @Override
     public void save(SoapExchange exchange) {
         if (!ignoreExchange(exchange)) {
-            EntityManager em = null;//Requests.getEntityManagerFactory(this.getServletContext()).createEntityManager();
+            EntityManager em = emf.createEntityManager();
             try {
                 em.getTransaction().begin();
                 em.persist(exchange);
@@ -90,6 +92,13 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
             emf.close();
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
+        }
+        try {
+            // try shutdown DB, useful for some DB platforms (derby)
+            EntityManagerFactory emfClose = Persistence.createEntityManagerFactory("ProxyPUshutdown");
+            emfClose.close();
+        } catch (Exception e) {
+            LOGGER.warn(e.getMessage(), e);
         }
     }
 

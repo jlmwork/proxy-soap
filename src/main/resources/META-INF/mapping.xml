@@ -4,7 +4,7 @@
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_1_0.xsd">
     <description>The minimal mappings for a persistent entity in XML.</description>
-    <entity name="SoapRequestMonitor" class="prototypes.ws.proxy.soap.io.SoapExchange" access="FIELD">
+    <entity name="SoapExchange" class="prototypes.ws.proxy.soap.io.SoapExchange" access="FIELD">
         <table name="T_SOAPEXCHANGE"/>
         <attributes>
             <!-- just specified special columns or ignored fields -->

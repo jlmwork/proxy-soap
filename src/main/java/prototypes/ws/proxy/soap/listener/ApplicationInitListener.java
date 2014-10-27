@@ -8,7 +8,7 @@ import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
 import prototypes.ws.proxy.soap.constantes.ApplicationConfig;
 import prototypes.ws.proxy.soap.context.ApplicationContext;
 import prototypes.ws.proxy.soap.repository.SoapExchangeRepository;
-import prototypes.ws.proxy.soap.repository.memory.SoapExchangeRepositoryInMemory;
+import prototypes.ws.proxy.soap.repository.jpa.SoapExchangeRepositoryJpa;
 
 /**
  *
@@ -40,7 +40,8 @@ public class ApplicationInitListener implements ServletContextListener {
         // save config
         ApplicationContext.setProxyConfiguration(sce.getServletContext(), proxyConfig);
 
-        SoapExchangeRepository exchangesRepo = new SoapExchangeRepositoryInMemory(proxyConfig);
+        //SoapExchangeRepository exchangesRepo = new SoapExchangeRepositoryInMemory(proxyConfig);
+        SoapExchangeRepository exchangesRepo = new SoapExchangeRepositoryJpa(proxyConfig);
         ApplicationContext.setSoapExchangeRepository(sce.getServletContext(), exchangesRepo);
 
     }
@@ -52,6 +53,9 @@ public class ApplicationInitListener implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         LOGGER.info("Application stopped");
-        ApplicationContext.getSoapExchangeRepository(sce.getServletContext()).close();
+        SoapExchangeRepository exchangesRepo = ApplicationContext.getSoapExchangeRepository(sce.getServletContext());
+        if (exchangesRepo != null) {
+            exchangesRepo.close();
+        }
     }
 }
