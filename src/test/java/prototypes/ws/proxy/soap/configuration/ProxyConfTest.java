@@ -33,7 +33,7 @@ public class ProxyConfTest {
         String derbyHome = ApplicationConfig.DEFAULT_STORAGE_PATH;
         System.setProperty("derby.system.home", derbyHome);
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("ProxyPU");
-        List<SoapExchange> res = emf.createEntityManager().createQuery("select monitor from SoapRequestMonitor as monitor", SoapExchange.class).getResultList();
+        List<SoapExchange> res = emf.createEntityManager().createQuery("select s from SoapExchange s", SoapExchange.class).getResultList();
         System.out.println(res);
         emf.close();
 
