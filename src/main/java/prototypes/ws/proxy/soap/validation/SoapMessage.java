@@ -1,15 +1,19 @@
+/*
+ * Copyright 2014 jlamande.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package prototypes.ws.proxy.soap.validation;
-
-import java.io.IOException;
-import java.util.Vector;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import prototypes.ws.proxy.soap.constantes.ProxyErrorConstantes;
-import prototypes.ws.proxy.soap.constantes.SoapConstantes;
-import prototypes.ws.proxy.soap.xml.XmlStrings;
 
 import com.eviware.soapui.impl.wsdl.WsdlInterface;
 import com.eviware.soapui.impl.wsdl.WsdlOperation;
@@ -19,11 +23,19 @@ import com.eviware.soapui.model.ModelItem;
 import com.eviware.soapui.model.iface.Attachment;
 import com.eviware.soapui.support.types.StringToStringMap;
 import com.eviware.soapui.support.types.StringToStringsMap;
+import java.io.IOException;
+import java.util.Vector;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+import prototypes.ws.proxy.soap.constantes.ProxyErrorConstantes;
+import prototypes.ws.proxy.soap.constantes.SoapConstantes;
+import prototypes.ws.proxy.soap.xml.XmlStrings;
 
 public class SoapMessage implements WsdlMessageExchange {
 
-    private String        request, response;
-    private String        operationName;
+    private String request, response;
+    private String operationName;
     private WsdlInterface wsdlInterface;
     private WsdlOperation wsdlOperation;
 
@@ -111,13 +123,13 @@ public class SoapMessage implements WsdlMessageExchange {
     @Override
     public Attachment[] getRequestAttachments() {
 
-        return new Attachment[] {};
+        return new Attachment[]{};
     }
 
     @Override
     public Attachment[] getRequestAttachmentsForPart(String arg0) {
 
-        return new Attachment[] {};
+        return new Attachment[]{};
     }
 
     @Override
@@ -139,13 +151,13 @@ public class SoapMessage implements WsdlMessageExchange {
     @Override
     public Attachment[] getResponseAttachments() {
 
-        return new Attachment[] {};
+        return new Attachment[]{};
     }
 
     @Override
     public Attachment[] getResponseAttachmentsForPart(String arg0) {
 
-        return new Attachment[] {};
+        return new Attachment[]{};
     }
 
     public SoapMessage setResponseContent(String response) {
