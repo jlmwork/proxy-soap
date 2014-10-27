@@ -93,8 +93,8 @@ public class ValidationFilter extends HttpServletFilter {
             // This wrapping must occur in the first called ServletFilter
             request = new MultiReadHttpServletRequest(request);
             // wraps response for post processing
-            response = new BufferedHttpResponseWrapper(response);
             OutputStream out = response.getOutputStream();
+            response = new BufferedHttpResponseWrapper(response);
 
             // creates a SoapValidator
             SoapValidator validator = findSoapValidator(request);
@@ -116,7 +116,7 @@ public class ValidationFilter extends HttpServletFilter {
 
             // 3] Response validation
             boolean responseValid = validateOutput(request, response,
-                    out, validator, soapExchange);
+                    validator, soapExchange);
             if (!responseValid && proxyConfig.isInBlockingMode()) {
                 LOGGER.info("Proxy is in blocking mode.");
                 response.sendError(HttpServletResponse.SC_BAD_GATEWAY,
@@ -128,9 +128,7 @@ public class ValidationFilter extends HttpServletFilter {
             // send response back to the client
             response.addHeader("X-Filtered-By", "proxy-soap");
             out.write(soapExchange.getResponse().getBytes());
-            LOGGER.debug("Response sent");
-            out.close();
-            LOGGER.debug("Response closed");
+            LOGGER.debug("Response written");
         } else {
             // pass the request along the filter chain
             chain.doFilter(request, response);
@@ -190,7 +188,7 @@ public class ValidationFilter extends HttpServletFilter {
      * @throws IOException
      */
     private boolean validateOutput(HttpServletRequest request,
-            HttpServletResponse response, OutputStream out,
+            HttpServletResponse response,
             SoapValidator soapValidator, SoapExchange soapExchange)
             throws IOException {
         boolean valid = false;
