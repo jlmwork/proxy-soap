@@ -28,14 +28,14 @@ $(function() {
     $('#refresh').click(function() {
         $.ajax($(this).attr('href'))
                 .done(function(msg) {
-                    console.log("refresh requests");
+                    console.log("refresh exchanges");
                     var div = $('<div>');
                     div.html(msg);
-                    var content = div.find('#requeststable tbody tr');
-                    var previousLength = $('#requeststable tbody tr').length;
-                    $('#requeststable tbody').hide().html(content).fadeIn('slow');
+                    var content = div.find('#exchangestable tbody tr');
+                    var previousLength = $('#exchangestable tbody tr').length;
+                    $('#exchangestable tbody').hide().html(content).fadeIn('slow');
                     if (previousLength === 0) {
-                        var newLength = $('#requeststable tbody tr').length;
+                        var newLength = $('#exchangestable tbody tr').length;
                         if (newLength > 0) {
                             $("#actionButtons").fadeIn('slow').show();
                         }
@@ -59,8 +59,8 @@ $(function() {
     $('#clear').click(function() {
         $.ajax($(this).attr('href'))
                 .done(function() {
-                    console.log("requests cleared");
-                    $('#requeststable tbody').fadeOut('slow').html();
+                    console.log("exchanges cleared");
+                    $('#exchangestable tbody').fadeOut('slow').html();
                     $("#actionButtons").fadeOut('slow').hide();
                 })
                 .fail(function() {

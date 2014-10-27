@@ -18,6 +18,7 @@ package prototypes.ws.proxy.soap.servlet;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
@@ -47,6 +49,10 @@ public class ProxyServlet extends AbstractServlet {
     private static final List<String> RESP_HEADERS_TO_IGNORE = Arrays
             .asList(new String[]{"transfer-encoding", "content-encoding",
                 "set-cookie", "x-powered-by"});
+
+    // following headers must not go back unchanged to the client
+    private static final List<String> REQ_HEADERS_TO_IGNORE = Arrays
+            .asList(new String[]{"transfer-encoding"});
 
     private ProxyConfiguration proxyConfig;
 
@@ -90,7 +96,18 @@ public class ProxyServlet extends AbstractServlet {
             httpConn.setReadTimeout(proxyConfig.getReadTimeout());
             httpConn.setDoOutput(false);
 
-            this.addRequestHeaders(request, httpConn);
+            // Headers
+            List<String> headersToIgnore = new ArrayList<String>(REQ_HEADERS_TO_IGNORE);
+            if (!Strings.isNullOrEmpty(request.getParameter("username"))
+                    && !Strings.isNullOrEmpty(request.getParameter("password"))) {
+                LOGGER.info("Use different username/password pari for backend");
+                String userpass = request.getParameter("username") + ":" + request.getParameter("password");
+                String basicAuth = "Basic " + new String(new Base64().encode(userpass.getBytes()));
+                headersToIgnore.add(Requests.HEADER_AUTH.toLowerCase());
+                httpConn.setRequestProperty(Requests.HEADER_AUTH, basicAuth);
+            }
+            this.addRequestHeaders(request, httpConn, headersToIgnore);
+
             httpConn.setRequestMethod(request.getMethod());
             String reqContentType = (!Strings.isNullOrEmpty(request.getContentType()))
                     ? request.getContentType()
@@ -117,6 +134,7 @@ public class ProxyServlet extends AbstractServlet {
                         httpConn.getInputStream(), gzipped));
             } catch (IOException e) {
                 LOGGER.debug("Failed to read target response body", e);
+                proxyExchange.setResponseBody(Streams.getString(httpConn.getErrorStream(), gzipped));
             }
 
             // Make Proxy Result
@@ -137,7 +155,7 @@ public class ProxyServlet extends AbstractServlet {
                 httpConn.disconnect();
             }
         }
-
+        List<String> respHeadersToIgnore = new ArrayList<String>(RESP_HEADERS_TO_IGNORE);
         // Specific error code treatment
         switch (proxyExchange.getResponseCode()) {
             case 0:
@@ -154,12 +172,15 @@ public class ProxyServlet extends AbstractServlet {
                         String.format(ProxyErrorConstantes.NOT_FOUND,
                                 targetUrl.toString()));
                 return;
+            //case 401:
+            //    respHeadersToIgnore.add("Content-Length".toLowerCase());
+            //    break;
         }
 
         // return response with filtered headers
-        addResponseHeaders(response, proxyExchange, RESP_HEADERS_TO_IGNORE);
+        addResponseHeaders(response, proxyExchange, respHeadersToIgnore);
         response.setStatus(proxyExchange.getResponseCode());
-        // send service request body
+
         Streams.putStringAndClose(response.getOutputStream(),
                 proxyExchange.getResponseBody());
     }
@@ -171,20 +192,22 @@ public class ProxyServlet extends AbstractServlet {
      * @param httpConn
      */
     private void addRequestHeaders(HttpServletRequest req,
-            HttpURLConnection httpConn) {
+            HttpURLConnection httpConn, List<String> headersToIgnore) {
         String headerName = null;
         for (Enumeration<String> e = req.getHeaderNames(); e.hasMoreElements(); headerName = e
                 .nextElement()) {
             // unactivate gzipped request with remote host
-            if ((headerName == null)
-                    || headerName.toLowerCase().equals("transfer-encoding")) {
-                LOGGER.debug("Ignore Request header [" + headerName + "=" + req.getHeader(headerName) + "]");
-                continue;
+            if (headerName != null
+                    && !headersToIgnore.contains(headerName.toLowerCase())) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Add Request header [" + headerName + "=" + req.getHeader(headerName) + "]");
+                }
+                httpConn.setRequestProperty(headerName, req.getHeader(headerName));
+            } else {
+                if (headerName != null) {
+                    LOGGER.debug("Ignore Request header [" + headerName + "=" + req.getHeader(headerName) + "]");
+                }
             }
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Add Request header [" + headerName + "=" + req.getHeader(headerName) + "]");
-            }
-            httpConn.setRequestProperty(headerName, req.getHeader(headerName));
         }
         httpConn.setRequestProperty("X-Forwarded-For", req.getRemoteHost());
     }

@@ -18,8 +18,8 @@
         <servlet-class>prototypes.ws.proxy.soap.servlet.UiServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RequestsServlet</servlet-name>
-        <servlet-class>prototypes.ws.proxy.soap.servlet.RequestsServlet</servlet-class>
+        <servlet-name>ExchangesServlet</servlet-name>
+        <servlet-class>prototypes.ws.proxy.soap.servlet.ExchangesServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>ErrorServlet</servlet-name>
@@ -42,8 +42,8 @@
         <url-pattern>/ui/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RequestsServlet</servlet-name>
-        <url-pattern>/requests</url-pattern>
+        <servlet-name>ExchangesServlet</servlet-name>
+        <url-pattern>/exchanges</url-pattern>
     </servlet-mapping>
     <filter>
         <display-name>ValidationFilter</display-name>

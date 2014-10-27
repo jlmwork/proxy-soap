@@ -12,14 +12,14 @@
     <dt><%=ApplicationConfig.PROP_VALIDATION%></dt><dd><fmt:message key="help.section.preconfig.proxy.active"/></dd>
     <dt><%=ApplicationConfig.PROP_BLOCKING_MODE%></dt><dd><fmt:message key="help.section.preconfig.proxy.blocking"/></dd>
     <dt><%=ApplicationConfig.PROP_WSDL_DIRS%></dt><dd><fmt:message key="help.section.preconfig.proxy.wsdls"/></dd>
-    <dt><%=ApplicationConfig.PROP_MAX_REQUESTS%></dt><dd><fmt:message key="help.section.preconfig.proxy.maxrequests"/></dd>
+    <dt><%=ApplicationConfig.PROP_MAX_EXCHANGES%></dt><dd><fmt:message key="help.section.preconfig.proxy.maxexchanges"/></dd>
 </dl>
 <fmt:message key="Example" /> :
 <code>
     -D<%=ApplicationConfig.PROP_VALIDATION%>=true
     -D<%=ApplicationConfig.PROP_BLOCKING_MODE%>=true
     -D<%=ApplicationConfig.PROP_WSDL_DIRS%>=path1<%=java.io.File.pathSeparator%>path2
-    -D<%=ApplicationConfig.PROP_MAX_REQUESTS%>=100
+    -D<%=ApplicationConfig.PROP_MAX_EXCHANGES%>=100
 </code>
 <br/>
 
@@ -41,7 +41,7 @@
     <fmt:message key="help.section.load.txt">
         <fmt:param value="<%=ApplicationConfig.PROP_VALIDATION%>"/>
         <fmt:param value="<%=ApplicationConfig.PROP_BLOCKING_MODE%>"/>
-        <fmt:param value="<%=ApplicationConfig.PROP_MAX_REQUESTS%>"/>
+        <fmt:param value="<%=ApplicationConfig.PROP_MAX_EXCHANGES%>"/>
     </fmt:message>
 <p>
 

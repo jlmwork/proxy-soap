@@ -16,9 +16,11 @@
 package prototypes.ws.proxy.soap.repository.jpa;
 
 import java.util.List;
+import java.util.Properties;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import org.eclipse.persistence.internal.jpa.metamodel.ManagedTypeImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
@@ -44,8 +46,26 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
         LOGGER.info("DERBY HOME : " + derbyHome);
         System.setProperty("derby.system.home", derbyHome);
         System.setProperty("derby.database.forceDatabaseLock", "false");
-        emf = (EntityManagerFactory) Persistence.createEntityManagerFactory("ProxyPU");
-
+        /*
+         try {
+         InitialContext ic = new InitialContext();
+         // Construct BasicDataSource
+         BasicDataSource bds = new BasicDataSource();
+         bds.setDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
+         bds.setUrl("jdbc:derby:proxy-soap_derby.db;create=true");
+         bds.setUsername("proxy");
+         bds.setPassword("soap");
+         ic.bind("jdbc/proxyDS", bds);
+         } catch (NamingException nE) {
+         LOGGER.warn("Datasource creation failed : " + nE.getMessage(), nE);
+         }*/
+        // externalize DB connection
+        Properties connectionProps = new Properties();
+        connectionProps.setProperty("javax.persistence.jdbc.driver", "org.apache.derby.jdbc.EmbeddedDriver");
+        connectionProps.setProperty("javax.persistence.jdbc.url", "jdbc:derby:proxy-soap_derby.db;create=true");
+        connectionProps.setProperty("javax.persistence.jdbc.user", "proxy");
+        connectionProps.setProperty("javax.persistence.jdbc.password", "soap");
+        emf = (EntityManagerFactory) Persistence.createEntityManagerFactory("ProxyPU", connectionProps);
     }
 
     @Override
@@ -56,13 +76,14 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
     @Override
     public List<SoapExchange> list() {
         EntityManager em = emf.createEntityManager();
-        return em.createQuery("select s from SoapExchange s", SoapExchange.class).getResultList();
+        return em.createQuery("select s from SoapExchange s ORDER BY s.time DESC", SoapExchange.class).getResultList();
     }
 
     @Override
     public void save(SoapExchange exchange) {
+        EntityManager em = null;
         if (!ignoreExchange(exchange)) {
-            EntityManager em = emf.createEntityManager();
+            em = emf.createEntityManager();
             try {
                 em.getTransaction().begin();
                 em.persist(exchange);
@@ -70,20 +91,34 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
             } catch (Exception e) {
                 LOGGER.error(e.getMessage());
             } finally {
-                if (em != null) {
-                    // Close the database connection:
-                    if (em.getTransaction().isActive()) {
-                        em.getTransaction().rollback();
-                    }
-                    em.close();
-                }
+                closeTransaction(em);
             }
         }
     }
 
     @Override
     public synchronized void removeAll() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        LOGGER.info("Remove all SoapExchanges");
+        EntityManager em = null;
+        try {
+            // try truncate
+            em = emf.createEntityManager();
+            // will use a more complex method to use truncate rather than delete
+            // so we need the table name of the entity
+            String table = ((ManagedTypeImpl) emf.getMetamodel().managedType(SoapExchange.class)).getDescriptor().getTableName();
+            em.getTransaction().begin();
+            try {
+                em.createNativeQuery("truncate table " + table).executeUpdate();
+            } catch (Exception truncE) {
+                LOGGER.warn("Error on TRUNCATE operation " + truncE.getMessage());
+                em.createQuery("delete from SoapExchange").executeUpdate();
+            }
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+        } finally {
+            closeTransaction(em);
+        }
     }
 
     @Override
@@ -95,10 +130,23 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
         }
         try {
             // try shutdown DB, useful for some DB platforms (derby)
-            EntityManagerFactory emfClose = Persistence.createEntityManagerFactory("ProxyPUshutdown");
+            Properties connectionProps = new Properties();
+            connectionProps.setProperty("javax.persistence.jdbc.driver", "org.apache.derby.jdbc.EmbeddedDriver");
+            connectionProps.setProperty("javax.persistence.jdbc.url", "jdbc:derby:proxy-soap_derby.db;shutdown=true");
+            EntityManagerFactory emfClose = Persistence.createEntityManagerFactory("ProxyPU", connectionProps);
             emfClose.close();
         } catch (Exception e) {
             LOGGER.warn(e.getMessage(), e);
+        }
+    }
+
+    private void closeTransaction(EntityManager em) {
+        if (em != null) {
+            // Close the database connection:
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            em.close();
         }
     }
 

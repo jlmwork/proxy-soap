@@ -29,8 +29,8 @@ public class ApplicationConfig {
     // reconfiguration
     // on preivous installed proxies
     public static String PROP_WSDL_DIRS = "proxy.soap.wsdls";
-    public static String PROP_MAX_REQUESTS = "proxy.soap.maxrequests";
-    public static String PROP_IGNORE_VALID_REQUESTS = "proxy.soap.ignore.valid.requests";
+    public static String PROP_MAX_EXCHANGES = "proxy.soap.maxexchanges";
+    public static String PROP_IGNORE_VALID_EXCHANGES = "proxy.soap.ignore.exchanges.valid";
 
     public static String PROP_RUN_MODE = "proxy.soap.run.mode";
 

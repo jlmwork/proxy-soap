@@ -3,17 +3,17 @@
 <%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <fmt:setBundle basename="messages"/>
 <style>.white,.white:hover,.white:visited{color:white;}</style>
-<h2><fmt:message key="requests.pagetitle"/>
-    <%--<small class="autorefresh"><fmt:message key="requests.autorefresh"/> [<span>off</span>]</small>--%>
+<h2><fmt:message key="exchanges.pagetitle"/>
+    <%--<small class="autorefresh"><fmt:message key="exchanges.autorefresh"/> [<span>off</span>]</small>--%>
     <small>
-        <a href="requests" id="refresh" class="goright" title="<fmt:message key="requests.reload"/>"><span class="glyphicon glyphicon-refresh"></span></a>
+        <a href="exchanges" id="refresh" class="goright" title="<fmt:message key="exchanges.reload"/>"><span class="glyphicon glyphicon-refresh"></span></a>
     </small>
     <c:if test="${empty requestList}">
         <c:set var="displayActionButtons">style="display: none;"</c:set>
     </c:if>
     <small id="actionButtons" ${displayActionButtons}>
-        <a href="ui/action/clearRequests" id="clear" class="goright" title="<fmt:message key="requests.clear"/>"><span class="glyphicon glyphicon-trash"></span></a>
-        <a href="requests?accept=text/csv" id="export" class="goright glyphicon glyphicon-cloud-download" title="<fmt:message key="requests.export"/>"></a>
+        <a href="ui/action/clearRequests" id="clear" class="goright" title="<fmt:message key="exchanges.clear"/>"><span class="glyphicon glyphicon-trash"></span></a>
+        <a href="exchanges?accept=text/csv" id="export" class="goright glyphicon glyphicon-cloud-download" title="<fmt:message key="exchanges.export"/>"></a>
     </small>
 </h2>
 <c:choose>
@@ -29,35 +29,35 @@
 <div class="panel ${panelMessageType}">
     <%-- Panel header --%>
     <div class="panel-heading">${panelMessage}</div>
-    <table class="table table-bordered table-striped table-hover table-condensed" id="requeststable">
+    <table class="table table-bordered table-striped table-hover table-condensed" id="exchangestable">
         <thead>
             <tr class="text-center">
                 <th>#</th>
-                <th><fmt:message key="requests.request.date"/></th>
-                <th><fmt:message key="requests.request.from"/></th>
-                <th><fmt:message key="requests.request.to"/></th>
-                <th><fmt:message key="requests.request.validator"/></th>
-                <th><fmt:message key="requests.request.operation"/></th>
-                <th><fmt:message key="requests.request.request"/></th>
-                <th><fmt:message key="requests.request.response"/></th>
-                <th><fmt:message key="requests.request.response.time"/></th>
+                <th><fmt:message key="exchanges.request.date"/></th>
+                <th><fmt:message key="exchanges.request.from"/></th>
+                <th><fmt:message key="exchanges.request.to"/></th>
+                <th><fmt:message key="exchanges.request.validator"/></th>
+                <th><fmt:message key="exchanges.request.operation"/></th>
+                <th><fmt:message key="exchanges.request.request"/></th>
+                <th><fmt:message key="exchanges.request.response"/></th>
+                <th><fmt:message key="exchanges.request.response.time"/></th>
             </tr>
         </thead>
         <tbody>
-            <c:forEach var="call" items="${requestList}" varStatus="loop">
+            <c:forEach var="exchange" items="${requestList}" varStatus="loop">
                 <c:choose>
-                    <c:when test="${ ! empty call.request && ! empty call.validatorId }">
-                        <c:set var="viewWsdl"><a target="_blank" href="ui/action/viewWSDL?validator=${call.validatorId}" title="<fmt:message key="requests.request.validated.by"/> ${call.validatorId} (<fmt:message key="requests.request.click.viewwsdl" />)" class="glyphicon glyphicon-file"></a></c:set>
+                    <c:when test="${ ! empty exchange.request && ! empty exchange.validatorId }">
+                        <c:set var="viewWsdl"><a target="_blank" href="ui/action/viewWSDL?validator=${exchange.validatorId}" title="<fmt:message key="exchanges.request.validated.by"/> ${exchange.validatorId} (<fmt:message key="exchanges.request.click.viewwsdl" />)" class="glyphicon glyphicon-file"></a></c:set>
                 </c:when>
                 <c:otherwise>
-                    <c:set var="viewWsdl"><span title="<fmt:message key="requests.request.error.nowsdl" />" class="glyphicon glyphicon-remove-sign"></span></c:set>
+                    <c:set var="viewWsdl"><span title="<fmt:message key="exchanges.request.error.nowsdl" />" class="glyphicon glyphicon-remove-sign"></span></c:set>
                 </c:otherwise>
             </c:choose>
             <c:choose>
-                <c:when test="${ call.requestValid && call.responseValid }">
+                <c:when test="${ exchange.requestValid && exchange.responseValid }">
                     <c:set var="status" value="success" />
                 </c:when>
-                <c:when test="${ (not call.requestValid || not call.responseValid) && !empty call.validatorId }">
+                <c:when test="${ (not exchange.requestValid || not exchange.responseValid) && !empty exchange.validatorId }">
                     <c:set var="status" value="danger" />
                 </c:when>
                 <c:otherwise>
@@ -66,25 +66,25 @@
             </c:choose>
 
             <tr class="${status}">
-                <td><a href="#" title="${call.id}">#</a></td>
-                <td><small>${call.date}</small></td>
-                <td><small>${call.from}</small></td>
-                <td><small>${call.uri}</small></td>
+                <td><a href="#" title="${exchange.id}">#</a></td>
+                <td><small>${exchange.date}</small></td>
+                <td><small>${exchange.from}</small></td>
+                <td><small>${exchange.uri}</small></td>
                 <td>
                     <small>
                         <%-- TODO : activate validators tab on click --%>
-                        <a class="viewvalidator" href="#${call.validatorId}">${call.validatorId}</a>
+                        <a class="viewvalidator" href="#${exchange.validatorId}">${exchange.validatorId}</a>
                     </small>
                 </td>
-                <td><small>${call.operation}</small></td>
+                <td><small>${exchange.operation}</small></td>
 
                 <%--  ================================ --%>
                 <%--  ========== Request  ============ --%>
                 <td><c:choose>
-                        <c:when test="${call.requestXmlValid}">
+                        <c:when test="${exchange.requestXmlValid}">
                             <span class="label label-success">XML Valid</span>
                         </c:when>
-                        <c:when test="${empty call.requestXmlValid}">
+                        <c:when test="${empty exchange.requestXmlValid}">
                             <span class="label label-default">No XML validation</span>
                         </c:when>
                         <c:otherwise>
@@ -92,10 +92,10 @@
                         </c:otherwise>
                     </c:choose>
                     <c:choose>
-                        <c:when test="${call.requestSoapValid}">
+                        <c:when test="${exchange.requestSoapValid}">
                             <span class="label label-success">SOAP Valid</span>
                         </c:when>
-                        <c:when test="${empty call.requestSoapValid}">
+                        <c:when test="${empty exchange.requestSoapValid}">
                             <span class="label label-default">No SOAP Validation</span>
                         </c:when>
                         <c:otherwise>
@@ -103,18 +103,18 @@
                         </c:otherwise>
                     </c:choose>
                     <div class="validation-actions">
-                        <c:if test="${ ! empty call.request }">
+                        <c:if test="${ ! empty exchange.request }">
                             <a class="glyphicon glyphicon-eye-open" data-toggle="modal"
                                href="#reqModal_${loop.index}" title="view Request content"></a>
                         </c:if>
-                        <c:if test="${ ! empty call.request && ! empty call.validatorId }">
+                        <c:if test="${ ! empty exchange.request && ! empty exchange.validatorId }">
                             ${viewWsdl}
                         </c:if>
 
-                        <c:if test="${ ! empty call.requestSoapErrors || ! empty call.requestXmlErrors}">
+                        <c:if test="${ ! empty exchange.requestSoapErrors || ! empty exchange.requestXmlErrors}">
                             <a class="glyphicon error glyphicon-exclamation-sign"
                                data-toggle="modal" href="#reqErrors_${loop.index}"
-                               title="<fmt:message key="requests.request.view.errors" />"></a>
+                               title="<fmt:message key="exchanges.request.view.errors" />"></a>
                         </c:if>
 
                         <div class="modal fade" id="reqModal_${loop.index}">
@@ -126,7 +126,7 @@
                                         <h4 class="modal-title">Request content</h4>
                                     </div>
                                     <div class="modal-body">
-                                        <pre><code class="xml"><c:out escapeXml="true" value="${call.requestAsXML}" /></code></pre>
+                                        <pre><code class="xml"><c:out escapeXml="true" value="${exchange.requestAsXML}" /></code></pre>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-default"
@@ -148,18 +148,18 @@
                                         <h4 class="modal-title">Request errors</h4>
                                     </div>
                                     <div class="modal-body text-left">
-                                        <c:if test="${ ! empty call.requestXmlErrors}">
+                                        <c:if test="${ ! empty exchange.requestXmlErrors}">
                                             <h5 class="modal-title">XML errors</h5>
                                             <ul>
-                                                <c:forEach var="error" items="${ call.requestXmlErrors }">
+                                                <c:forEach var="error" items="${ exchange.requestXmlErrors }">
                                                     <li>${ error }</li>
                                                     </c:forEach>
                                             </ul>
                                         </c:if>
-                                        <c:if test="${ ! empty call.requestSoapErrors}">
+                                        <c:if test="${ ! empty exchange.requestSoapErrors}">
                                             <h5 class="modal-title">SOAP errors</h5>
                                             <ul>
-                                                <c:forEach var="error" items="${ call.requestSoapErrors }">
+                                                <c:forEach var="error" items="${ exchange.requestSoapErrors }">
                                                     <li>${ error }</li>
                                                     </c:forEach>
                                             </ul>
@@ -180,10 +180,10 @@
                 <%--  ========== Response ============ --%>
                 <td>
                     <c:choose>
-                        <c:when test="${call.responseXmlValid}">
+                        <c:when test="${exchange.responseXmlValid}">
                             <span class="label label-success">XML Valid</span>
                         </c:when>
-                        <c:when test="${empty call.responseXmlValid}">
+                        <c:when test="${empty exchange.responseXmlValid}">
                             <span class="label label-default">No XML Validation</span>
                         </c:when>
                         <c:otherwise>
@@ -191,10 +191,10 @@
                         </c:otherwise>
                     </c:choose>
                     <c:choose>
-                        <c:when test="${call.responseSoapValid}">
+                        <c:when test="${exchange.responseSoapValid}">
                             <span class="label label-success">SOAP Valid</span>
                         </c:when>
-                        <c:when test="${empty call.responseSoapValid}">
+                        <c:when test="${empty exchange.responseSoapValid}">
                             <span class="label label-default">No SOAP Validation</span>
                         </c:when>
                         <c:otherwise>
@@ -202,18 +202,18 @@
                         </c:otherwise>
                     </c:choose>
                     <div class="validation-actions">
-                        <c:if test="${ ! empty call.response }">
+                        <c:if test="${ ! empty exchange.response }">
                             <a class="glyphicon glyphicon-eye-open" data-toggle="modal"
                                href="#respModal_${loop.index}" title="View response content"></a>
                         </c:if>
-                        <c:if test="${ ! empty call.response && ! empty call.validatorId }">
+                        <c:if test="${ ! empty exchange.response && ! empty exchange.validatorId }">
                             ${viewWsdl}
                         </c:if>
 
-                        <c:if test="${ ! empty call.responseSoapErrors || ! empty call.responseXmlErrors}">
+                        <c:if test="${ ! empty exchange.responseSoapErrors || ! empty exchange.responseXmlErrors}">
                             <a class="glyphicon error glyphicon-exclamation-sign"
                                data-toggle="modal" href="#respErrors_${loop.index}"
-                               title="<fmt:message key="requests.request.view.errors" />"></a>
+                               title="<fmt:message key="exchanges.request.view.errors" />"></a>
                         </c:if>
 
                         <div class="modal fade" id="respModal_${loop.index}">
@@ -225,7 +225,7 @@
                                         <h4 class="modal-title">Response content</h4>
                                     </div>
                                     <div class="modal-body">
-                                        <pre><code class="xml"><c:out escapeXml="true" value="${call.responseAsXML}" /></code></pre>
+                                        <pre><code class="xml"><c:out escapeXml="true" value="${exchange.responseAsXML}" /></code></pre>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-default"
@@ -246,18 +246,18 @@
                                         <h4 class="modal-title">Response errors</h4>
                                     </div>
                                     <div class="modal-body text-left">
-                                        <c:if test="${ ! empty call.responseXmlErrors}">
+                                        <c:if test="${ ! empty exchange.responseXmlErrors}">
                                             <h5 class="modal-title">XML errors</h5>
                                             <ul>
-                                                <c:forEach var="error" items="${ call.responseXmlErrors }">
+                                                <c:forEach var="error" items="${ exchange.responseXmlErrors }">
                                                     <li>${ error }</li>
                                                     </c:forEach>
                                             </ul>
                                         </c:if>
-                                        <c:if test="${ ! empty call.responseSoapErrors}">
+                                        <c:if test="${ ! empty exchange.responseSoapErrors}">
                                             <h5 class="modal-title">SOAP errors</h5>
                                             <ul>
-                                                <c:forEach var="error" items="${ call.responseSoapErrors }">
+                                                <c:forEach var="error" items="${ exchange.responseSoapErrors }">
                                                     <li>${ error }</li>
                                                     </c:forEach>
                                             </ul>
@@ -274,7 +274,7 @@
                         </div>
                         <!-- /.modal -->
                     </div></td>
-                <td><small>${call.responseTime}</small></td>
+                <td><small>${exchange.responseTime}</small></td>
             </tr>
         </c:forEach>
         </tbody>

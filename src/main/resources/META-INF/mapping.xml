@@ -10,7 +10,7 @@
             <!-- just specified special columns or ignored fields -->
             <id name="id"/>
             <basic name="time">
-                <temporal>DATE</temporal>
+                <temporal>DATETIME</temporal>
             </basic>
             <basic name="from">
                 <column name="ipFrom" />

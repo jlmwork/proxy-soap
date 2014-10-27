@@ -27,6 +27,8 @@ public class Requests {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(Requests.class);
 
+    public static final String HEADER_AUTH = "Authorization";
+
     /**
      * Get complete host, e.g. <scheme>://<serverName>:<port>
      *

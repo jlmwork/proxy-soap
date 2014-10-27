@@ -16,8 +16,12 @@
 package prototypes.ws.proxy.soap.configuration;
 
 import java.util.List;
+import java.util.Properties;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.metamodel.EntityType;
+import org.eclipse.persistence.internal.jpa.metamodel.EntityTypeImpl;
+import org.eclipse.persistence.internal.jpa.metamodel.ManagedTypeImpl;
 import org.junit.Test;
 import prototypes.ws.proxy.soap.constantes.ApplicationConfig;
 import prototypes.ws.proxy.soap.io.SoapExchange;
@@ -32,8 +36,23 @@ public class ProxyConfTest {
     public void test() {
         String derbyHome = ApplicationConfig.DEFAULT_STORAGE_PATH;
         System.setProperty("derby.system.home", derbyHome);
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("ProxyPU");
+        Properties connectionProps = new Properties();
+        connectionProps.setProperty("javax.persistence.jdbc.driver", "org.apache.derby.jdbc.EmbeddedDriver");
+        connectionProps.setProperty("javax.persistence.jdbc.url", "jdbc:derby:proxy-soap_derby.db;create=true");
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("ProxyPU", connectionProps);
         List<SoapExchange> res = emf.createEntityManager().createQuery("select s from SoapExchange s", SoapExchange.class).getResultList();
+
+        System.out.println(emf.getMetamodel().managedType(SoapExchange.class));
+        System.out.println(((ManagedTypeImpl) emf.getMetamodel().managedType(SoapExchange.class)).getDescriptor().getTableName());
+
+        java.util.Set<EntityType<?>> entities = emf.getMetamodel().getEntities();
+        for (EntityType entity : entities) {
+            //String tableName = entity.getClass().getAnnotation(SoapExchange.class).name();
+            emf.getMetamodel().managedType(SoapExchange.class);
+            System.out.println(entity);
+            System.out.println(((EntityTypeImpl) entity).getBindableType());
+            System.out.println(((EntityTypeImpl) entity).getDescriptor().getTableName());
+        }
         System.out.println(res);
         emf.close();
 

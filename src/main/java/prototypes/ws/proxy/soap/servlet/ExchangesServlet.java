@@ -30,8 +30,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.context.ApplicationContext;
-import prototypes.ws.proxy.soap.io.Strings;
 import prototypes.ws.proxy.soap.io.SoapExchange;
+import prototypes.ws.proxy.soap.io.Strings;
 import prototypes.ws.proxy.soap.repository.SoapExchangeRepository;
 import prototypes.ws.proxy.soap.time.Dates;
 
@@ -39,10 +39,10 @@ import prototypes.ws.proxy.soap.time.Dates;
  *
  * @author jlamande
  */
-public class RequestsServlet extends HttpServlet {
+public class ExchangesServlet extends HttpServlet {
 
     private static final Logger LOGGER = LoggerFactory
-            .getLogger(RequestsServlet.class);
+            .getLogger(ExchangesServlet.class);
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -55,7 +55,7 @@ public class RequestsServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        LOGGER.info("Requests");
+        LOGGER.info("Exchanges");
 
         // Content-negotiation
         // as ajax does not support file download very well
@@ -72,7 +72,6 @@ public class RequestsServlet extends HttpServlet {
         if ("text/csv".equals(askedFormat.toLowerCase())) {
             LOGGER.debug("CSV format");
             response.setContentType("text/csv;charset=UTF-8");
-            response.setHeader(null, null);
             Cookie cookie = new Cookie("fileDownload", "true");
             cookie.setPath("/");
             response.addCookie(cookie);
@@ -87,7 +86,7 @@ public class RequestsServlet extends HttpServlet {
             try {
                 String csvTitle = "ID;Date;From;To;Request XML Errors;Request SOAP Errors;Response SOAP errors";
                 out.println((new CsvBuilder()).append(csvTitle).toString());
-                LOGGER.debug("Export " + soapExchanges.size() + " soapRequests");
+                LOGGER.debug("Export " + soapExchanges.size() + " soapExchanges");
                 for (SoapExchange soapRequest : soapExchanges) {
                     out.println((new CsvBuilder()).append(soapRequest).toString());
                 }
@@ -114,7 +113,7 @@ public class RequestsServlet extends HttpServlet {
              .build();*/
             PrintWriter out = response.getWriter();
             JsonWriter jsonWriter = Json.createWriter(out);
-            LOGGER.debug("Export " + soapExchanges.size() + " soapRequests");
+            LOGGER.debug("Export " + soapExchanges.size() + " soapExchanges");
             JsonObjectBuilder oBuilder = Json.createObjectBuilder();
             JsonArrayBuilder aBuilder = Json.createArrayBuilder();
             for (SoapExchange soapRequest : soapExchanges) {
@@ -125,18 +124,18 @@ public class RequestsServlet extends HttpServlet {
                         .add("To", soapRequest.getUri())
                 );
             }
-            oBuilder.add("requests", aBuilder.build());
+            oBuilder.add("exchanges", aBuilder.build());
             jsonWriter.write(oBuilder.build());
             jsonWriter.close();
             out.close();
         } else {
             request.setAttribute("requestList", soapExchanges);
-            request.getRequestDispatcher("/WEB-INF/views/jsp/requests.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/jsp/exchanges.jsp").forward(request, response);
         }
     }
 
     private String generateFilename() {
-        StringBuilder sb = new StringBuilder("requests_export_");
+        StringBuilder sb = new StringBuilder("exchanges_export_");
         sb.append(Dates.getFormattedDate(Dates.YYYYMMDD_HHMMSS));
         sb.append(".csv");
         return sb.toString();

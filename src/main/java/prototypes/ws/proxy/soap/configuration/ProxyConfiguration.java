@@ -37,10 +37,10 @@ public class ProxyConfiguration extends HashMap<String, Object> {
 
     private final AtomicBoolean validationActive = new AtomicBoolean(true);
     private final AtomicBoolean inBlockingMode = new AtomicBoolean(true);
-    private final AtomicInteger nbMaxRequests = new AtomicInteger(50);
+    private final AtomicInteger nbMaxExchanges = new AtomicInteger(50);
     private String wsdlDirs = "";
     private final AtomicBoolean isPersisted = new AtomicBoolean(false);
-    private final AtomicBoolean ignoreValidRequests = new AtomicBoolean(false);
+    private final AtomicBoolean ignoreValidExchanges = new AtomicBoolean(false);
     private final String persistPath = ApplicationConfig.DEFAULT_STORAGE_PATH + "proxy-soap.properties";
     private final AtomicInteger runMode = new AtomicInteger(ApplicationConfig.RUN_MODE_PROD);
     private AtomicInteger connectTimeout = new AtomicInteger(2000);
@@ -65,9 +65,9 @@ public class ProxyConfiguration extends HashMap<String, Object> {
             setBlockingMode(Boolean.parseBoolean(blockingMode));
             setValidationActive(Boolean.parseBoolean(validation));
             setWsdlDirs(wsdlDirs);
-            setNbMaxRequests(maxRequests);
+            setNbMaxExchanges(maxRequests);
             setRunMode(runMode);
-            setIgnoreValidRequests(Boolean.parseBoolean(ignoreValidRequests));
+            setIgnoreValidExchanges(Boolean.parseBoolean(ignoreValidRequests));
         }
     }
 
@@ -76,24 +76,24 @@ public class ProxyConfiguration extends HashMap<String, Object> {
         setBlockingMode(blockingMode);
         setValidationActive(validation);
         setWsdlDirs(wsdlDirs);
-        setNbMaxRequests(maxRequests);
-        setIgnoreValidRequests(ignoreValidRequests);
+        ProxyConfiguration.this.setNbMaxExchanges(maxRequests);
+        setIgnoreValidExchanges(ignoreValidRequests);
     }
 
     public static String[] getKeys() {
         return new String[]{ApplicationConfig.PROP_BLOCKING_MODE,
             ApplicationConfig.PROP_VALIDATION,
             ApplicationConfig.PROP_WSDL_DIRS,
-            ApplicationConfig.PROP_MAX_REQUESTS,
-            ApplicationConfig.PROP_IGNORE_VALID_REQUESTS};
+            ApplicationConfig.PROP_MAX_EXCHANGES,
+            ApplicationConfig.PROP_IGNORE_VALID_EXCHANGES};
     }
 
     private static String[] getAllKeys() {
         return new String[]{ApplicationConfig.PROP_BLOCKING_MODE,
             ApplicationConfig.PROP_VALIDATION,
             ApplicationConfig.PROP_WSDL_DIRS,
-            ApplicationConfig.PROP_MAX_REQUESTS,
-            ApplicationConfig.PROP_IGNORE_VALID_REQUESTS,
+            ApplicationConfig.PROP_MAX_EXCHANGES,
+            ApplicationConfig.PROP_IGNORE_VALID_EXCHANGES,
             ApplicationConfig.PROP_RUN_MODE};
     }
 
@@ -107,10 +107,10 @@ public class ProxyConfiguration extends HashMap<String, Object> {
             return isValidationActive();
         } else if (ApplicationConfig.PROP_WSDL_DIRS.equals(key)) {
             return getWsdlDirs();
-        } else if (ApplicationConfig.PROP_MAX_REQUESTS.equals(key)) {
-            return getNbMaxRequests();
-        } else if (ApplicationConfig.PROP_IGNORE_VALID_REQUESTS.equals(key)) {
-            return isIgnoreValidRequests();
+        } else if (ApplicationConfig.PROP_MAX_EXCHANGES.equals(key)) {
+            return getNbMaxExchanges();
+        } else if (ApplicationConfig.PROP_IGNORE_VALID_EXCHANGES.equals(key)) {
+            return isIgnoreValidExchanges();
         } else if (ApplicationConfig.PROP_RUN_MODE.equals(key)) {
             return this.runMode;
         } else if ("persisted".equals(key)) {
@@ -124,7 +124,7 @@ public class ProxyConfiguration extends HashMap<String, Object> {
     public String[] getProperties() {
         return new String[]{"" + isInBlockingMode(),
             "" + isValidationActive(), getWsdlDirs(),
-            "" + getNbMaxRequests()};
+            "" + getNbMaxExchanges()};
     }
 
     public void setProperty(String key, String value) {
@@ -136,10 +136,10 @@ public class ProxyConfiguration extends HashMap<String, Object> {
             } else if ("wsdls".equals(key)
                     || ApplicationConfig.PROP_WSDL_DIRS.equals(key)) {
                 setWsdlDirs(value);
-            } else if (ApplicationConfig.PROP_MAX_REQUESTS.equals(key)) {
-                setNbMaxRequests(value);
-            } else if (ApplicationConfig.PROP_IGNORE_VALID_REQUESTS.equals(key)) {
-                setIgnoreValidRequests(Boolean.parseBoolean(value));
+            } else if (ApplicationConfig.PROP_MAX_EXCHANGES.equals(key)) {
+                setNbMaxExchanges(value);
+            } else if (ApplicationConfig.PROP_IGNORE_VALID_EXCHANGES.equals(key)) {
+                setIgnoreValidExchanges(Boolean.parseBoolean(value));
             }
         }
     }
@@ -180,17 +180,17 @@ public class ProxyConfiguration extends HashMap<String, Object> {
         inBlockingMode.set(blockingMode);
     }
 
-    public int getNbMaxRequests() {
-        return nbMaxRequests.get();
+    public int getNbMaxExchanges() {
+        return nbMaxExchanges.get();
     }
 
-    public void setNbMaxRequests(int max) {
-        nbMaxRequests.set(max);
+    public void setNbMaxExchanges(int max) {
+        nbMaxExchanges.set(max);
     }
 
-    public void setNbMaxRequests(String max) {
+    public void setNbMaxExchanges(String max) {
         try {
-            nbMaxRequests.set(Integer.valueOf(max));
+            nbMaxExchanges.set(Integer.valueOf(max));
         } catch (NumberFormatException e) {
             // previous value will be used
         }
@@ -229,12 +229,12 @@ public class ProxyConfiguration extends HashMap<String, Object> {
         }
     }
 
-    public boolean isIgnoreValidRequests() {
-        return this.ignoreValidRequests.get();
+    public boolean isIgnoreValidExchanges() {
+        return this.ignoreValidExchanges.get();
     }
 
-    public void setIgnoreValidRequests(boolean ignore) {
-        this.ignoreValidRequests.set(ignore);
+    public void setIgnoreValidExchanges(boolean ignore) {
+        this.ignoreValidExchanges.set(ignore);
     }
 
     public int getConnectTimeout() {
@@ -293,7 +293,7 @@ public class ProxyConfiguration extends HashMap<String, Object> {
 
     @Override
     public String toString() {
-        return "ProxyConfiguration{" + "validationActive=" + validationActive + ", inBlockingMode=" + inBlockingMode + ", nbMaxRequests=" + nbMaxRequests + ", wsdlDirs=" + wsdlDirs + ", isPersisted=" + isPersisted + ", ignoreValidRequests=" + ignoreValidRequests + ", persistPath=" + persistPath + ", runMode=" + runMode + '}';
+        return "ProxyConfiguration{" + "validationActive=" + validationActive + ", inBlockingMode=" + inBlockingMode + ", nbMaxRequests=" + nbMaxExchanges + ", wsdlDirs=" + wsdlDirs + ", isPersisted=" + isPersisted + ", ignoreValidRequests=" + ignoreValidExchanges + ", persistPath=" + persistPath + ", runMode=" + runMode + '}';
     }
 
 }
