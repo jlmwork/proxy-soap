@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package tools.saml.asserter;
+package prototypes.ws.proxy.soap.wss.saml.asserter;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -19,14 +19,15 @@ import org.slf4j.LoggerFactory;
  * @author jlamande
  */
 public class SamlTokenAssertionGenerator {
-    
+
     private static final org.slf4j.Logger LOGGER
             = LoggerFactory.getLogger(SamlTokenAssertionGenerator.class);
 
     /**
      * SAML Version hard-coded
      *
-     * @TODO: use factory pattern and an interface for Generators for more supported versions
+     * @TODO: use factory pattern and an interface for Generators for more
+     * supported versions
      *
      */
     //private static final String SAML_VERSION = "1.1";
@@ -51,6 +52,13 @@ public class SamlTokenAssertionGenerator {
         SAMLAuthenticationStatement authStatement = new SAMLAuthenticationStatement(subject, strAuthMethod, date, null, null, null);
 
         assertion.addStatement(authStatement);
+        // needs to check for validity before returning
+        try {
+            assertion.checkValidity();
+        } catch (org.opensaml.MalformedException e) {
+            LOGGER.error("Assertion invalid " + e.getMessage());
+            throw new IllegalArgumentException(e);
+        }
         traceAssertion(assertion);
 
         return assertion.toString();

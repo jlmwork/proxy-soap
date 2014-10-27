@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package prototypes.ws.proxy.soap.saml;
+package prototypes.ws.proxy.soap.wss.saml.asserter;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -22,6 +22,7 @@ public class SignedSamlTokenAssertionGeneratorTest extends SamlTokenAssertionGen
 
     /**
      * Test of generate method, of class SignedSamlTokenAssertionGenerator.
+     *
      * @throws java.lang.Exception
      */
     @Test
@@ -48,13 +49,13 @@ public class SignedSamlTokenAssertionGeneratorTest extends SamlTokenAssertionGen
         assertTrue("Returned assertion should contain the provided login", assertion.contains(login));
         assertTrue("Returned assertion must be signed", assertion.contains("Signature"));
     }
-    
+
     @Test(expected = IllegalArgumentException.class)
     public void testGenerateBadParams() throws Exception {
         String login = null;
         Long time = 0L;
         String issuer = "";
-        SignedSamlTokenAssertionGenerator generator 
+        SignedSamlTokenAssertionGenerator generator
                 = new SignedSamlTokenAssertionGenerator();
         String assertion = generator.generate(login, time, issuer,
                 SignedSamlTokenAssertionGeneratorTest.class.getResource("/demo.jks"), "", "", "");

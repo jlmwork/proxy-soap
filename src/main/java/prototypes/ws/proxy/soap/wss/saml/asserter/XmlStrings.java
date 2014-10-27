@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package tools.saml.asserter;
+package prototypes.ws.proxy.soap.wss.saml.asserter;
 
 import java.io.ByteArrayInputStream;
 import javax.xml.parsers.DocumentBuilder;

@@ -3,14 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package tools.saml.asserter;
+package prototypes.ws.proxy.soap.wss.saml.asserter;
 
 import java.net.URL;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import org.slf4j.Logger;
 import org.opensaml.SAMLAssertion;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
@@ -28,7 +25,7 @@ public class SignedSamlTokenAssertionGenerator extends SamlTokenAssertionGenerat
 
     private static final String CRYPTO_ALGO
             = "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
-    
+
     public String generate(String login, Long timeInSeconds, String issuer, URL keystore,
             String keyStorePass, String keyAlias, String keyPass) throws Exception {
         Parameters params = Parameters.builder()
@@ -42,7 +39,7 @@ public class SignedSamlTokenAssertionGenerator extends SamlTokenAssertionGenerat
                 .build();
         return this.generate(params);
     }
-    
+
     public String generate(String login, String issuer, URL keystore,
             String keyStorePass, String keyAlias, String keyPass) throws Exception {
         Parameters params = Parameters.builder()
@@ -58,7 +55,7 @@ public class SignedSamlTokenAssertionGenerator extends SamlTokenAssertionGenerat
     }
 
     public String generate(Parameters params) throws Exception {
-        String assertionString = super.generate(params.getLogin(), 
+        String assertionString = super.generate(params.getLogin(),
                 params.getValidityTime(), params.getIssuer());
 
         // unmarshall XML and load Document
@@ -66,8 +63,8 @@ public class SignedSamlTokenAssertionGenerator extends SamlTokenAssertionGenerat
         SAMLAssertion samlAssertion = new SAMLAssertion();
         samlAssertion.fromDOM(doc.getDocumentElement());
 
-        samlAssertion.sign(CRYPTO_ALGO, Keystores.getKey(params.getKeystore(), 
-                params.getKeystorePass(), params.getKeyAlias(), 
+        samlAssertion.sign(CRYPTO_ALGO, Keystores.getKey(params.getKeystore(),
+                params.getKeystorePass(), params.getKeyAlias(),
                 params.getKeyPass()), null);
         String signedAssertion = samlAssertion.toString();
         traceAssertion(samlAssertion);
@@ -78,31 +75,31 @@ public class SignedSamlTokenAssertionGenerator extends SamlTokenAssertionGenerat
 
         private static final Long MAX_VALIDITY = 120L;//Long.valueOf(Days.ONE.toStandardSeconds().getSeconds());
 
-        @NotNull
-        @Size(min = 1)
+        //@NotNull
+        //@Size(min = 1)
         String login;
 
-        @Min(value = 1)
+        //@Min(value = 1)
         //@Max(value = MAX_VALIDITY)
         Long validityTime;
 
-        @NotNull
-        @Size(min = 1)
+        //@NotNull
+        //@Size(min = 1)
         String issuer;
 
-        @NotNull
+        //@NotNull
         URL keystore;
 
-        @NotNull
-        @Size(min = 1)
+        //@NotNull
+        //@Size(min = 1)
         String keystorePass;
 
-        @NotNull
-        @Size(min = 1)
+        //@NotNull
+        //@Size(min = 1)
         String keyAlias;
 
-        @NotNull
-        @Size(min = 1)
+        //@NotNull
+        //@Size(min = 1)
         String keyPass;
 
         public String getLogin() {
@@ -147,7 +144,7 @@ public class SignedSamlTokenAssertionGenerator extends SamlTokenAssertionGenerat
             }
 
             public Builder withValidityTime(Long validityTime) {
-                if(validityTime != null) {
+                if (validityTime != null) {
                     instance.validityTime = validityTime;
                 } else {
                     instance.validityTime = DEFAULT_VALIDITY_TIME;
@@ -156,7 +153,7 @@ public class SignedSamlTokenAssertionGenerator extends SamlTokenAssertionGenerat
             }
 
             public Builder withValidityTime(String validityTime) {
-                if(validityTime != null) {
+                if (validityTime != null) {
                     instance.validityTime = Long.valueOf(validityTime);
                 } else {
                     instance.validityTime = DEFAULT_VALIDITY_TIME;

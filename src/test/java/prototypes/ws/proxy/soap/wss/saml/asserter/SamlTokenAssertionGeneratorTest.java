@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package prototypes.ws.proxy.soap.saml;
+package prototypes.ws.proxy.soap.wss.saml.asserter;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
