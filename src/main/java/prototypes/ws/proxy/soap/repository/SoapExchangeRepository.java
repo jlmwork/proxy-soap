@@ -41,6 +41,8 @@ public abstract class SoapExchangeRepository {
 
     public abstract List<SoapExchange> list();
 
+    public abstract List<SoapExchange> listWithoutContent();
+
     public abstract void save(SoapExchange monitor);
 
     public abstract void removeAll();

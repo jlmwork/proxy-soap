@@ -13,7 +13,7 @@
     </c:if>
     <small id="actionButtons" ${displayActionButtons}>
         <a href="ui/action/clearRequests" id="clear" class="goright" title="<fmt:message key="exchanges.clear"/>"><span class="glyphicon glyphicon-trash"></span></a>
-        <a href="exchanges?accept=text/csv" id="export" class="goright glyphicon glyphicon-cloud-download" title="<fmt:message key="exchanges.export"/>"></a>
+        <a href="exchanges?accept=application/zip" id="export" class="goright glyphicon glyphicon-cloud-download" title="<fmt:message key="exchanges.export"/>"></a>
     </small>
 </h2>
 <c:choose>

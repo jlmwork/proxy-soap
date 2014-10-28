@@ -240,7 +240,7 @@ public class Files {
         try {
             content = Streams.getString(new FileInputStream(svgPath));
         } catch (IOException ex) {
-            LOGGER.warn("Error reading " + svgPath + " : " + ex.getMessage());
+            LOGGER.warn("Error reading {}, {}", svgPath, ex.getMessage());
         }
         return content;
     }
@@ -264,5 +264,23 @@ public class Files {
             }
         }
         return finalFileName;
+    }
+
+    public static void deleteDirectory(String path) {
+        try {
+            LOGGER.debug("delete directory {} ", path);
+            FileUtils.deleteDirectory(new File(path));
+        } catch (IOException ex) {
+            LOGGER.warn("Cant delete directory {} : {}", path, ex.getMessage());
+        }
+    }
+
+    public static void deleteFile(String path) {
+        try {
+            LOGGER.debug("delete file {} ", path);
+            FileUtils.forceDelete(new File(path));
+        } catch (IOException ex) {
+            LOGGER.warn("Cant delete file {} : {} ", path, ex.getMessage());
+        }
     }
 }

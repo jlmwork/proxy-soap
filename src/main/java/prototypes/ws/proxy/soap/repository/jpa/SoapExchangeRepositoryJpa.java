@@ -49,6 +49,8 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
         LOGGER.info("DERBY HOME : " + derbyHome);
         System.setProperty("derby.system.home", derbyHome);
         System.setProperty("derby.database.forceDatabaseLock", "false");
+        Files.deleteFile(ApplicationConfig.DEFAULT_STORAGE_PATH + "proxy-soap_derby.db" + File.separator + "db.lck");
+        Files.deleteFile(ApplicationConfig.DEFAULT_STORAGE_PATH + "proxy-soap_derby.db" + File.separator + "dbex.lck");
         /*
          try {
          InitialContext ic = new InitialContext();
@@ -85,14 +87,20 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
 
     @Override
     public List<SoapExchange> list() {
-        EntityManager em = emf.createEntityManager();
-        List<SoapExchange> exchanges = em.createQuery("select s from SoapExchange s ORDER BY s.time DESC", SoapExchange.class).getResultList();
+        List<SoapExchange> exchanges = listWithoutContent();
         // TODO : eager loading - not a good idea for high volumes
         for (SoapExchange exchange : exchanges) {
-            em.detach(exchange);
+            // em.detach(exchange);
             exchange.setRequest(Files.read(getRequestFilePath(exchange)));
             exchange.setResponse(Files.read(getRequestFilePath(exchange)));
         }
+        return exchanges;
+    }
+
+    @Override
+    public List<SoapExchange> listWithoutContent() {
+        EntityManager em = emf.createEntityManager();
+        List<SoapExchange> exchanges = em.createQuery("select s from SoapExchange s ORDER BY s.time DESC", SoapExchange.class).getResultList();
         return exchanges;
     }
 
@@ -117,15 +125,15 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
     }
 
     private String getRequestFilePath(SoapExchange exchange) {
-        String dirPath = ApplicationConfig.DEFAULT_STORAGE_PATH + "exchanges" + File.separator + Dates.getFormattedDate(exchange.getTime(), Dates.YYYYMMDD_HH) + File.separator;
-        LOGGER.debug("Save files path : " + dirPath);
+        String dirPath = ApplicationConfig.EXCHANGES_STORAGE_PATH + Dates.getFormattedDate(exchange.getTime(), Dates.YYYYMMDD_HH) + File.separator;
+        LOGGER.debug("Requests files path : " + dirPath);
         (new File(dirPath)).mkdirs();
         return dirPath + exchange.getId() + "-request.xml";
     }
 
     private String getResponseFilePath(SoapExchange exchange) {
-        String dirPath = ApplicationConfig.DEFAULT_STORAGE_PATH + "exchanges" + File.separator + Dates.getFormattedDate(exchange.getTime(), Dates.YYYYMMDD_HH) + File.separator;
-        LOGGER.debug("Save files path : " + dirPath);
+        String dirPath = ApplicationConfig.EXCHANGES_STORAGE_PATH + Dates.getFormattedDate(exchange.getTime(), Dates.YYYYMMDD_HH) + File.separator;
+        LOGGER.debug("Response files path : " + dirPath);
         (new File(dirPath)).mkdirs();
         return dirPath + exchange.getId() + "-response.xml";
     }
@@ -143,6 +151,7 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
             em.getTransaction().begin();
             try {
                 em.createNativeQuery("truncate table " + table).executeUpdate();
+                Files.deleteDirectory(ApplicationConfig.EXCHANGES_STORAGE_PATH);
             } catch (Exception truncE) {
                 LOGGER.warn("Error on TRUNCATE operation " + truncE.getMessage());
                 em.createQuery("delete from SoapExchange").executeUpdate();
@@ -169,6 +178,8 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
             connectionProps.setProperty("javax.persistence.jdbc.url", "jdbc:derby:;shutdown=true");
             EntityManagerFactory emfClose = Persistence.createEntityManagerFactory("ProxyPU", connectionProps);
             emfClose.close();
+            Files.deleteFile(ApplicationConfig.DEFAULT_STORAGE_PATH + "proxy-soap_derby.db" + File.separator + "db.lck");
+            Files.deleteFile(ApplicationConfig.DEFAULT_STORAGE_PATH + "proxy-soap_derby.db" + File.separator + "dbex.lck");
         } catch (Exception e) {
             LOGGER.warn(e.getMessage(), e);
         }

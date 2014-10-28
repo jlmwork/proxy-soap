@@ -36,6 +36,8 @@ public class ApplicationConfig {
 
     public static final String DEFAULT_STORAGE_PATH = System.getProperty("java.io.tmpdir") + File.separator + "proxy-soap" + File.separator;
 
+    public static final String EXCHANGES_STORAGE_PATH = ApplicationConfig.DEFAULT_STORAGE_PATH + "exchanges" + File.separator;
+
     static {
         // create the default storage path
         (new File(DEFAULT_STORAGE_PATH)).mkdirs();

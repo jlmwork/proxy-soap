@@ -40,6 +40,11 @@ public class SoapExchangeRepositoryInMemory extends SoapExchangeRepository {
     }
 
     @Override
+    public List<SoapExchange> listWithoutContent() {
+        return list();
+    }
+
+    @Override
     public synchronized List<SoapExchange> list() {
         return exchanges;
     }

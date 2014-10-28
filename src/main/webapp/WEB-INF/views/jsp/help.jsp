@@ -3,23 +3,27 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <fmt:setBundle basename="messages"/>
+<c:set var="propValidation"><%=ApplicationConfig.PROP_VALIDATION%></c:set>
+<c:set var="propBlocking"><%=ApplicationConfig.PROP_BLOCKING_MODE%></c:set>
+<c:set var="propWsdl"><%=ApplicationConfig.PROP_WSDL_DIRS%></c:set>
+<c:set var="propMax"><%=ApplicationConfig.PROP_MAX_EXCHANGES%></c:set>
 
-<h2><fmt:message key="help.pagetitle"/></h2>
+    <h2><fmt:message key="help.pagetitle"/></h2>
 
 <h3><fmt:message key="help.section.preconfig.title"/></h3>
 <fmt:message key="help.section.preconfig.description"/>
 <dl>
-    <dt><%=ApplicationConfig.PROP_VALIDATION%></dt><dd><fmt:message key="help.section.preconfig.proxy.active"/></dd>
-    <dt><%=ApplicationConfig.PROP_BLOCKING_MODE%></dt><dd><fmt:message key="help.section.preconfig.proxy.blocking"/></dd>
-    <dt><%=ApplicationConfig.PROP_WSDL_DIRS%></dt><dd><fmt:message key="help.section.preconfig.proxy.wsdls"/></dd>
-    <dt><%=ApplicationConfig.PROP_MAX_EXCHANGES%></dt><dd><fmt:message key="help.section.preconfig.proxy.maxexchanges"/></dd>
+    <dt>${propValidation}</dt><dd><fmt:message key="config.${propValidation}.help"/></dd>
+    <dt>${propBlocking}</dt><dd><fmt:message key="config.${propBlocking}.help"/></dd>
+    <dt>${propWsdl}</dt><dd><fmt:message key="config.${propWsdl}.help"/></dd>
+    <dt>${propMax}</dt><dd><fmt:message key="config.${propMax}.help"/></dd>
 </dl>
 <fmt:message key="Example" /> :
 <code>
-    -D<%=ApplicationConfig.PROP_VALIDATION%>=true
-    -D<%=ApplicationConfig.PROP_BLOCKING_MODE%>=true
-    -D<%=ApplicationConfig.PROP_WSDL_DIRS%>=path1<%=java.io.File.pathSeparator%>path2
-    -D<%=ApplicationConfig.PROP_MAX_EXCHANGES%>=100
+    -D${propValidation}=true
+    -D${propBlocking}=true
+    -D${propWsdl}=path1<%=java.io.File.pathSeparator%>path2
+    -D${propMax}=100
 </code>
 <br/>
 
@@ -32,16 +36,16 @@
     <fmt:message key="help.section.config.multiplecases">
         <fmt:param value="<%=java.io.File.pathSeparator%>"/>
     </fmt:message>
-    <br /><fmt:message key="Example" /> :<code>-D<%=ApplicationConfig.PROP_WSDL_DIRS%>=path1<%=java.io.File.pathSeparator%>path2</code>
+    <br /><fmt:message key="Example" /> :<code>-D${propWsdl}=path1<%=java.io.File.pathSeparator%>path2</code>
     <br/>
 </p>
 
 <h4><fmt:message key="help.section.load.title" /></h4>
 <p>
     <fmt:message key="help.section.load.txt">
-        <fmt:param value="<%=ApplicationConfig.PROP_VALIDATION%>"/>
-        <fmt:param value="<%=ApplicationConfig.PROP_BLOCKING_MODE%>"/>
-        <fmt:param value="<%=ApplicationConfig.PROP_MAX_EXCHANGES%>"/>
+        <fmt:param value="${propValidation}"/>
+        <fmt:param value="${propBlocking}"/>
+        <fmt:param value="${propMax}"/>
     </fmt:message>
 <p>
 

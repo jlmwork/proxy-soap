@@ -29,9 +29,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import prototypes.ws.proxy.soap.constantes.ApplicationConfig;
 import prototypes.ws.proxy.soap.context.ApplicationContext;
 import prototypes.ws.proxy.soap.io.SoapExchange;
 import prototypes.ws.proxy.soap.io.Strings;
+import prototypes.ws.proxy.soap.io.ZipOut;
 import prototypes.ws.proxy.soap.repository.SoapExchangeRepository;
 import prototypes.ws.proxy.soap.time.Dates;
 
@@ -67,9 +69,9 @@ public class ExchangesServlet extends HttpServlet {
         LOGGER.debug("Asked format : " + askedFormat);
 
         SoapExchangeRepository repository = ApplicationContext.getSoapExchangeRepository(this.getServletContext());
-        List<SoapExchange> soapExchanges = repository.list();
 
         if ("text/csv".equals(askedFormat.toLowerCase())) {
+            List<SoapExchange> soapExchanges = repository.listWithoutContent();
             LOGGER.debug("CSV format");
             response.setContentType("text/csv;charset=UTF-8");
             Cookie cookie = new Cookie("fileDownload", "true");
@@ -77,7 +79,7 @@ public class ExchangesServlet extends HttpServlet {
             response.addCookie(cookie);
             response.setHeader("Content-Description", "File Transfer");
             response.setHeader("Content-Type", "application/octet-stream");
-            response.setHeader("Content-Disposition", "attachment; filename=" + generateFilename());
+            response.setHeader("Content-Disposition", "attachment; filename=" + generateFilename("csv"));
             response.setHeader("Content-Transfer-Encoding", "binary");
             response.setHeader("Expires", "0");
             response.setHeader("Cache-Control", "must-revalidate");
@@ -92,7 +94,33 @@ public class ExchangesServlet extends HttpServlet {
             } finally {
                 out.close();
             }
+        } else if ("application/zip".equals(askedFormat.toLowerCase())) {
+            List<SoapExchange> soapExchanges = repository.listWithoutContent();
+            LOGGER.debug("ZIP format");
+            response.setContentType("application/zip");
+            Cookie cookie = new Cookie("fileDownload", "true");
+            cookie.setPath("/");
+            response.addCookie(cookie);
+            response.setHeader("Content-Description", "File Transfer");
+            response.setHeader("Content-Type", "application/octet-stream");
+            response.setHeader("Content-Disposition", "attachment; filename=" + generateFilename("zip"));
+            response.setHeader("Content-Transfer-Encoding", "binary");
+            response.setHeader("Expires", "0");
+            response.setHeader("Cache-Control", "must-revalidate");
+            response.setHeader("Pragma", "public");
+            ZipOut zipOut = new ZipOut(response.getOutputStream());
+            PrintWriter writer = zipOut.getFileWriter(generateFilename("csv"));
+            CsvWriter csvBuilder = new CsvWriter(writer);
+            LOGGER.debug("Export " + soapExchanges.size() + " soapExchanges");
+            for (SoapExchange soapRequest : soapExchanges) {
+                csvBuilder.append(soapRequest).flush();
+            }
+            zipOut.closeFileWriter();
+            zipOut.addDirToZipStream(ApplicationConfig.EXCHANGES_STORAGE_PATH, new String[]{"xml"});
+            zipOut.finish();
+
         } else if ("application/json".equals(askedFormat.toLowerCase())) {
+            List<SoapExchange> soapExchanges = repository.listWithoutContent();
             //JsonGenerator jg = jsonF.createJsonGenerator(new File("result.json"), JsonEncoding.UTF8);
             /*JsonObject model = Json.createObjectBuilder()
              .add("firstName", "Duke")
@@ -129,15 +157,16 @@ public class ExchangesServlet extends HttpServlet {
             jsonWriter.close();
             out.close();
         } else {
+            List<SoapExchange> soapExchanges = repository.list();
             request.setAttribute("requestList", soapExchanges);
             request.getRequestDispatcher("/WEB-INF/views/jsp/exchanges.jsp").forward(request, response);
         }
     }
 
-    private String generateFilename() {
+    private String generateFilename(String extension) {
         StringBuilder sb = new StringBuilder("exchanges_export_");
         sb.append(Dates.getFormattedDate(Dates.YYYYMMDD_HHMMSS));
-        sb.append(".csv");
+        sb.append(".").append(extension);
         return sb.toString();
     }
 
