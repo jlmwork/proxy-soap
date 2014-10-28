@@ -69,7 +69,6 @@ public class Requests {
             uri = Requests.getHost(request) + "/" + uri;
         }
 
-        // TODO :
         LOGGER.debug("Target uri : " + uri);
         URL targetUrl;
         try {

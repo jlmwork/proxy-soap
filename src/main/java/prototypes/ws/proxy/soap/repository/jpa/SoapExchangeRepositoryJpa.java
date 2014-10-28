@@ -75,13 +75,25 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
 
     @Override
     public SoapExchange get(String id) {
-        return emf.createEntityManager().createQuery("select s from SoapExchange s where id=:id", SoapExchange.class).setParameter("id", id).getSingleResult();
+        EntityManager em = emf.createEntityManager();
+        SoapExchange exchange = em.createQuery("select s from SoapExchange s where id=:id", SoapExchange.class).setParameter("id", id).getSingleResult();
+        em.detach(exchange);
+        exchange.setRequest(Files.read(getRequestFilePath(exchange)));
+        exchange.setResponse(Files.read(getRequestFilePath(exchange)));
+        return exchange;
     }
 
     @Override
     public List<SoapExchange> list() {
         EntityManager em = emf.createEntityManager();
-        return em.createQuery("select s from SoapExchange s ORDER BY s.time DESC", SoapExchange.class).getResultList();
+        List<SoapExchange> exchanges = em.createQuery("select s from SoapExchange s ORDER BY s.time DESC", SoapExchange.class).getResultList();
+        // TODO : eager loading - not a good idea for high volumes
+        for (SoapExchange exchange : exchanges) {
+            em.detach(exchange);
+            exchange.setRequest(Files.read(getRequestFilePath(exchange)));
+            exchange.setResponse(Files.read(getRequestFilePath(exchange)));
+        }
+        return exchanges;
     }
 
     @Override
@@ -105,14 +117,14 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
     }
 
     private String getRequestFilePath(SoapExchange exchange) {
-        String dirPath = ApplicationConfig.DEFAULT_STORAGE_PATH + Dates.getFormattedDate(exchange.getTime(), Dates.YYYYMMDD_HH) + File.separator;
+        String dirPath = ApplicationConfig.DEFAULT_STORAGE_PATH + "exchanges" + File.separator + Dates.getFormattedDate(exchange.getTime(), Dates.YYYYMMDD_HH) + File.separator;
         LOGGER.debug("Save files path : " + dirPath);
         (new File(dirPath)).mkdirs();
         return dirPath + exchange.getId() + "-request.xml";
     }
 
     private String getResponseFilePath(SoapExchange exchange) {
-        String dirPath = ApplicationConfig.DEFAULT_STORAGE_PATH + Dates.getFormattedDate(exchange.getTime(), Dates.YYYYMMDD_HH) + File.separator;
+        String dirPath = ApplicationConfig.DEFAULT_STORAGE_PATH + "exchanges" + File.separator + Dates.getFormattedDate(exchange.getTime(), Dates.YYYYMMDD_HH) + File.separator;
         LOGGER.debug("Save files path : " + dirPath);
         (new File(dirPath)).mkdirs();
         return dirPath + exchange.getId() + "-response.xml";

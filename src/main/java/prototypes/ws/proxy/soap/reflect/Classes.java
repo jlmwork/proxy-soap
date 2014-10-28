@@ -53,12 +53,11 @@ public class Classes {
                 method.setAccessible(true);
             }
         } catch (SecurityException e) {
-            e.printStackTrace();
+            LOGGER.warn("Error : " + e.getMessage());
         } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+            LOGGER.warn("Error : " + e.getMessage());
         } catch (NoSuchMethodException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOGGER.warn("Error : " + e.getMessage());
         }
     }
 

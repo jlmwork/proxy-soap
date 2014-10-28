@@ -230,10 +230,19 @@ public class Files {
             fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
             LOGGER.info("Remote file downloaded.");
         } catch (IOException ex) {
-            // TODO Auto-generated catch block
             LOGGER.error(ex.getMessage(), ex);
         }
         return localPath;
+    }
+
+    public static String read(String svgPath) {
+        String content = null;
+        try {
+            content = Streams.getString(new FileInputStream(svgPath));
+        } catch (IOException ex) {
+            LOGGER.warn("Error reading " + svgPath + " : " + ex.getMessage());
+        }
+        return content;
     }
 
     public static String write(String svgPath, String content) {

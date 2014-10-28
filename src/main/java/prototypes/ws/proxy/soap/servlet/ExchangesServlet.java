@@ -84,11 +84,10 @@ public class ExchangesServlet extends HttpServlet {
             response.setHeader("Pragma", "public");
             PrintWriter out = response.getWriter();
             try {
-                String csvTitle = "ID;Date;From;To;Request XML Errors;Request SOAP Errors;Response SOAP errors";
-                out.println((new CsvBuilder()).append(csvTitle).toString());
+                CsvWriter csvBuilder = new CsvWriter(out);
                 LOGGER.debug("Export " + soapExchanges.size() + " soapExchanges");
                 for (SoapExchange soapRequest : soapExchanges) {
-                    out.println((new CsvBuilder()).append(soapRequest).toString());
+                    csvBuilder.append(soapRequest).flush();
                 }
             } finally {
                 out.close();
@@ -111,6 +110,7 @@ public class ExchangesServlet extends HttpServlet {
              .add("type", "home")
              .add("number", "222-222-2222")))
              .build();*/
+            // TODO : use "fields" parameter for field selection
             PrintWriter out = response.getWriter();
             JsonWriter jsonWriter = Json.createWriter(out);
             LOGGER.debug("Export " + soapExchanges.size() + " soapExchanges");
@@ -141,12 +141,35 @@ public class ExchangesServlet extends HttpServlet {
         return sb.toString();
     }
 
-    private static class CsvBuilder {
+    private static class CsvWriter {
 
         String separator = ";";
         StringBuilder sb = new StringBuilder();
+        PrintWriter out;
 
-        public CsvBuilder append(SoapExchange s) {
+        CsvWriter(PrintWriter out) {
+            this.out = out;
+            init();
+        }
+
+        public void flush() {
+            this.out.println(sb.toString());
+            sb = new StringBuilder();
+        }
+
+        private void init() {
+            // title
+            this.append("ID")
+                    .append("Date")
+                    .append("From")
+                    .append("To")
+                    .append("Request XML Errors")
+                    .append("Request SOAP Errors")
+                    .append("Response SOAP errors");
+            this.flush();
+        }
+
+        public CsvWriter append(SoapExchange s) {
             this.append(s.getId()).append(s.getDate()).append(s.getFrom()).append(s.getUri());
             this.append(s.getRequestXmlErrors());
             this.append(s.getRequestSoapErrors());
@@ -160,12 +183,12 @@ public class ExchangesServlet extends HttpServlet {
             return cleanField;
         }
 
-        public CsvBuilder append(String field) {
+        public CsvWriter append(String field) {
             sb.append(cleanupField(field)).append(separator);
             return this;
         }
 
-        public CsvBuilder append(List<?> field) {
+        public CsvWriter append(List<?> field) {
             if (field != null && field.size() > 0) {
                 this.append(field.toString());
             } else {
@@ -174,17 +197,13 @@ public class ExchangesServlet extends HttpServlet {
             return this;
         }
 
-        public CsvBuilder append(Object field) {
+        public CsvWriter append(Object field) {
             if (field != null) {
                 this.append(field.toString());
             } else {
                 this.append("");
             }
             return this;
-        }
-
-        public String toString() {
-            return sb.toString();
         }
     }
 
