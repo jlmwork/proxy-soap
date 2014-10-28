@@ -12,15 +12,8 @@
         <maven.compiler.source>1.6</maven.compiler.source>
         <maven.compiler.target>1.6</maven.compiler.target>
         <servlet.version>2.5</servlet.version>
-        <eclipselink.version>2.3.3-patch20121205</eclipselink.version>
+        <eclipselink.version>2.3.1</eclipselink.version>
     </properties>
-    <repositories>
-        <repository>
-            <id>weblogic-temp-repo</id>
-            <name>weblogic-temp-repo</name>
-            <url>http://pcyy33sge.pcy.edfgdf.fr:8082/artifactory/weblogic-temp-repo</url>
-        </repository>
-    </repositories>
     <distributionManagement>
         <repository>
             <id>sgel-releases</id>
@@ -175,19 +168,11 @@
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>javax.persistence</artifactId>
-            <version>2.0.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>eclipselink</artifactId>
-            <version>2.3.1</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>commonj.sdo</artifactId>
-                    <groupId>commonj.sdo</groupId>
-                </exclusion>
-            </exclusions>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -203,7 +188,6 @@
         <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
-            <version>10.8.2.2</version>
         </dependency>
         <!-- SAML -->
         <dependency>
@@ -228,6 +212,31 @@
             </exclusions>
         </dependency>
     </dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.eclipse.persistence</groupId>
+                <artifactId>javax.persistence</artifactId>
+                <version>2.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.persistence</groupId>
+                <artifactId>eclipselink</artifactId>
+                <version>${eclipselink.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>commonj.sdo</artifactId>
+                        <groupId>commonj.sdo</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derby</artifactId>
+                <version>10.8.2.2</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <build>
         <plugins>
             <plugin>
@@ -243,7 +252,8 @@
                 <artifactId>jetty-maven-plugin</artifactId>
                 <version>9.2.3.v20140905</version>
                 <configuration>
-                    <useProvidedScope>true</useProvidedScope>
+                    <!--rather use dependencies
+                    <useProvidedScope>true</useProvidedScope>-->
                     <scanIntervalSeconds>5</scanIntervalSeconds>
                     <stopKey>foo</stopKey>
                     <stopPort>9999</stopPort>
@@ -257,6 +267,23 @@
                         <contextPath>/proxy-soap</contextPath>
                     </webApp>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.eclipse.persistence</groupId>
+                        <artifactId>javax.persistence</artifactId>
+                        <version>2.0.0</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.eclipse.persistence</groupId>
+                        <artifactId>eclipselink</artifactId>
+                        <version>${eclipselink.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.derby</groupId>
+                        <artifactId>derby</artifactId>
+                        <version>10.8.2.2</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>

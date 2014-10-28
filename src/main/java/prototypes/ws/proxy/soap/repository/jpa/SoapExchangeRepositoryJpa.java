@@ -69,6 +69,8 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
         connectionProps.setProperty("javax.persistence.jdbc.user", "proxy");
         connectionProps.setProperty("javax.persistence.jdbc.password", "soap");
         emf = (EntityManagerFactory) Persistence.createEntityManagerFactory("ProxyPU", connectionProps);
+        //try to start
+        emf.createEntityManager().close();
     }
 
     @Override
@@ -91,17 +93,29 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
                 em.getTransaction().begin();
                 em.persist(exchange);
                 em.getTransaction().commit();
-                String dirPath = ApplicationConfig.DEFAULT_STORAGE_PATH + Dates.getFormattedDate(exchange.getTime(), Dates.YYYYMMDD_HH) + File.separator;
-                LOGGER.debug("Save files path : " + dirPath);
-                (new File(dirPath)).mkdirs();
-                Files.write(dirPath + exchange.getId() + "-request.xml", exchange.getRequestAsXML());
-                Files.write(dirPath + exchange.getId() + "-response.xml", exchange.getResponseAsXML());
+
+                Files.write(getRequestFilePath(exchange), exchange.getRequestAsXML());
+                Files.write(getResponseFilePath(exchange), exchange.getResponseAsXML());
             } catch (Exception e) {
                 LOGGER.error(e.getMessage());
             } finally {
                 closeTransaction(em);
             }
         }
+    }
+
+    private String getRequestFilePath(SoapExchange exchange) {
+        String dirPath = ApplicationConfig.DEFAULT_STORAGE_PATH + Dates.getFormattedDate(exchange.getTime(), Dates.YYYYMMDD_HH) + File.separator;
+        LOGGER.debug("Save files path : " + dirPath);
+        (new File(dirPath)).mkdirs();
+        return dirPath + exchange.getId() + "-request.xml";
+    }
+
+    private String getResponseFilePath(SoapExchange exchange) {
+        String dirPath = ApplicationConfig.DEFAULT_STORAGE_PATH + Dates.getFormattedDate(exchange.getTime(), Dates.YYYYMMDD_HH) + File.separator;
+        LOGGER.debug("Save files path : " + dirPath);
+        (new File(dirPath)).mkdirs();
+        return dirPath + exchange.getId() + "-response.xml";
     }
 
     @Override
@@ -140,7 +154,7 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
             // try shutdown DB, useful for some DB platforms (derby)
             Properties connectionProps = new Properties();
             connectionProps.setProperty("javax.persistence.jdbc.driver", "org.apache.derby.jdbc.EmbeddedDriver");
-            connectionProps.setProperty("javax.persistence.jdbc.url", "jdbc:derby:proxy-soap_derby.db;shutdown=true");
+            connectionProps.setProperty("javax.persistence.jdbc.url", "jdbc:derby:;shutdown=true");
             EntityManagerFactory emfClose = Persistence.createEntityManagerFactory("ProxyPU", connectionProps);
             emfClose.close();
         } catch (Exception e) {
