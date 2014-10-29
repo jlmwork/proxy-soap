@@ -23,9 +23,14 @@
             <tbody>
                 <c:forEach var="setting" items="${settings}" varStatus="loop">
                     <tr>
-                        <td><fmt:message key="config.${setting}"/></td>
                         <td>
-                            <%-- this temp variable avoids cast exception under jasper compilation (jetty, tomcat, ...) --%>
+                            <fmt:message key="config.${setting}"/>
+                            <a href="ui#" data-toggle="tooltip" title="<fmt:message key="config.${setting}.help"/>" data-placement="right">
+                                <span class="glyphicon glyphicon-question-sign"></span>
+                            </a>
+                        </td>
+                        <td>
+                            <%-- this temp variable avoids boolean cast exception under jasper compilation (jetty, tomcat, ...) --%>
                             <c:set var="settingval">${proxy[setting]}</c:set>
                             <c:choose>
                                 <c:when test="${settingval == 'true' || settingval == 'false' }">
@@ -38,6 +43,7 @@
                                     <input type="text" name="${setting}" value="${settingval}" style="width: 100%;" />
                                 </c:otherwise>
                             </c:choose>
+
                         </td>
                     </tr>
                 </c:forEach>
