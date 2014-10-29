@@ -19,10 +19,8 @@ import com.eviware.soapui.impl.wsdl.submit.WsdlMessageExchange;
 import com.eviware.soapui.impl.wsdl.support.wsdl.WsdlContext;
 import com.eviware.soapui.impl.wsdl.support.wsdl.WsdlUtils;
 import com.eviware.soapui.impl.wsdl.support.wsdl.WsdlValidator;
-import com.eviware.soapui.model.testsuite.AssertionError;
 import com.ibm.wsdl.PartImpl;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import javax.wsdl.Part;
 import javax.xml.namespace.QName;
@@ -60,7 +58,8 @@ public class ExtendedWsdlValidator extends WsdlValidator {
         this.wsdlContext = wsdlContext;
     }
 
-    public AssertionError[] assertHeaders(WsdlMessageExchange requestMessage) {
+    public List<String> assertHeaders(WsdlMessageExchange requestMessage) {
+        List<String> errors = new ArrayList<String>();
         try {
             LOG.debug("Headers validation");
             requestMessage.getOperation();
@@ -105,13 +104,19 @@ public class ExtendedWsdlValidator extends WsdlValidator {
              *
              * }
              */
-            return _internalConvertErrors(errorsH);
+            if (!errorsH.isEmpty()) {
+                for (XmlError error : errorsH) {
+                    errors.add(error.toString());
+                }
+            }
+            return errors;
+
         } catch (XmlException e) {
             LOG.warn("XMLError : " + e.getMessage());
         } catch (Exception e) {
             LOG.warn("Exception : " + e.getMessage());
         }
-        return new AssertionError[0];
+        return errors;
     }
 
     private void validateMessageBody(List<XmlError> errors, SchemaType type,
@@ -119,27 +124,6 @@ public class ExtendedWsdlValidator extends WsdlValidator {
         Classes.callPrivateMethod(WsdlValidator.class, "validateMessageBody",
                 this, new Class<?>[]{List.class, SchemaType.class,
                     XmlObject.class}, new Object[]{errors, type, msg});
-    }
-
-    private AssertionError[] _internalConvertErrors(List<XmlError> errors) {
-        return (AssertionError[]) Classes.callPrivateMethod(
-                WsdlValidator.class, "convertErrors", this,
-                new Class<?>[]{List.class}, new Object[]{errors});
-    }
-
-    public static AssertionError[] convertErrors(List<XmlError> errors) {
-        if (errors.size() > 0) {
-            List<AssertionError> response = new ArrayList<AssertionError>();
-            for (Iterator<XmlError> i = errors.iterator(); i.hasNext();) {
-                XmlError error = i.next();
-                AssertionError assertionError = new AssertionError(error);
-                if (!response.contains(assertionError)) {
-                    response.add(assertionError);
-                }
-            }
-            return response.toArray(new AssertionError[response.size()]);
-        }
-        return new AssertionError[0];
     }
 
 }

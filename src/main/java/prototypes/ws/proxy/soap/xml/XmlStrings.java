@@ -247,8 +247,8 @@ public class XmlStrings {
         return XmlObject.Factory.parse(input, xmlOptions);
     }
 
-    public static List<XmlError> validateXml(String xml) {
-        List<XmlError> errs = new ArrayList<XmlError>();
+    public static List<String> validateXml(String xml) {
+        List<String> errs = new ArrayList<String>();
         try {
             XmlOptions xmlOptions = new XmlOptions();
             xmlOptions.setLoadLineNumbers();
@@ -261,9 +261,9 @@ public class XmlStrings {
             if (e.getErrors() != null) {
                 errs.addAll(e.getErrors());
             }
-            errs.add(XmlError.forMessage(e.getMessage()));
+            errs.add(XmlError.forMessage(e.getMessage()).toString());
         } catch (Exception e) {
-            errs.add(XmlError.forMessage(e.getMessage()));
+            errs.add(XmlError.forMessage(e.getMessage()).toString());
         }
 
         return errs;

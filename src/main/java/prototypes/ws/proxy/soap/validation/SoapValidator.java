@@ -16,7 +16,6 @@
 package prototypes.ws.proxy.soap.validation;
 
 import com.eviware.soapui.impl.wsdl.submit.WsdlMessageExchange;
-import com.eviware.soapui.model.testsuite.AssertionError;
 import java.util.List;
 import javax.xml.namespace.QName;
 
@@ -46,7 +45,7 @@ public interface SoapValidator {
      * @param xml
      * @return
      */
-    boolean validateXml(String xml, List<AssertionError> errors);
+    boolean validateXml(String xml, List<String> errors);
 
     /**
      * Validate request message with wsdl definition. On failure, errors list
@@ -57,7 +56,7 @@ public interface SoapValidator {
      * @return
      */
     boolean validateRequest(WsdlMessageExchange requestMessage,
-            List<AssertionError> errors);
+            List<String> errors);
 
     /**
      * Validate response message with wsdl definition.
@@ -76,7 +75,7 @@ public interface SoapValidator {
      * @return
      */
     boolean validateResponse(WsdlMessageExchange responseMessage,
-            List<AssertionError> errors);
+            List<String> errors);
 
     /**
      * Make request message object from xml message.

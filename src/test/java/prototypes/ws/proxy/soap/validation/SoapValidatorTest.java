@@ -15,7 +15,6 @@
  */
 package prototypes.ws.proxy.soap.validation;
 
-import com.eviware.soapui.model.testsuite.AssertionError;
 import java.util.ArrayList;
 import java.util.List;
 import static org.junit.Assert.fail;
@@ -50,7 +49,7 @@ public class SoapValidatorTest {
     @Test
     public void validateSoap() {
         SoapMessage requestMessage = validator.newRequestMessage(request);
-        List<AssertionError> errors = new ArrayList<AssertionError>();
+        List<String> errors = new ArrayList<String>();
 
         if (!validator.validateXml(requestMessage.getRequestContent(), errors)) {
             fail("Request message is not valid xml");
@@ -75,7 +74,7 @@ public class SoapValidatorTest {
     @Test
     public void validateSoapFault() {
         SoapMessage requestMessage = validator.newRequestMessage(request);
-        List<AssertionError> errors = new ArrayList<AssertionError>();
+        List<String> errors = new ArrayList<String>();
 
         /*
          * Response message validation

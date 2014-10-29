@@ -16,6 +16,7 @@
 package prototypes.ws.proxy.soap.validation;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -24,19 +25,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.io.Files;
 import prototypes.ws.proxy.soap.io.Requests;
-import prototypes.ws.proxy.soap.xml.ComparableQName;
 
 public class SoapValidatorFactory {
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(SoapValidatorFactory.class);
 
-    private final Map<ComparableQName, SoapValidator> validatorsByQname = new TreeMap<ComparableQName, SoapValidator>();
+    private final Map<QName, SoapValidator> validatorsByQname = new HashMap<QName, SoapValidator>();
 
     private final Map<String, SoapValidator> validatorsByPath = new TreeMap<String, SoapValidator>();
 
     /**
-     * Constructeur privé
+     * private Constructor
      */
     private SoapValidatorFactory() {
     }
@@ -47,13 +47,13 @@ public class SoapValidatorFactory {
     private static class SingletonHolder {
 
         /**
-         * Instance unique non préinitialisée
+         * Unique instance
          */
         private final static SoapValidatorFactory instance = new SoapValidatorFactory();
     }
 
     /**
-     * Point d'accès pour l'instance unique du singleton
+     * Access to the unique instance
      */
     public static SoapValidatorFactory getInstance() {
         return SingletonHolder.instance;
@@ -100,10 +100,7 @@ public class SoapValidatorFactory {
      *
      */
     public SoapValidator getValidator(QName qname) {
-        if (qname instanceof ComparableQName) {
-            return validatorsByQname.get((ComparableQName) qname);
-        }
-        return null;
+        return validatorsByQname.get(qname);
     }
 
     public SoapValidator getValidator(String key) {
@@ -143,7 +140,7 @@ public class SoapValidatorFactory {
                 validatorsByPath.put(key, validator);
                 // get list of operations qnames and attach a key for each one
                 for (QName qName : validator.getOperationsQName()) {
-                    validatorsByQname.put(new ComparableQName(qName), validator);
+                    validatorsByQname.put(qName, validator);
                 }
                 LOGGER.debug("Saves the new WSDL Validator under key : " + key);
             } catch (NotFoundSoapException e) {

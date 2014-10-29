@@ -16,7 +16,6 @@
 package prototypes.ws.proxy.soap.io;
 
 import com.eaio.uuid.UUID;
-import com.eviware.soapui.model.testsuite.AssertionError;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -42,10 +41,10 @@ public class SoapExchange {
     private Boolean requestXmlValid;
     private Boolean responseSoapValid;
     private Boolean responseXmlValid;
-    private List<AssertionError> requestSoapErrors;
-    private List<AssertionError> responseSoapErrors;
-    private List<AssertionError> requestXmlErrors;
-    private List<AssertionError> responseXmlErrors;
+    private List<String> requestSoapErrors;
+    private List<String> responseSoapErrors;
+    private List<String> requestXmlErrors;
+    private List<String> responseXmlErrors;
     private long responseTime;
 
     public String getValidatorId() {
@@ -248,56 +247,56 @@ public class SoapExchange {
     /**
      * @return the requestErrors
      */
-    public List<AssertionError> getRequestXmlErrors() {
+    public List<String> getRequestXmlErrors() {
         return requestXmlErrors;
     }
 
     /**
      * @param requestErrors the requestErrors to set
      */
-    public void setRequestXmlErrors(List<AssertionError> requestErrors) {
+    public void setRequestXmlErrors(List<String> requestErrors) {
         this.requestXmlErrors = requestErrors;
     }
 
     /**
      * @return the responseErrors
      */
-    public List<AssertionError> getResponseXmlErrors() {
+    public List<String> getResponseXmlErrors() {
         return responseXmlErrors;
     }
 
     /**
      * @param responseErrors the responseErrors to set
      */
-    public void setResponseXmlErrors(List<AssertionError> responseErrors) {
+    public void setResponseXmlErrors(List<String> responseErrors) {
         this.responseXmlErrors = responseErrors;
     }
 
     /**
      * @return the requestErrors
      */
-    public List<AssertionError> getRequestSoapErrors() {
+    public List<String> getRequestSoapErrors() {
         return requestSoapErrors;
     }
 
     /**
      * @param requestErrors the requestErrors to set
      */
-    public void setRequestSoapErrors(List<AssertionError> requestErrors) {
+    public void setRequestSoapErrors(List<String> requestErrors) {
         this.requestSoapErrors = requestErrors;
     }
 
     /**
      * @return the responseErrors
      */
-    public List<AssertionError> getResponseSoapErrors() {
+    public List<String> getResponseSoapErrors() {
         return responseSoapErrors;
     }
 
     /**
      * @param responseErrors the responseErrors to set
      */
-    public void setResponseSoapErrors(List<AssertionError> responseErrors) {
+    public void setResponseSoapErrors(List<String> responseErrors) {
         this.responseSoapErrors = responseErrors;
     }
 

@@ -18,7 +18,6 @@ package prototypes.ws.proxy.soap.filter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -26,7 +25,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
-import org.apache.xmlbeans.XmlError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -41,7 +39,6 @@ import prototypes.ws.proxy.soap.io.Strings;
 import prototypes.ws.proxy.soap.io.wrapper.BufferedHttpResponseWrapper;
 import prototypes.ws.proxy.soap.io.wrapper.MultiReadHttpServletRequest;
 import prototypes.ws.proxy.soap.repository.SoapExchangeRepository;
-import prototypes.ws.proxy.soap.validation.ExtendedWsdlValidator;
 import prototypes.ws.proxy.soap.validation.SoapMessage;
 import prototypes.ws.proxy.soap.validation.SoapValidator;
 import prototypes.ws.proxy.soap.validation.SoapValidatorFactory;
@@ -149,7 +146,7 @@ public class ValidationFilter extends HttpServletFilter {
                 .getInputStream()));
 
         // 1] XML Well formed ?
-        List<XmlError> errors = XmlStrings.validateXml(requestBodyContent);
+        List<String> errors = XmlStrings.validateXml(requestBodyContent);
         boolean valid = (errors.isEmpty());
         soapExchange.setRequestXmlValid(valid);
         LOGGER.info("Is Request XML valid ? " + errors.isEmpty());
@@ -164,7 +161,7 @@ public class ValidationFilter extends HttpServletFilter {
                     .newRequestMessage(requestBodyContent);
             request.setAttribute("requestMessage", message);
             soapExchange.setOperation(message.getOperation().getBindingOperationName());
-            List<com.eviware.soapui.model.testsuite.AssertionError> soapErrors = new ArrayList<com.eviware.soapui.model.testsuite.AssertionError>();
+            List<String> soapErrors = new ArrayList<String>();
             valid = valid && soapValidator.validateRequest(message, soapErrors);
             LOGGER.info("Is Request SOAP valid ? " + valid);
             soapExchange.setRequestSoapErrors(soapErrors);
@@ -173,8 +170,7 @@ public class ValidationFilter extends HttpServletFilter {
             }
             soapExchange.setRequestSoapValid(valid);
         } else {
-            soapExchange.setRequestXmlErrors(Arrays.asList(ExtendedWsdlValidator
-                    .convertErrors(errors)));
+            soapExchange.setRequestXmlErrors(errors);
             LOGGER.debug("XML Errors : " + errors);
         }
         soapExchange.setRequest(requestBodyContent);
@@ -201,7 +197,7 @@ public class ValidationFilter extends HttpServletFilter {
 
         if (proxyExchange != null && proxyExchange.getResponseCode() == HttpServletResponse.SC_OK) {
             // 1] XML Well formed ?
-            List<XmlError> errors = XmlStrings.validateXml(responseBodyContent);
+            List<String> errors = XmlStrings.validateXml(responseBodyContent);
             valid = (errors.isEmpty());
             soapExchange.setResponseXmlValid(valid);
             LOGGER.info("Is Response XML valid ? " + errors.isEmpty());
@@ -209,8 +205,8 @@ public class ValidationFilter extends HttpServletFilter {
 
             // 2] Soap Valid ?
             if (valid && (soapValidator != null)) {
-                List<com.eviware.soapui.model.testsuite.AssertionError> soapErrors
-                        = new ArrayList<com.eviware.soapui.model.testsuite.AssertionError>();
+                List<String> soapErrors
+                        = new ArrayList<String>();
                 SoapMessage requestMessage = (SoapMessage) request
                         .getAttribute("requestMessage");
                 if (requestMessage != null) {
@@ -228,8 +224,7 @@ public class ValidationFilter extends HttpServletFilter {
                     LOGGER.info("Cant validate SOAP Response as Request was SOAP invalid");
                 }
             } else {
-                soapExchange.setResponseXmlErrors(Arrays.asList(ExtendedWsdlValidator
-                        .convertErrors(errors)));
+                soapExchange.setResponseXmlErrors(errors);
             }
         }
         soapExchange.setResponse(responseBodyContent);

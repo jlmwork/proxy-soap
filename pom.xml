@@ -262,6 +262,7 @@
                     <scanIntervalSeconds>5</scanIntervalSeconds>
                     <stopKey>foo</stopKey>
                     <stopPort>9999</stopPort>
+                    <jvmArgs>-XX:+CMSClassUnloadingEnabled -XX:PermSize=128M -XX:MaxPermSize=128M</jvmArgs>
                     <systemProperties>
                         <systemProperty>
                             <name>jetty.port</name>

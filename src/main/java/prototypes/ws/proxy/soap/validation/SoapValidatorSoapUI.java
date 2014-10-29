@@ -24,6 +24,7 @@ import com.eviware.soapui.impl.wsdl.support.wsdl.WsdlContext;
 import com.eviware.soapui.impl.wsdl.support.wsdl.WsdlInterfaceDefinition;
 import com.eviware.soapui.model.testsuite.AssertionError;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -33,10 +34,10 @@ import java.util.Map;
 import javax.wsdl.Message;
 import javax.wsdl.Part;
 import javax.xml.namespace.QName;
-import org.apache.xmlbeans.XmlError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 import prototypes.ws.proxy.soap.constantes.SoapConstantes;
 import prototypes.ws.proxy.soap.constantes.SoapErrorConstantes;
 import prototypes.ws.proxy.soap.io.Requests;
@@ -84,7 +85,7 @@ public class SoapValidatorSoapUI implements SoapValidator {
     /**
      * Load or reload definition from wsdl file.
      */
-    public void loadDefinition() {
+    private void loadDefinition() {
         // Check file exists if it is not a remote resource
         if (!Requests.isHttpPath(schemaPath)) {
             if (!new File(schemaPath).exists()) {
@@ -176,22 +177,14 @@ public class SoapValidatorSoapUI implements SoapValidator {
     }
 
     @Override
-    public boolean validateXml(String xml, List<AssertionError> errors) {
-        List<XmlError> errs = XmlStrings.validateXml(xml);
-        if (errors == null) {
-            errors = new ArrayList<AssertionError>();
-        }
-
-        for (XmlError error : errs) {
-            errors.add(new AssertionError(error));
-        }
-
-        return errors.isEmpty();
+    public boolean validateXml(String xml, List<String> errors) {
+        List<String> errs = XmlStrings.validateXml(xml);
+        return errs.isEmpty();
     }
 
     @Override
     public boolean validateRequest(WsdlMessageExchange requestMessage,
-            List<AssertionError> errors) {
+            List<String> errors) {
         LOGGER.debug("Request validation");
         // XML Validation
         if (!validateXml(requestMessage.getRequestContent(), errors)) {
@@ -203,16 +196,18 @@ public class SoapValidatorSoapUI implements SoapValidator {
         AssertionError[] errs = wsdlValidator.assertRequest(requestMessage,
                 false);
 
-        if (errors != null) {
-            errors.addAll(Arrays.asList(errs));
+        if (errs != null) {
+            for (AssertionError error : errs) {
+                errors.add(error.toString());
+            }
         }
 
         LOGGER.debug("Request headers validation");
-        AssertionError[] errsH = wsdlValidator.assertHeaders(requestMessage);
+        List<String> errsH = wsdlValidator.assertHeaders(requestMessage);
         if (errsH != null) {
-            errors.addAll(Arrays.asList(errsH));
+            errors.addAll(errsH);
         }
-        return errors.size() == 0;
+        return errors.isEmpty();
     }
 
     @Override
@@ -222,7 +217,7 @@ public class SoapValidatorSoapUI implements SoapValidator {
 
     @Override
     public boolean validateResponse(WsdlMessageExchange responseMessage,
-            List<AssertionError> errors) {
+            List<String> errors) {
         LOGGER.debug("Response validation");
         // XML Validation
         if (!validateXml(responseMessage.getResponseContent(), errors)) {
@@ -233,7 +228,10 @@ public class SoapValidatorSoapUI implements SoapValidator {
         try {
             opNode = XmlStrings.firstChild(responseMessage.getResponseContent(),
                     SoapConstantes.BODY);
-        } catch (Exception e) {
+        } catch (IOException e) {
+            LOGGER.error("Response get body first child fail", e);
+            return false;
+        } catch (SAXException e) {
             LOGGER.error("Response get body first child fail", e);
             return false;
         }
@@ -254,15 +252,19 @@ public class SoapValidatorSoapUI implements SoapValidator {
         AssertionError[] errs = wsdlValidator.assertResponse(responseMessage,
                 false);
 
-        if (errors != null) {
-            errors.addAll(Arrays.asList(errs));
+        if (errs != null) {
+            for (AssertionError error : errs) {
+                errors.add(error.toString());
+            }
         }
 
         LOGGER.debug("Response headers validation");
-        AssertionError[] errsH = wsdlValidator.assertHeaders(responseMessage);
-        errors.addAll(Arrays.asList(errsH));
+        List<String> errsH = wsdlValidator.assertHeaders(responseMessage);
+        if (errsH != null) {
+            errors.addAll(errsH);
+        }
 
-        return errors.size() == 0;
+        return errors.isEmpty();
     }
 
     @Override
@@ -271,7 +273,9 @@ public class SoapValidatorSoapUI implements SoapValidator {
             return new SoapMessage(message, wsdlInterface);
         } catch (SoapException e) {
             throw e;
-        } catch (Exception e) {
+        } catch (IOException e) {
+            throw new SoapException("Make request message fail", e);
+        } catch (SAXException e) {
             throw new SoapException("Make request message fail", e);
         }
     }

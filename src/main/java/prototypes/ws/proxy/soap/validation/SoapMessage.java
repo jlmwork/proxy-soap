@@ -31,7 +31,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import prototypes.ws.proxy.soap.constantes.ProxyErrorConstantes;
 import prototypes.ws.proxy.soap.constantes.SoapConstantes;
-import prototypes.ws.proxy.soap.xml.ComparableQName;
 import prototypes.ws.proxy.soap.xml.XmlStrings;
 
 public class SoapMessage implements WsdlMessageExchange {
@@ -74,7 +73,7 @@ public class SoapMessage implements WsdlMessageExchange {
             return null;
         }
 
-        QName qname = new ComparableQName(opNode.getNamespaceURI(), opNode.getLocalName());
+        QName qname = new QName(opNode.getNamespaceURI(), opNode.getLocalName());
         return qname;
     }
 

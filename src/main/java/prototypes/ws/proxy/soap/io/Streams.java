@@ -64,15 +64,13 @@ public class Streams {
 
     }
 
-    public static byte[] getBytes(InputStream is) {
+    public static byte[] getBytes(InputStream iS) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         int readed;
         try {
-
-            while ((readed = is.read()) != -1) {
+            while ((readed = iS.read()) != -1) {
                 baos.write(readed);
             }
-
         } catch (IOException e) {
             // e.printStackTrace();
         } finally {
@@ -81,8 +79,14 @@ public class Streams {
             } catch (IOException e) {
                 // e.printStackTrace();
             }
+            if (iS != null) {
+                try {
+                    iS.close();
+                } catch (IOException e) {
+                    // e.printStackTrace();
+                }
+            }
         }
-
         return baos.toByteArray();
     }
 

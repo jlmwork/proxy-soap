@@ -16,11 +16,11 @@
                 <column name="ipFrom" />
             </basic>
             <transient name="request"/>
-            <transient name="response"/>
+            <transient name="response"/><!--
             <transient name="requestSoapErrors"/>
             <transient name="responseSoapErrors"/>
             <transient name="requestXmlErrors"/>
-            <transient name="responseXmlErrors"/>
+            <transient name="responseXmlErrors"/>-->
         </attributes>
     </entity>
 </entity-mappings>

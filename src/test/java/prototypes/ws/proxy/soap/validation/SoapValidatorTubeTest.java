@@ -15,7 +15,6 @@
  */
 package prototypes.ws.proxy.soap.validation;
 
-import com.eviware.soapui.model.testsuite.AssertionError;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +49,7 @@ public class SoapValidatorTubeTest {
                 .getResourceAsStream(
                         "sample-soaps/propagerDonneesPointEtAffaire_OK.xml"));
         SoapMessage requestMessage = validator.newRequestMessage(request);
-        List<AssertionError> errors = new ArrayList<AssertionError>();
+        List<String> errors = new ArrayList<String>();
         if (!validator.validateRequest(requestMessage, errors)) {
             System.out.println(errors);
             fail("Request message not valid");
@@ -66,7 +65,7 @@ public class SoapValidatorTubeTest {
                         .getResourceAsStream(
                                 "sample-soaps/propagerDonneesPointEtAffaire_HeadersKO.xml"));
         SoapMessage requestMessage = validator.newRequestMessage(request);
-        List<AssertionError> errors = new ArrayList<AssertionError>();
+        List<String> errors = new ArrayList<String>();
         if (validator.validateRequest(requestMessage, errors)) {
             fail("Request message should not be valid");
         }

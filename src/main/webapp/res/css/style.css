@@ -45,3 +45,6 @@ body .modal-dialog {
     vertical-align:middle;
     text-align: center;
 }
+.glyphicon.error {
+    color: red;
+}
