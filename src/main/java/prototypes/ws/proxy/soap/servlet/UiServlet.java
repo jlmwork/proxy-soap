@@ -69,7 +69,7 @@ public class UiServlet extends AbstractServlet {
         request.setAttribute("proxy", proxyConfig);
 
         request.setAttribute("requestList", exchangeRepository.list());
-        request.setAttribute("validators", SoapValidatorFactory.getValidators());
+        request.setAttribute("validators", SoapValidatorFactory.getInstance().getValidators());
 
         if ("clearRequests".equals(action)) {
             clearRequests(request, response);
@@ -115,7 +115,7 @@ public class UiServlet extends AbstractServlet {
         try {
             String validator = request.getParameter("validator");
             if (validator != null) {
-                String urlStr = SoapValidatorFactory.getValidators()
+                String urlStr = SoapValidatorFactory.getInstance().getValidators()
                         .get(validator).getUrl();
                 URL url = new URL(urlStr);
                 LOGGER.debug("WSDL Url : " + url);

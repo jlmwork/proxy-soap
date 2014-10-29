@@ -19,20 +19,20 @@ import com.eviware.soapui.model.testsuite.AssertionError;
 import java.util.ArrayList;
 import java.util.List;
 import static org.junit.Assert.fail;
-import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-@Ignore
 public class SoapValidatorTest {
 
-    private final String schemaPath = "src/test/resources/wsdl/affaire/AffaireServiceWrite.wsdl";
+    private static final String schemaPath = "src/test/resources/wsdl/affaire/AffaireServiceWrite.wsdl";
 
-    private SoapValidatorSoapUI validator;
+    private static SoapValidatorSoapUI validator;
 
-    @Before
-    public void setUp() {
+    @BeforeClass
+    public static void staticSetUp() {
         validator = new SoapValidatorSoapUI(schemaPath);
+        validator.getOperationsQName();
+
     }
 
     @Test(expected = SoapException.class)

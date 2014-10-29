@@ -25,9 +25,11 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.namespace.QName;
 import org.apache.xmlbeans.XmlError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
 import prototypes.ws.proxy.soap.context.ApplicationContext;
 import prototypes.ws.proxy.soap.context.RequestContext;
@@ -91,42 +93,39 @@ public class ValidationFilter extends HttpServletFilter {
             // Prepare Objects
             // wraps request for allowing to read request body more than once
             // This wrapping must occur in the first called ServletFilter
-            request = new MultiReadHttpServletRequest(request);
+            HttpServletRequest wrappedRequest = new MultiReadHttpServletRequest(request);
             // wraps response for post processing
             OutputStream out = response.getOutputStream();
-            response = new BufferedHttpResponseWrapper(response);
-
-            // creates a SoapValidator
-            SoapValidator validator = findSoapValidator(request);
+            HttpServletResponse wrappedResponse = new BufferedHttpResponseWrapper(response);
 
             // 1] Request validation
-            boolean requestValid = validateInput(request, validator,
+            boolean requestValid = validateInput(wrappedRequest,
                     soapExchange);
             if (!requestValid && proxyConfig.isInBlockingMode()) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                wrappedResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,
                         "Request message invalid");
                 return;
             }
 
             // 2] pass the request along the filter chain
             long start = System.currentTimeMillis();
-            chain.doFilter(request, response);
+            chain.doFilter(wrappedRequest, wrappedResponse);
             long stop = System.currentTimeMillis();
             soapExchange.setResponseTime(stop - start);
 
             // 3] Response validation
-            boolean responseValid = validateOutput(request, response,
-                    validator, soapExchange);
+            boolean responseValid = validateOutput(wrappedRequest, wrappedResponse,
+                    soapExchange);
             if (!responseValid && proxyConfig.isInBlockingMode()) {
                 LOGGER.info("Proxy is in blocking mode.");
-                response.sendError(HttpServletResponse.SC_BAD_GATEWAY,
+                wrappedResponse.sendError(HttpServletResponse.SC_BAD_GATEWAY,
                         "Response message invalid");
                 return;
             }
             // store the exchange
             exchangeRepository.save(soapExchange);
             // send response back to the client
-            response.addHeader("X-Filtered-By", "proxy-soap");
+            wrappedResponse.addHeader("X-Filtered-By", "proxy-soap");
             out.write(soapExchange.getResponse().getBytes());
             LOGGER.debug("Response written");
         } else {
@@ -144,7 +143,7 @@ public class ValidationFilter extends HttpServletFilter {
      * @throws IOException
      */
     private boolean validateInput(HttpServletRequest request,
-            SoapValidator soapValidator, SoapExchange soapExchange)
+            SoapExchange soapExchange)
             throws IOException {
         String requestBodyContent = new String(Streams.getBytes(request
                 .getInputStream()));
@@ -154,6 +153,9 @@ public class ValidationFilter extends HttpServletFilter {
         boolean valid = (errors.isEmpty());
         soapExchange.setRequestXmlValid(valid);
         LOGGER.info("Is Request XML valid ? " + errors.isEmpty());
+        // get the SoapValidator
+        SoapValidator soapValidator = findSoapValidator(request, requestBodyContent);
+        request.setAttribute("soapValidator", soapValidator);
 
         // 2] Soap Valid ?
         if (valid && (soapValidator != null)) {
@@ -189,7 +191,7 @@ public class ValidationFilter extends HttpServletFilter {
      */
     private boolean validateOutput(HttpServletRequest request,
             HttpServletResponse response,
-            SoapValidator soapValidator, SoapExchange soapExchange)
+            SoapExchange soapExchange)
             throws IOException {
         boolean valid = false;
         String responseBodyContent = new String(
@@ -203,6 +205,7 @@ public class ValidationFilter extends HttpServletFilter {
             valid = (errors.isEmpty());
             soapExchange.setResponseXmlValid(valid);
             LOGGER.info("Is Response XML valid ? " + errors.isEmpty());
+            SoapValidator soapValidator = (SoapValidator) request.getAttribute("soapValidator");
 
             // 2] Soap Valid ?
             if (valid && (soapValidator != null)) {
@@ -233,18 +236,33 @@ public class ValidationFilter extends HttpServletFilter {
         return valid;
     }
 
-    private SoapValidator findSoapValidator(HttpServletRequest request) {
-        SoapValidator soapValidator;
+    private SoapValidator findSoapValidator(HttpServletRequest request, String requestBody) {
+        SoapValidator soapValidator = null;
         String wsdlPath = request.getParameter("wsdl");
 
+        // create validator on-the-fly
         if (!Strings.isNullOrEmpty(wsdlPath)) {
             LOGGER.info("Specific Validation activated by parameter wsdl");
             LOGGER.debug("WSDL=" + wsdlPath);
-            soapValidator = SoapValidatorFactory.createSoapValidator(wsdlPath);
+            soapValidator = SoapValidatorFactory.getInstance().createSoapValidator(wsdlPath);
         } else {
             LOGGER.info("Default WSDL Validation activated (as no wsdl parameter has been provided)");
-            String service = Requests.resolveSoapServiceFromRequest(request);
-            soapValidator = SoapValidatorFactory.createSoapValidator(service);
+            //String service = Requests.resolveSoapServiceFromRequest(request);
+            //soapValidator = SoapValidatorFactory.createSoapValidator(service);
+            QName qname;
+            try {
+                qname = SoapMessage.getOperationNameFromBody(requestBody);
+                soapValidator = SoapValidatorFactory.getInstance().getValidator(qname);
+                if (soapValidator == null) {
+                    LOGGER.warn("No Validator found for {}", qname);
+                } else {
+                    LOGGER.info("Validator found for {}", qname);
+                }
+            } catch (SAXException ex) {
+                LOGGER.warn("XML Error while resolving service operation from XML {} ", ex.getMessage());
+            } catch (IOException ex) {
+                LOGGER.warn("IO error while resolving service operation from XML {} ", ex.getMessage());
+            }
         }
         return soapValidator;
     }

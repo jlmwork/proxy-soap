@@ -24,6 +24,7 @@ import prototypes.ws.proxy.soap.constantes.ApplicationConfig;
 import prototypes.ws.proxy.soap.context.ApplicationContext;
 import prototypes.ws.proxy.soap.repository.SoapExchangeRepository;
 import prototypes.ws.proxy.soap.repository.jpa.SoapExchangeRepositoryJpa;
+import prototypes.ws.proxy.soap.validation.SoapValidatorFactory;
 
 /**
  *
@@ -72,5 +73,7 @@ public class ApplicationInitListener implements ServletContextListener {
         if (exchangesRepo != null) {
             exchangesRepo.close();
         }
+        // validators cleanup
+        SoapValidatorFactory.getInstance().clear();
     }
 }

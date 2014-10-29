@@ -18,6 +18,7 @@ package prototypes.ws.proxy.soap.validation;
 import com.eviware.soapui.impl.wsdl.submit.WsdlMessageExchange;
 import com.eviware.soapui.model.testsuite.AssertionError;
 import java.util.List;
+import javax.xml.namespace.QName;
 
 public interface SoapValidator {
 
@@ -94,6 +95,8 @@ public interface SoapValidator {
     SoapMessage newResponseMessage(String message, SoapMessage requestMessage);
 
     Object[] getOperations();
+
+    List<QName> getOperationsQName();
 
     String getUrl();
 }

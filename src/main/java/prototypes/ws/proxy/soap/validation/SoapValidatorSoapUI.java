@@ -29,6 +29,10 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import javax.wsdl.Message;
+import javax.wsdl.Part;
+import javax.xml.namespace.QName;
 import org.apache.xmlbeans.XmlError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +60,8 @@ public class SoapValidatorSoapUI implements SoapValidator {
 
     private ExtendedWsdlValidator wsdlValidator;
 
+    private List<QName> operationsQname = new ArrayList<QName>();
+
     public static final String FAULT = "Fault";
 
     public SoapValidatorSoapUI(String schemaPath) {
@@ -68,6 +74,11 @@ public class SoapValidatorSoapUI implements SoapValidator {
         this.from = from;
         createdTime = Calendar.getInstance().getTimeInMillis();
         loadDefinition();
+    }
+
+    @Override
+    public List<QName> getOperationsQName() {
+        return operationsQname;
     }
 
     /**
@@ -107,6 +118,16 @@ public class SoapValidatorSoapUI implements SoapValidator {
             // Make Wsdl Validator
             wsdlValidator = new ExtendedWsdlValidator(
                     wsdlInterface.getWsdlContext());
+
+            Map<QName, Message> vars = (Map<QName, Message>) this.wsdlInterface.getDefinitionContext().getDefinition().getMessages();
+            for (QName qname : vars.keySet()) {
+                Message mess = vars.get(qname);
+                Map<String, Part> parts = mess.getParts();
+                for (Part qNamePart : parts.values()) {
+                    operationsQname.add(qNamePart.getElementName());
+                    LOGGER.debug("WSDL contains Part {}", qNamePart.getElementName());
+                }
+            }
 
             // destroy timer
             // SoapUI.getSoapUITimer().cancel();

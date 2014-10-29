@@ -19,17 +19,45 @@ import java.io.File;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
+import javax.xml.namespace.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.io.Files;
 import prototypes.ws.proxy.soap.io.Requests;
+import prototypes.ws.proxy.soap.xml.ComparableQName;
 
 public class SoapValidatorFactory {
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(SoapValidatorFactory.class);
 
-    private static final Map<String, SoapValidator> validators = new TreeMap<String, SoapValidator>();
+    private final Map<ComparableQName, SoapValidator> validatorsByQname = new TreeMap<ComparableQName, SoapValidator>();
+
+    private final Map<String, SoapValidator> validatorsByPath = new TreeMap<String, SoapValidator>();
+
+    /**
+     * Constructeur privé
+     */
+    private SoapValidatorFactory() {
+    }
+
+    /**
+     * Holder
+     */
+    private static class SingletonHolder {
+
+        /**
+         * Instance unique non préinitialisée
+         */
+        private final static SoapValidatorFactory instance = new SoapValidatorFactory();
+    }
+
+    /**
+     * Point d'accès pour l'instance unique du singleton
+     */
+    public static SoapValidatorFactory getInstance() {
+        return SingletonHolder.instance;
+    }
 
     /**
      * Make new soap validator to validate soap message with this wsdl
@@ -38,16 +66,21 @@ public class SoapValidatorFactory {
      * @param wsdlPath
      * @return
      */
-    public static SoapValidator createSoapValidator(String wsdlPath) {
+    public SoapValidator createSoapValidator(String wsdlPath) {
         return createSoapValidator(wsdlPath, null, null);
+    }
+
+    public void clear() {
+        validatorsByQname.clear();
+        validatorsByPath.clear();
     }
 
     /**
      *
      */
-    public static void listValidators() {
+    public void listValidators() {
         if (LOGGER.isDebugEnabled()) {
-            Iterator<Map.Entry<String, SoapValidator>> it = validators
+            Iterator<Map.Entry<String, SoapValidator>> it = validatorsByPath
                     .entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry<String, SoapValidator> pairs = it.next();
@@ -59,15 +92,29 @@ public class SoapValidatorFactory {
     /**
      *
      */
-    public static Map<String, SoapValidator> getValidators() {
-        return validators;
+    public Map<String, SoapValidator> getValidators() {
+        return validatorsByPath;
     }
 
-    private static SoapValidator createSoapValidator(String wsdlPath,
+    /**
+     *
+     */
+    public SoapValidator getValidator(QName qname) {
+        if (qname instanceof ComparableQName) {
+            return validatorsByQname.get((ComparableQName) qname);
+        }
+        return null;
+    }
+
+    public SoapValidator getValidator(String key) {
+        return validatorsByPath.get(key);
+    }
+
+    private SoapValidator createSoapValidator(String wsdlPath,
             String key, String from) {
         key = (key != null) ? key : wsdlPath;
 
-        SoapValidator validator = validators.get(key);
+        SoapValidator validator = getValidator(key);
         boolean createNew = false;
         if (validator == null) {
             LOGGER.debug("No existing WSDL Validator for key : '" + key + "'");
@@ -93,8 +140,12 @@ public class SoapValidatorFactory {
             LOGGER.debug("Create new WSDL Validator for path : " + wsdlPath);
             try {
                 validator = new SoapValidatorSoapUI(wsdlPath, key, from);
+                validatorsByPath.put(key, validator);
+                // get list of operations qnames and attach a key for each one
+                for (QName qName : validator.getOperationsQName()) {
+                    validatorsByQname.put(new ComparableQName(qName), validator);
+                }
                 LOGGER.debug("Saves the new WSDL Validator under key : " + key);
-                validators.put(key, validator);
             } catch (NotFoundSoapException e) {
                 return null;
             }
@@ -107,7 +158,7 @@ public class SoapValidatorFactory {
      * @param multiplePaths
      * @return
      */
-    public static void createSoapValidators(String multiplePaths) {
+    public void createSoapValidators(String multiplePaths) {
         LOGGER.info("create soap validators");
         // catch paths
         String[] toScanPaths = multiplePaths.split(";");// File.pathSeparator);

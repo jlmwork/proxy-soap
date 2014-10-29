@@ -25,41 +25,57 @@ import com.eviware.soapui.support.types.StringToStringMap;
 import com.eviware.soapui.support.types.StringToStringsMap;
 import java.io.IOException;
 import java.util.Vector;
+import javax.xml.namespace.QName;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import prototypes.ws.proxy.soap.constantes.ProxyErrorConstantes;
 import prototypes.ws.proxy.soap.constantes.SoapConstantes;
+import prototypes.ws.proxy.soap.xml.ComparableQName;
 import prototypes.ws.proxy.soap.xml.XmlStrings;
 
 public class SoapMessage implements WsdlMessageExchange {
 
     private String request, response;
-    private String operationName;
+    private QName operationName;
     private WsdlInterface wsdlInterface;
     private WsdlOperation wsdlOperation;
 
-    public SoapMessage(String requestBody, WsdlInterface wsdlInterface)
+    public SoapMessage(String requestBody, WsdlInterface wsdlInterface, QName operationQName)
             throws SAXException, IOException {
-
         if ((requestBody == null) || (requestBody.length() == 0)) {
             throw new SoapException(ProxyErrorConstantes.EMPTY_REQUEST);
         }
-
         this.request = requestBody;
         this.wsdlInterface = wsdlInterface;
-
-        Node opNode = XmlStrings.firstChild(request, SoapConstantes.BODY);
-
-        /*
-         * No body, or no body's children
-         */
-        if (opNode == null) {
+        // No body, or no body's children
+        if (operationQName == null) {
             return;
         }
+        operationName = operationQName;
+        wsdlOperation = wsdlInterface.getOperationByName(operationName.getLocalPart());
+    }
 
-        operationName = opNode.getLocalName();
-        wsdlOperation = wsdlInterface.getOperationByName(operationName);
+    public SoapMessage(String requestBody, WsdlInterface wsdlInterface)
+            throws SAXException, IOException {
+        this(requestBody, wsdlInterface, getOperationNameFromBody(requestBody));
+
+    }
+
+    public static QName getOperationNameFromBody(String body) throws SAXException, IOException {
+        if ((body == null) || (body.length() == 0)) {
+            throw new SoapException(ProxyErrorConstantes.EMPTY_REQUEST);
+        }
+
+        Node opNode = XmlStrings.firstChild(body, SoapConstantes.BODY);
+
+        // No body, or no body's children
+        if (opNode == null) {
+            return null;
+        }
+
+        QName qname = new ComparableQName(opNode.getNamespaceURI(), opNode.getLocalName());
+        return qname;
     }
 
     public NodeList getHeaders() throws SAXException, IOException {

@@ -219,7 +219,7 @@ public class ProxyConfiguration extends HashMap<String, Object> {
             setValidationActive(false);
         }
         try {
-            SoapValidatorFactory.createSoapValidators(this.wsdlDirs);
+            SoapValidatorFactory.getInstance().createSoapValidators(this.wsdlDirs);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
