@@ -108,6 +108,8 @@ public class ValidationFilter extends HttpServletFilter {
             long start = System.currentTimeMillis();
             chain.doFilter(wrappedRequest, wrappedResponse);
             long stop = System.currentTimeMillis();
+            ProxyExchange proxyExchange = RequestContext.getProxyExchange(request);
+            soapExchange.setRequestHeaders(proxyExchange.getResponseHeaders());
             soapExchange.setResponseTime(stop - start);
 
             // 3] Response validation
@@ -226,6 +228,7 @@ public class ValidationFilter extends HttpServletFilter {
             } else {
                 soapExchange.setResponseXmlErrors(errors);
             }
+            soapExchange.setResponseHeaders(proxyExchange.getResponseHeaders());
         }
         soapExchange.setResponse(responseBodyContent);
         return valid;

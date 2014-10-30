@@ -21,31 +21,35 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import prototypes.ws.proxy.soap.xml.XmlStrings;
 
 public class SoapExchange {
-
-    public static final String UID = "proxy.soap.requestmonitor";
 
     private Calendar time = new GregorianCalendar();
     // give the request an unique attribute id
     private final String id = new UUID().toString();
     private String uri;
     private String from;
-    private String request;
-    private String response;
     private String message;
     private String operation;
     private String validatorId;
+    private long responseTime;
+
+    // request
+    private String request;
+    private Map<String, List<String>> requestHeaders;
     private Boolean requestSoapValid;
     private Boolean requestXmlValid;
-    private Boolean responseSoapValid;
-    private Boolean responseXmlValid;
     private List<String> requestSoapErrors;
     private List<String> responseSoapErrors;
+    // response
+    private String response;
+    private Boolean responseSoapValid;
+    private Boolean responseXmlValid;
+    private Map<String, List<String>> responseHeaders;
     private List<String> requestXmlErrors;
     private List<String> responseXmlErrors;
-    private long responseTime;
 
     public String getValidatorId() {
         return validatorId;
@@ -314,6 +318,22 @@ public class SoapExchange {
 
     public void setResponseXmlValid(Boolean responseXmlValid) {
         this.responseXmlValid = responseXmlValid;
+    }
+
+    public Map<String, List<String>> getRequestHeaders() {
+        return requestHeaders;
+    }
+
+    public void setRequestHeaders(Map<String, List<String>> requestHeaders) {
+        this.requestHeaders = requestHeaders;
+    }
+
+    public Map<String, List<String>> getResponseHeaders() {
+        return responseHeaders;
+    }
+
+    public void setResponseHeaders(Map<String, List<String>> responseHeaders) {
+        this.responseHeaders = responseHeaders;
     }
 
 }

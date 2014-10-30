@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<entity-mappings version="1.0"
-                 xmlns="http://java.sun.com/xml/ns/persistence/orm"
+<entity-mappings version="2.1"
+                 xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                 xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_1_0.xsd">
+                 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd">
     <description>The complete mappings for Proxy Objects. XML Requests and Responses will be stored in DB</description>
+    <converter class="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter"/>
     <entity name="SoapExchange" class="prototypes.ws.proxy.soap.io.SoapExchange" access="FIELD">
         <!-- use distinct name of not full mapping -->
         <table name="T_SOAPEXCHANGE_FULL"/>
@@ -22,6 +23,14 @@
             <basic name="response">
                 <column name="RESPONSE_XML" length="4096"/>
             </basic>
+            <basic name="requestHeaders">
+                <column name="REQUESTHEADERS" length="2048"/>
+            </basic>
+            <basic name="responseHeaders">
+                <column name="RESPONSEHEADERS" length="2048"/>
+            </basic>
         </attributes>
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter" attribute-name="requestHeaders"/>
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter" attribute-name="responseHeaders"/>
     </entity>
 </entity-mappings>

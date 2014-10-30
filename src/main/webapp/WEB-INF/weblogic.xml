@@ -4,4 +4,10 @@
         <cookie-name>proxy.soap</cookie-name>
     </session-descriptor>
     <context-root>/proxy-soap</context-root>
+    <container-descriptor>
+        <prefer-application-packages>
+            <package-name>javax.persistence.*</package-name>
+            <package-name>org.eclipse.persistence.*</package-name>
+        </prefer-application-packages>
+    </container-descriptor>
 </weblogic-web-app>

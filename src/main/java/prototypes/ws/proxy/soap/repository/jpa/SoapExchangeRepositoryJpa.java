@@ -133,6 +133,7 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
                 LOGGER.debug("exchange saved");
             } catch (Exception e) {
                 LOGGER.error(e.getMessage());
+                LOGGER.debug("Persistence Exception Stack : ", e);
             } finally {
                 closeTransaction(em);
             }

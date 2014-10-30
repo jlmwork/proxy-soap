@@ -107,6 +107,7 @@ public class ProxyServlet extends AbstractServlet {
                 httpConn.setRequestProperty(Requests.HEADER_AUTH, basicAuth);
             }
             this.addRequestHeaders(request, httpConn, headersToIgnore);
+            proxyExchange.setRequestHeaders(httpConn.getRequestProperties());
 
             httpConn.setRequestMethod(request.getMethod());
             String reqContentType = (!Strings.isNullOrEmpty(request.getContentType()))
@@ -140,7 +141,7 @@ public class ProxyServlet extends AbstractServlet {
             // Make Proxy Result
             proxyExchange.setResponseCode(httpConn.getResponseCode());
             proxyExchange.setResponseMessage(httpConn.getResponseMessage());
-            proxyExchange.setHeaders(httpConn.getHeaderFields());
+            proxyExchange.setResponseHeaders(httpConn.getHeaderFields());
             proxyExchange.setContentType(httpConn.getContentType());
             proxyExchange.setContentEncoding(httpConn.getContentEncoding());
             proxyExchange.setGzipped(gzipped);
@@ -222,12 +223,12 @@ public class ProxyServlet extends AbstractServlet {
     private void addResponseHeaders(HttpServletResponse resp,
             ProxyExchange proxyResult, List<String> headersToIgnore) {
 
-        if (proxyResult.getHeaders() == null) {
+        if (proxyResult.getResponseHeaders() == null) {
             return;
         }
 
         for (Map.Entry<String, List<String>> respHeader : proxyResult
-                .getHeaders().entrySet()) {
+                .getResponseHeaders().entrySet()) {
             String headerName = respHeader.getKey();
             List<String> headerValues = respHeader.getValue();
             for (String headerValue : headerValues) {

@@ -30,7 +30,8 @@ public class ProxyExchange {
     private String responseMessage;
     private String responseBody = "";
     private boolean gzipped = false;
-    private Map<String, List<String>> headers;
+    private Map<String, List<String>> requestHeaders;
+    private Map<String, List<String>> responseHeaders;
     private String contentType;
     private String contentEncoding;
 
@@ -90,18 +91,26 @@ public class ProxyExchange {
         this.gzipped = gzipped;
     }
 
+    public Map<String, List<String>> getRequestHeaders() {
+        return requestHeaders;
+    }
+
+    public void setRequestHeaders(Map<String, List<String>> requestHeaders) {
+        this.requestHeaders = requestHeaders;
+    }
+
     /**
      * @return the headers
      */
-    public Map<String, List<String>> getHeaders() {
-        return headers;
+    public Map<String, List<String>> getResponseHeaders() {
+        return responseHeaders;
     }
 
     /**
      * @param headers the headers to set
      */
-    public void setHeaders(Map<String, List<String>> headers) {
-        this.headers = headers;
+    public void setResponseHeaders(Map<String, List<String>> headers) {
+        this.responseHeaders = headers;
     }
 
     /**
@@ -137,7 +146,7 @@ public class ProxyExchange {
         return Strings.toWellFormatedString("ProxyResult [##responseCode="
                 + responseCode + "##responseMessage=" + responseMessage
                 + "##gzipped=" + gzipped + "##headers="
-                + Strings.toWellFormatedString(headers.toString(), ",")
+                + Strings.toWellFormatedString(responseHeaders.toString(), ",")
                 + "##contentType=" + contentType + "##contentEncoding="
                 + contentEncoding + "##responseBody=" + responseBody + "]");
     }

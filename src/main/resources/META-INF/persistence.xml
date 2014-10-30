@@ -4,6 +4,7 @@
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
         <!-- unactivate L2 cache-->
         <shared-cache-mode>NONE</shared-cache-mode>
+        <!--<class>prototypes.ws.proxy.soap.repository.jpa.HeadersConverter</class>-->
         <!--<class>prototypes.ws.proxy.soap.monitor.SoapRequestMonitor</class>-->
         <mapping-file>META-INF/mapping.xml</mapping-file>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
@@ -25,13 +26,14 @@
             <property name="eclipselink.logging.parameters" value="true"/>
             <property name="eclipselink.deploy-on-startup" value="false"/>
             <property name="eclipselink.weaving" value="static"/>
-            <property name="eclipselink.ddl-generation" value="create-tables"/>
+            <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
         </properties>
     </persistence-unit>
     <persistence-unit name="ProxyPUFull" transaction-type="RESOURCE_LOCAL">
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
         <!-- unactivate L2 cache-->
         <shared-cache-mode>NONE</shared-cache-mode>
+        <class>prototypes.ws.proxy.soap.repository.jpa.HeadersConverter</class>
         <!--<class>prototypes.ws.proxy.soap.monitor.SoapRequestMonitor</class>-->
         <mapping-file>META-INF/mapping_full.xml</mapping-file>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
@@ -53,7 +55,7 @@
             <property name="eclipselink.logging.parameters" value="true"/>
             <property name="eclipselink.deploy-on-startup" value="false"/>
             <property name="eclipselink.weaving" value="static"/>
-            <property name="eclipselink.ddl-generation" value="create-tables"/>
+            <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
         </properties>
     </persistence-unit>
 
