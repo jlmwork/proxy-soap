@@ -68,7 +68,7 @@ public class UiServlet extends AbstractServlet {
         request.setAttribute("settings", ProxyConfiguration.getKeys());
         request.setAttribute("proxy", proxyConfig);
 
-        request.setAttribute("requestList", exchangeRepository.list());
+        //request.setAttribute("requestList", exchangeRepository.list());
         request.setAttribute("validators", SoapValidatorFactory.getInstance().getValidators());
 
         if ("clearRequests".equals(action)) {

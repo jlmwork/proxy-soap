@@ -16,6 +16,7 @@
         <!-- Le styles -->
         <link href="res/lib/twitter-bootstrap/css/bootstrap.css" rel="stylesheet" />
         <link href="res/lib/twitter-bootstrap/css/bootstrap-theme.css" rel="stylesheet" />
+        <link rel="stylesheet" href="res/css/bootstrap-table.css">
         <link rel="stylesheet" href="res/css/style.css">
         <link rel="stylesheet" href="res/lib/highlight.js/styles/default.min.css">
 
@@ -79,6 +80,7 @@
         <!-- Placed at the end of the document so the pages load faster -->
         <script src="res/lib/jquery/jquery.js"></script>
         <script src="res/lib/twitter-bootstrap/js/bootstrap.js"></script>
+        <script src="res/js/bootstrap-table.min.js"></script>
         <script src="res/lib/highlight.js/highlight.pack.js"></script>
         <script src="res/js/jquery.fileDownload.js"></script>
         <script>

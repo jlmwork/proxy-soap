@@ -26,14 +26,17 @@ $(function() {
     var timer = 0;
 
     $('#refresh').click(function() {
-        $.ajax($(this).attr('href'))
+        $.ajax($(this).attr('data-href'))
                 .done(function(msg) {
                     console.log("refresh exchanges");
                     var div = $('<div>');
                     div.html(msg);
                     var content = div.find('#exchangestable tbody tr');
                     var previousLength = $('#exchangestable tbody tr').length;
-                    $('#exchangestable tbody').hide().html(content).fadeIn('slow');
+                    var table = $('#exchangestable tbody').hide().html(content);
+                    destroyTable();
+                    table.fadeIn('slow');
+                    transformTable();
                     if (previousLength === 0) {
                         var newLength = $('#exchangestable tbody tr').length;
                         if (newLength > 0) {
@@ -57,11 +60,11 @@ $(function() {
     });
 
     $('#clear').click(function() {
-        $.ajax($(this).attr('href'))
+        $.ajax($(this).attr('data-href'))
                 .done(function() {
                     console.log("exchanges cleared");
                     $('#exchangestable tbody').fadeOut('slow').html();
-                    $("#actionButtons").fadeOut('slow').hide();
+                    $("#custom-toolbar").fadeIn('slow').hide();
                 })
                 .fail(function() {
                     console.log("error on refresh");
@@ -72,7 +75,7 @@ $(function() {
     $('#export').click(function() {
         $('#preparing-file-modal').modal('show');
 
-        $.fileDownload($(this).attr('href'), {
+        $.fileDownload($(this).attr('data-href'), {
             successCallback: function(url) {
                 console.log("download success");
                 $('#preparing-file-modal').modal('hide');
@@ -106,3 +109,54 @@ $(function() {
             .data('enabled', Cookie.get('autorefresh') != "true")
             .click();
 });
+/*
+ function destroyTable() {
+ console.log("destroyTable table");
+ var table = $('#exchangestable');
+ table.bootstrapTable('destroy');
+ }
+ function transformTable() {
+ console.log("transform table");
+ var table = $('#exchangestable');
+ var classes = 'table table-bordered table-striped table-hover table-condensed';
+ table.bootstrapTable({
+ classes: classes,
+ sortName: "date", sortOrder: "asc", sortable: true,
+ search: true,
+ showColumns: true,
+ pagination: true
+ });
+ }
+
+ $(function() {
+ transformTable();
+ });*/
+
+function rowStyle(row, index) {
+    if (row.request_valid === "true" && row.response_valid === "true") {
+        return {classes: 'success'};
+    } else if ((row.request_valid !== "true" || row.response_valid !== "true") && row.validator !== "") {
+        return {classes: 'danger'};
+    } else if (row.request_xml_valid !== "true" || row.response_xml_valid !== "true") {
+        return {classes: 'danger'};
+    }
+    return {classes: 'warning'};
+}
+
+$(function() {
+    $btn = $('button[name="refresh"]');
+    $btn.click(function() {
+        var trs = $.find('#exchangestable tbody tr');
+        console.log(trs.length);
+        if (trs.length > 1)
+            $("#custom-toolbar").fadeIn('slow').show();
+        else if (trs.length === 1) {
+            var tds = trs.find("td");
+            console.log(tds);
+        }
+        else
+            $("#custom-toolbar").fadeIn('slow').hide();
+    });
+
+});
+

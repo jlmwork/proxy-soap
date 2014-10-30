@@ -146,20 +146,37 @@ public class ExchangesServlet extends HttpServlet {
             JsonArrayBuilder aBuilder = Json.createArrayBuilder();
             for (SoapExchange soapRequest : soapExchanges) {
                 aBuilder.add(Json.createObjectBuilder()
-                        .add("ID", soapRequest.getId())
-                        .add("Date", soapRequest.getDate())
-                        .add("From", soapRequest.getFrom())
-                        .add("To", soapRequest.getUri())
+                        .add("id", stripNull(soapRequest.getId()))
+                        .add("date", stripNull(soapRequest.getDate()))
+                        .add("from", stripNull(soapRequest.getFrom()))
+                        .add("to", stripNull(soapRequest.getUri()))
+                        .add("validator", stripNull(soapRequest.getValidatorId()))
+                        .add("operation", stripNull(soapRequest.getOperation()))
+                        .add("resp_time", stripNull(soapRequest.getResponseTime()))
+                        .add("request_valid", stripNull(soapRequest.getRequestValid()))
+                        .add("request_xml_valid", stripNull(soapRequest.getRequestXmlValid()))
+                        .add("request_soap_valid", stripNull(soapRequest.getRequestSoapValid()))
+                        .add("response_valid", stripNull(soapRequest.getResponseValid()))
+                        .add("response_xml_valid", stripNull(soapRequest.getResponseXmlValid()))
+                        .add("response_soap_valid", stripNull(soapRequest.getResponseSoapValid()))
                 );
             }
-            oBuilder.add("exchanges", aBuilder.build());
-            jsonWriter.write(oBuilder.build());
+            //oBuilder.add("exchanges", aBuilder.build());
+            jsonWriter.write(aBuilder.build());
             jsonWriter.close();
             out.close();
         } else {
             List<SoapExchange> soapExchanges = repository.list();
             request.setAttribute("requestList", soapExchanges);
             request.getRequestDispatcher("/WEB-INF/views/jsp/exchanges.jsp").forward(request, response);
+        }
+    }
+
+    private static String stripNull(Object o) {
+        if (o == null) {
+            return "";
+        } else {
+            return o.toString();
         }
     }
 

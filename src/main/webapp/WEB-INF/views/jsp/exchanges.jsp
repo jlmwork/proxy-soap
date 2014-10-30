@@ -2,20 +2,15 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <fmt:setBundle basename="messages"/>
-<style>.white,.white:hover,.white:visited{color:white;}</style>
-<h2><fmt:message key="exchanges.pagetitle"/>
-    <%--<small class="autorefresh"><fmt:message key="exchanges.autorefresh"/> [<span>off</span>]</small>--%>
-    <small>
-        <a href="exchanges" id="refresh" class="goright" title="<fmt:message key="exchanges.reload"/>"><span class="glyphicon glyphicon-refresh"></span></a>
-    </small>
-    <c:if test="${empty requestList}">
-        <c:set var="displayActionButtons">style="display: none;"</c:set>
-    </c:if>
-    <small id="actionButtons" ${displayActionButtons}>
-        <a href="ui/action/clearRequests" id="clear" class="goright" title="<fmt:message key="exchanges.clear"/>"><span class="glyphicon glyphicon-trash"></span></a>
-        <a href="exchanges?accept=application/zip" id="export" class="goright glyphicon glyphicon-cloud-download" title="<fmt:message key="exchanges.export"/>"></a>
-    </small>
-</h2>
+<h4><fmt:message key="exchanges.pagetitle"/></h4>
+
+<div id="custom-toolbar">
+    <div class="form-inline" role="form">
+        <button id="clear" data-href="ui/action/clearRequests" type="button" class="btn btn-default" title="<fmt:message key="exchanges.clear"/>"><span class="glyphicon glyphicon-trash"></span></button>
+        <button id="export" data-href="exchanges?accept=application/zip" type="button" class="btn btn-default" title="<fmt:message key="exchanges.export"/>"><span class="glyphicon glyphicon-cloud-download"></span></button>
+    </div>
+</div>
+<%--
 <c:choose>
     <c:when test="${!proxy.validationActive}">
         <c:set var="panelMessageType" value="panel-danger" />
@@ -26,24 +21,38 @@
         <c:set var="panelMessage"><fmt:message key="config.proxy.soap.blockingmode"/> <fmt:message key="config.proxy.soap.blockingmode.true"/></c:set>
     </c:when>
 </c:choose>
-<div class="panel ${panelMessageType}">
-    <%-- Panel header --%>
-    <div class="panel-heading">${panelMessage}</div>
-    <table class="table table-bordered table-striped table-hover table-condensed" id="exchangestable">
-        <thead>
-            <tr class="text-center">
-                <th>#</th>
-                <th><fmt:message key="exchanges.request.date"/></th>
-                <th><fmt:message key="exchanges.request.from"/></th>
-                <th><fmt:message key="exchanges.request.to"/></th>
-                <th><fmt:message key="exchanges.request.validator"/></th>
-                <th><fmt:message key="exchanges.request.operation"/></th>
-                <th><fmt:message key="exchanges.request.request"/></th>
-                <th><fmt:message key="exchanges.request.response"/></th>
-                <th><fmt:message key="exchanges.request.response.time"/></th>
-            </tr>
-        </thead>
-        <tbody>
+<div class="panel ${panelMessageType}">Panel header
+<div class="panel-heading">${panelMessage}</div>--%>
+<table id="exchangestable" data-toggle="table"
+       data-sort-order="desc"
+       data-url="exchanges?accept=application/json" data-cache="false"
+       data-height="500"
+       data-toolbar="#custom-toolbar"
+       data-show-refresh="true"
+       data-show-toggle=true"
+       data-pagination="true"
+       data-search="true"
+       data-show-columns="true"
+       data-row-style="rowStyle">
+    <thead>
+        <tr class="text-center">
+            <th data-field="id" data-visible="false">#</th>
+            <th data-field="date" data-sortable="true"><fmt:message key="exchanges.request.date"/></th>
+            <th data-field="from"><fmt:message key="exchanges.request.from"/></th>
+            <th data-field="to"><fmt:message key="exchanges.request.to"/></th>
+            <th data-field="validator" data-sortable="true"><fmt:message key="exchanges.request.validator"/></th>
+            <th data-field="operation"><fmt:message key="exchanges.request.operation"/></th>
+            <th data-field="resp_time" data-sortable="true"><fmt:message key="exchanges.request.response.time"/></th>
+            <th data-field="request_valid" data-visible="false"><fmt:message key="exchanges.request.request"/> Valid</th>
+            <th data-field="request_xml_valid" data-visible="false"><fmt:message key="exchanges.request.request"/> XML Valid</th>
+            <th data-field="request_soap_valid" data-visible="false"><fmt:message key="exchanges.request.request"/> SOAP Valid</th>
+            <th data-field="response_valid" data-visible="false"><fmt:message key="exchanges.request.response"/> Valid</th>
+            <th data-field="response_xml_valid" data-visible="false"><fmt:message key="exchanges.request.response"/> XML Valid</th>
+            <th data-field="response_soap_valid" data-visible="false"><fmt:message key="exchanges.request.response"/> SOAP Valid</th>
+        </tr>
+    </thead><%--
+    <tbody>
+
             <c:forEach var="exchange" items="${requestList}" varStatus="loop">
                 <c:choose>
                     <c:when test="${ ! empty exchange.request && ! empty exchange.validatorId }">
@@ -72,34 +81,33 @@
                 <td><small>${exchange.uri}</small></td>
                 <td>
                     <small>
-                        <%-- TODO : activate validators tab on click --%>
                         <a class="viewvalidator" href="#${exchange.validatorId}">${exchange.validatorId}</a>
                     </small>
                 </td>
                 <td><small>${exchange.operation}</small></td>
 
-                <%--  ================================ --%>
-                <%--  ========== Request  ============ --%>
+                <!--  ================================ -->
+                <!--  ========== Request  ============ -->
                 <td><c:choose>
                         <c:when test="${exchange.requestXmlValid}">
-                            <span class="label label-success">XML Valid</span>
+                            <span class="label label-success" title="XML Valid">XML</span>
                         </c:when>
                         <c:when test="${empty exchange.requestXmlValid}">
-                            <span class="label label-default">No XML validation</span>
+                            <span class="label label-default" title="No XML validation">XML</span>
                         </c:when>
                         <c:otherwise>
-                            <span class="label label-danger">XML Invalid</span>
+                            <span class="label label-danger" title="XML Invalid">XML</span>
                         </c:otherwise>
                     </c:choose>
                     <c:choose>
                         <c:when test="${exchange.requestSoapValid}">
-                            <span class="label label-success">SOAP Valid</span>
+                            <span class="label label-success" title="SOAP Valid">SOAP</span>
                         </c:when>
                         <c:when test="${empty exchange.requestSoapValid}">
-                            <span class="label label-default">No SOAP Validation</span>
+                            <span class="label label-default" title="No SOAP Validation">SOAP</span>
                         </c:when>
                         <c:otherwise>
-                            <span class="label label-danger">SOAP Invalid</span>
+                            <span class="label label-danger" title="SOAP Invalid">SOAP</span>
                         </c:otherwise>
                     </c:choose>
                     <div class="validation-actions">
@@ -176,29 +184,29 @@
                         </div>
                     </div></td>
 
-                <%--  ================================ --%>
-                <%--  ========== Response ============ --%>
-                <td>
+                <!--  ================================ -->
+                <!--  ========== Response ============ -->
+                <td class="text-nowrap">
                     <c:choose>
                         <c:when test="${exchange.responseXmlValid}">
-                            <span class="label label-success">XML Valid</span>
+                            <span class="label label-success" title="XML Valid">XML</span>
                         </c:when>
                         <c:when test="${empty exchange.responseXmlValid}">
-                            <span class="label label-default">No XML Validation</span>
+                            <span class="label label-default" title="No XML Validation">XML</span>
                         </c:when>
                         <c:otherwise>
-                            <span class="label label-danger">XML Invalid</span>
+                            <span class="label label-danger" title="XML Invalid">XML</span>
                         </c:otherwise>
                     </c:choose>
                     <c:choose>
                         <c:when test="${exchange.responseSoapValid}">
-                            <span class="label label-success">SOAP Valid</span>
+                            <span class="label label-success" title="SOAP Valid">SOAP</span>
                         </c:when>
                         <c:when test="${empty exchange.responseSoapValid}">
-                            <span class="label label-default">No SOAP Validation</span>
+                            <span class="label label-default" title="No SOAP Validation">SOAP</span>
                         </c:when>
                         <c:otherwise>
-                            <span class="label label-danger">SOAP Invalid</span>
+                            <span class="label label-danger" title="SOAP Invalid">SOAP</span>
                         </c:otherwise>
                     </c:choose>
                     <div class="validation-actions">
@@ -278,20 +286,20 @@
             </tr>
         </c:forEach>
         </tbody>
+    --%>
 
-
-    </table>
-</div>
+</table>
+<%--</div>--%>
 
 <div id="preparing-file-modal" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="exportInProgressLabel" aria-hidden="true">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title" id="exportInProgressLabel">Export en cours</h4>
-          </div>
-          <div class="modal-body">
-              We are preparing your report, please wait...
-          </div>
+            <div class="modal-header">
+                <h4 class="modal-title" id="exportInProgressLabel">Export en cours</h4>
+            </div>
+            <div class="modal-body">
+                We are preparing your report, please wait...
+            </div>
         </div>
     </div>
 </div>
