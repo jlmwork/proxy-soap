@@ -40,7 +40,11 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(SoapExchangeRepositoryJpa.class);
 
-    private EntityManagerFactory emf;
+    private final EntityManagerFactory emf;
+
+    private final Boolean xmlInDbs;
+
+    private final String persistenceUnitName;
 
     public SoapExchangeRepositoryJpa(ProxyConfiguration proxyConfig) {
         super(proxyConfig);
@@ -49,8 +53,7 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
         LOGGER.info("DERBY HOME : " + derbyHome);
         System.setProperty("derby.system.home", derbyHome);
         System.setProperty("derby.database.forceDatabaseLock", "false");
-        Files.deleteFile(ApplicationConfig.DEFAULT_STORAGE_PATH + "proxy-soap_derby.db" + File.separator + "db.lck");
-        Files.deleteFile(ApplicationConfig.DEFAULT_STORAGE_PATH + "proxy-soap_derby.db" + File.separator + "dbex.lck");
+        cleanupDb();
         /*
          try {
          InitialContext ic = new InitialContext();
@@ -66,11 +69,13 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
          }*/
         // externalize DB connection
         Properties connectionProps = new Properties();
-        connectionProps.setProperty("javax.persistence.jdbc.driver", "org.apache.derby.jdbc.EmbeddedDriver");
-        connectionProps.setProperty("javax.persistence.jdbc.url", "jdbc:derby:proxy-soap_derby.db;create=true");
-        connectionProps.setProperty("javax.persistence.jdbc.user", "proxy");
-        connectionProps.setProperty("javax.persistence.jdbc.password", "soap");
-        emf = (EntityManagerFactory) Persistence.createEntityManagerFactory("ProxyPU", connectionProps);
+        connectionProps.setProperty("javax.persistence.jdbc.driver", proxyConfig.getPersistenceDbDriver());
+        connectionProps.setProperty("javax.persistence.jdbc.url", proxyConfig.getPersistenceDbUrl() + ";" + proxyConfig.getPersistenceDbProperties());
+        connectionProps.setProperty("javax.persistence.jdbc.user", proxyConfig.getPersistenceDbUsername());
+        connectionProps.setProperty("javax.persistence.jdbc.password", proxyConfig.getPersistenceDbPassword());
+        xmlInDbs = proxyConfig.persistXmlInDb();
+        persistenceUnitName = (proxyConfig.persistXmlInDb()) ? "ProxyPUFull" : "ProxyPU";
+        emf = (EntityManagerFactory) Persistence.createEntityManagerFactory(persistenceUnitName, connectionProps);
         //try to start
         emf.createEntityManager().close();
     }
@@ -80,27 +85,35 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
         EntityManager em = emf.createEntityManager();
         SoapExchange exchange = em.createQuery("select s from SoapExchange s where id=:id", SoapExchange.class).setParameter("id", id).getSingleResult();
         em.detach(exchange);
-        exchange.setRequest(Files.read(getRequestFilePath(exchange)));
-        exchange.setResponse(Files.read(getRequestFilePath(exchange)));
+        if (!xmlInDbs) {
+            exchange.setRequest(Files.read(getRequestFilePath(exchange)));
+            exchange.setResponse(Files.read(getRequestFilePath(exchange)));
+        }
         return exchange;
     }
 
     @Override
     public List<SoapExchange> list() {
+        LOGGER.debug("get soap exchanges from db");
         List<SoapExchange> exchanges = listWithoutContent();
-        // TODO : eager loading - not a good idea for high volumes
-        for (SoapExchange exchange : exchanges) {
-            // em.detach(exchange);
-            exchange.setRequest(Files.read(getRequestFilePath(exchange)));
-            exchange.setResponse(Files.read(getRequestFilePath(exchange)));
+        if (!xmlInDbs) {
+            // TODO : eager loading - not a good idea for high volumes
+            for (SoapExchange exchange : exchanges) {
+                // em.detach(exchange);
+                exchange.setRequest(Files.read(getRequestFilePath(exchange)));
+                exchange.setResponse(Files.read(getRequestFilePath(exchange)));
+            }
         }
+        LOGGER.debug("get soap exchanges from db {} ", exchanges.size());
         return exchanges;
     }
 
     @Override
     public List<SoapExchange> listWithoutContent() {
+        LOGGER.debug("get soap exchanges from db");
         EntityManager em = emf.createEntityManager();
         List<SoapExchange> exchanges = em.createQuery("select s from SoapExchange s ORDER BY s.time DESC", SoapExchange.class).getResultList();
+        LOGGER.debug("get soap exchanges from db {} ", exchanges.size());
         return exchanges;
     }
 
@@ -113,9 +126,11 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
                 em.getTransaction().begin();
                 em.persist(exchange);
                 em.getTransaction().commit();
-
-                Files.write(getRequestFilePath(exchange), exchange.getRequestAsXML());
-                Files.write(getResponseFilePath(exchange), exchange.getResponseAsXML());
+                if (!xmlInDbs) {
+                    Files.write(getRequestFilePath(exchange), exchange.getRequestAsXML());
+                    Files.write(getResponseFilePath(exchange), exchange.getResponseAsXML());
+                }
+                LOGGER.debug("exchange saved");
             } catch (Exception e) {
                 LOGGER.error(e.getMessage());
             } finally {
@@ -151,7 +166,9 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
             em.getTransaction().begin();
             try {
                 em.createNativeQuery("truncate table " + table).executeUpdate();
-                Files.deleteDirectory(ApplicationConfig.EXCHANGES_STORAGE_PATH);
+                if (!xmlInDbs) {
+                    Files.deleteDirectory(ApplicationConfig.EXCHANGES_STORAGE_PATH);
+                }
             } catch (Exception truncE) {
                 LOGGER.warn("Error on TRUNCATE operation " + truncE.getMessage());
                 em.createQuery("delete from SoapExchange").executeUpdate();
@@ -176,10 +193,9 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
             Properties connectionProps = new Properties();
             connectionProps.setProperty("javax.persistence.jdbc.driver", "org.apache.derby.jdbc.EmbeddedDriver");
             connectionProps.setProperty("javax.persistence.jdbc.url", "jdbc:derby:;shutdown=true");
-            EntityManagerFactory emfClose = Persistence.createEntityManagerFactory("ProxyPU", connectionProps);
+            EntityManagerFactory emfClose = Persistence.createEntityManagerFactory(persistenceUnitName, connectionProps);
             emfClose.close();
-            Files.deleteFile(ApplicationConfig.DEFAULT_STORAGE_PATH + "proxy-soap_derby.db" + File.separator + "db.lck");
-            Files.deleteFile(ApplicationConfig.DEFAULT_STORAGE_PATH + "proxy-soap_derby.db" + File.separator + "dbex.lck");
+            cleanupDb();
         } catch (Exception e) {
             LOGGER.warn(e.getMessage(), e);
         }
@@ -193,6 +209,11 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
             }
             em.close();
         }
+    }
+
+    private void cleanupDb() {
+        Files.deleteFile(ApplicationConfig.DEFAULT_STORAGE_PATH + "proxy-soap_derby.db" + File.separator + "db.lck");
+        Files.deleteFile(ApplicationConfig.DEFAULT_STORAGE_PATH + "proxy-soap_derby.db" + File.separator + "dbex.lck");
     }
 
 }

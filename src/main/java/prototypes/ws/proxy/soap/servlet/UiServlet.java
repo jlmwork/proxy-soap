@@ -90,7 +90,7 @@ public class UiServlet extends AbstractServlet {
                 request.setAttribute("message", "config.saved");
             }
             if (request.getParameter("persist") != null) {
-                proxyConfig.persist();
+                proxyConfig.persistConf();
                 request.setAttribute("message", "config.persisted");
             }
         }

@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.constantes.ApplicationConfig;
 import prototypes.ws.proxy.soap.io.Files;
+import prototypes.ws.proxy.soap.io.Strings;
 import prototypes.ws.proxy.soap.validation.SoapValidatorFactory;
 
 public class ProxyConfiguration extends HashMap<String, Object> {
@@ -39,12 +40,19 @@ public class ProxyConfiguration extends HashMap<String, Object> {
     private final AtomicBoolean inBlockingMode = new AtomicBoolean(true);
     private final AtomicInteger nbMaxExchanges = new AtomicInteger(50);
     private String wsdlDirs = "";
-    private final AtomicBoolean isPersisted = new AtomicBoolean(false);
+    private final AtomicBoolean isPersistedConf = new AtomicBoolean(false);
     private final AtomicBoolean ignoreValidExchanges = new AtomicBoolean(false);
-    private final String persistPath = ApplicationConfig.DEFAULT_STORAGE_PATH + "proxy-soap.properties";
+    private final String persistedConfPath = ApplicationConfig.DEFAULT_STORAGE_PATH + "proxy-soap.properties";
     private final AtomicInteger runMode = new AtomicInteger(ApplicationConfig.RUN_MODE_PROD);
-    private AtomicInteger connectTimeout = new AtomicInteger(2000);
-    private AtomicInteger readTimeout = new AtomicInteger(10000);
+    private final AtomicInteger connectTimeout = new AtomicInteger(2000);
+    private final AtomicInteger readTimeout = new AtomicInteger(10000);
+    private final AtomicInteger persistenceMode = new AtomicInteger(ApplicationConfig.PERSIST_MODE_MEMORY);
+    private final AtomicBoolean persistenceXmlMode = new AtomicBoolean(false);
+    private String persistenceDbDriver = "org.apache.derby.jdbc.EmbeddedDriver";
+    private String persistenceDbUrl = "jdbc:derby:proxy-soap_derby.db";
+    private String persistenceDbUsername = "proxy";
+    private String persistenceDbPassword = "soap";
+    private String persistenceDbProperties = "create=true";
 
     /**
      * Load default configuration from system properties
@@ -55,11 +63,11 @@ public class ProxyConfiguration extends HashMap<String, Object> {
     public ProxyConfiguration(String validation, String blockingMode,
             String wsdlDirs, String maxRequests, String ignoreValidRequests, String runMode) {
         // check if a persisted configuration is available
-        boolean persistedConf = (new File(persistPath)).exists();
+        boolean persistedConf = (new File(persistedConfPath)).exists();
         if (persistedConf) {
             LOGGER.info("Persisted configuration File exist");
             loadPersistedConf();
-            this.isPersisted.set(true);
+            this.isPersistedConf.set(true);
         } else {
             LOGGER.info("Persisted configuration File doesn't exist");
             setBlockingMode(Boolean.parseBoolean(blockingMode));
@@ -80,23 +88,47 @@ public class ProxyConfiguration extends HashMap<String, Object> {
         setIgnoreValidExchanges(ignoreValidRequests);
     }
 
+    /**
+     * return externally configurable properties. Typically those properties
+     * will be provided by an IHM or Service to an administrator
+     *
+     * @return
+     */
     public static String[] getKeys() {
         return new String[]{ApplicationConfig.PROP_BLOCKING_MODE,
             ApplicationConfig.PROP_VALIDATION,
             ApplicationConfig.PROP_WSDL_DIRS,
             ApplicationConfig.PROP_MAX_EXCHANGES,
-            ApplicationConfig.PROP_IGNORE_VALID_EXCHANGES};
+            ApplicationConfig.PROP_IGNORE_VALID_EXCHANGES, //    ApplicationConfig.PROP_PERSIST_MODE,
+    };
     }
 
-    private static String[] getAllKeys() {
+    /**
+     * return internal properties
+     *
+     * @return
+     */
+    private static String[] getInternalKeys() {
         return new String[]{ApplicationConfig.PROP_BLOCKING_MODE,
             ApplicationConfig.PROP_VALIDATION,
             ApplicationConfig.PROP_WSDL_DIRS,
             ApplicationConfig.PROP_MAX_EXCHANGES,
             ApplicationConfig.PROP_IGNORE_VALID_EXCHANGES,
-            ApplicationConfig.PROP_RUN_MODE};
+            ApplicationConfig.PROP_RUN_MODE,
+            ApplicationConfig.PROP_PERSIST_MODE,
+            ApplicationConfig.PROP_PERSIST_MODE_DB_XML,
+            ApplicationConfig.PROP_PERSIST_MODE_DB_DRIVER,
+            ApplicationConfig.PROP_PERSIST_MODE_DB_URL,
+            ApplicationConfig.PROP_PERSIST_MODE_DB_USERNAME,
+            ApplicationConfig.PROP_PERSIST_MODE_DB_PASSWORD,
+            ApplicationConfig.PROP_PERSIST_MODE_DB_PROPERTIES,};
     }
 
+    /**
+     *
+     * @param obj
+     * @return
+     */
     public Object get(Object obj) {
         String key = (String) obj;
         if ("blockingMode".equals(key)
@@ -113,10 +145,24 @@ public class ProxyConfiguration extends HashMap<String, Object> {
             return isIgnoreValidExchanges();
         } else if (ApplicationConfig.PROP_RUN_MODE.equals(key)) {
             return this.runMode;
-        } else if ("persisted".equals(key)) {
-            return isPersisted();
-        } else if ("persistPath".equals(key)) {
-            return getPersistPath();
+        } else if ("persistedConf".equals(key)) {
+            return isPersistedConf();
+        } else if ("persistedConfPath".equals(key)) {
+            return getPersistedConfPath();
+        } else if (ApplicationConfig.PROP_PERSIST_MODE.equals(key)) {
+            return getPersistenceMode();
+        } else if (ApplicationConfig.PROP_PERSIST_MODE_DB_XML.equals(key)) {
+            return persistXmlInDb();
+        } else if (ApplicationConfig.PROP_PERSIST_MODE_DB_DRIVER.equals(key)) {
+            return this.persistenceDbDriver;
+        } else if (ApplicationConfig.PROP_PERSIST_MODE_DB_URL.equals(key)) {
+            return this.persistenceDbUrl;
+        } else if (ApplicationConfig.PROP_PERSIST_MODE_DB_USERNAME.equals(key)) {
+            return this.persistenceDbUsername;
+        } else if (ApplicationConfig.PROP_PERSIST_MODE_DB_PASSWORD.equals(key)) {
+            return this.persistenceDbPassword;
+        } else if (ApplicationConfig.PROP_PERSIST_MODE_DB_PROPERTIES.equals(key)) {
+            return this.persistenceDbProperties;
         }
         return null;
     }
@@ -140,6 +186,34 @@ public class ProxyConfiguration extends HashMap<String, Object> {
                 setNbMaxExchanges(value);
             } else if (ApplicationConfig.PROP_IGNORE_VALID_EXCHANGES.equals(key)) {
                 setIgnoreValidExchanges(Boolean.parseBoolean(value));
+            } else if (ApplicationConfig.PROP_PERSIST_MODE.equals(key)) {
+                if (!Strings.isNullOrEmpty(value)) {
+                    setPersistenceMode(Integer.parseInt(value));
+                }
+            } else if (ApplicationConfig.PROP_PERSIST_MODE_DB_XML.equals(key)) {
+                if (!Strings.isNullOrEmpty(value)) {
+                    setPersistenceXmlMode(Boolean.parseBoolean(value));
+                }
+            } else if (ApplicationConfig.PROP_PERSIST_MODE_DB_DRIVER.equals(key)) {
+                if (!Strings.isNullOrEmpty(value)) {
+                    this.persistenceDbDriver = value;
+                }
+            } else if (ApplicationConfig.PROP_PERSIST_MODE_DB_URL.equals(key)) {
+                if (!Strings.isNullOrEmpty(value)) {
+                    this.persistenceDbUrl = value;
+                }
+            } else if (ApplicationConfig.PROP_PERSIST_MODE_DB_USERNAME.equals(key)) {
+                if (!Strings.isNullOrEmpty(value)) {
+                    this.persistenceDbUsername = value;
+                }
+            } else if (ApplicationConfig.PROP_PERSIST_MODE_DB_PASSWORD.equals(key)) {
+                if (!Strings.isNullOrEmpty(value)) {
+                    this.persistenceDbPassword = value;
+                }
+            } else if (ApplicationConfig.PROP_PERSIST_MODE_DB_PROPERTIES.equals(key)) {
+                if (!Strings.isNullOrEmpty(value)) {
+                    this.persistenceDbProperties = value;
+                }
             }
         }
     }
@@ -253,27 +327,65 @@ public class ProxyConfiguration extends HashMap<String, Object> {
         this.readTimeout.set(readTimeout);
     }
 
-    public boolean isPersisted() {
-        return this.isPersisted.get();
+    public Integer getPersistenceMode() {
+        return persistenceMode.get();
     }
 
-    public String getPersistPath() {
-        return this.persistPath;
+    public void setPersistenceMode(Integer persistenceMode) {
+        this.persistenceMode.set(persistenceMode);
     }
 
-    public String persist() {
-        LOGGER.debug("Persist configuration to " + this.persistPath);
-        Files.write(this.persistPath, toProperties());
-        return persistPath;
+    public boolean persistXmlInDb() {
+        return persistenceXmlMode.get();
+    }
+
+    public void setPersistenceXmlMode(Boolean persistenceXmlMode) {
+        this.persistenceXmlMode.set(persistenceXmlMode);
+    }
+
+    public String getPersistenceDbDriver() {
+        return persistenceDbDriver;
+    }
+
+    public String getPersistenceDbUrl() {
+        return persistenceDbUrl;
+    }
+
+    public String getPersistenceDbUsername() {
+        return persistenceDbUsername;
+    }
+
+    public String getPersistenceDbPassword() {
+        return persistenceDbPassword;
+    }
+
+    public String getPersistenceDbProperties() {
+        return persistenceDbProperties;
+    }
+
+    public boolean isPersistedConf() {
+        return this.isPersistedConf.get();
+    }
+
+    public String getPersistedConfPath() {
+        return this.persistedConfPath;
+    }
+
+    public String persistConf() {
+        LOGGER.debug("Persist configuration to " + this.persistedConfPath);
+        Files.write(this.persistedConfPath, toProperties());
+        return persistedConfPath;
     }
 
     private void loadPersistedConf() {
-        LOGGER.debug("Load persisted configuration from " + this.persistPath);
+        LOGGER.debug("Load persisted configuration from " + this.persistedConfPath);
         Properties props = new Properties();
         try {
-            props.load(new FileInputStream(new File(persistPath)));
-            for (String key : getAllKeys()) {
-                this.setProperty(key, props.getProperty(key));
+            props.load(new FileInputStream(new File(persistedConfPath)));
+            for (String key : getInternalKeys()) {
+                if (props.getProperty(key) != null) {
+                    this.setProperty(key, props.getProperty(key));
+                }
             }
         } catch (IOException ex) {
             LOGGER.error(ex.getMessage(), ex);
@@ -282,18 +394,20 @@ public class ProxyConfiguration extends HashMap<String, Object> {
 
     public String toProperties() {
         StringBuilder sb = new StringBuilder();
-        for (String key : getAllKeys()) {
-            sb.append(key);
-            sb.append("=");
-            sb.append(this.get(key));
-            sb.append("\n");
+        for (String key : getInternalKeys()) {
+            if (this.get(key) != null) {
+                sb.append(key);
+                sb.append("=");
+                sb.append(this.get(key));
+                sb.append("\n");
+            }
         }
         return sb.toString();
     }
 
     @Override
     public String toString() {
-        return "ProxyConfiguration{" + "validationActive=" + validationActive + ", inBlockingMode=" + inBlockingMode + ", nbMaxRequests=" + nbMaxExchanges + ", wsdlDirs=" + wsdlDirs + ", isPersisted=" + isPersisted + ", ignoreValidRequests=" + ignoreValidExchanges + ", persistPath=" + persistPath + ", runMode=" + runMode + '}';
+        return "ProxyConfiguration{" + "validationActive=" + validationActive + ", inBlockingMode=" + inBlockingMode + ", nbMaxRequests=" + nbMaxExchanges + ", wsdlDirs=" + wsdlDirs + ", isPersisted=" + isPersistedConf + ", ignoreValidRequests=" + ignoreValidExchanges + ", persistPath=" + persistedConfPath + ", runMode=" + runMode + '}';
     }
 
 }

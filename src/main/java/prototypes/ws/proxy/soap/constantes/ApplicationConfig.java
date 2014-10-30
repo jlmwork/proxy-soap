@@ -16,6 +16,7 @@
 package prototypes.ws.proxy.soap.constantes;
 
 import java.io.File;
+import org.apache.commons.io.FilenameUtils;
 
 /**
  *
@@ -34,7 +35,7 @@ public class ApplicationConfig {
 
     public static String PROP_RUN_MODE = "proxy.soap.run.mode";
 
-    public static final String DEFAULT_STORAGE_PATH = System.getProperty("java.io.tmpdir") + File.separator + "proxy-soap" + File.separator;
+    public static final String DEFAULT_STORAGE_PATH = FilenameUtils.normalize(System.getProperty("java.io.tmpdir") + File.separator + "proxy-soap" + File.separator);
 
     public static final String EXCHANGES_STORAGE_PATH = ApplicationConfig.DEFAULT_STORAGE_PATH + "exchanges" + File.separator;
 
@@ -46,6 +47,18 @@ public class ApplicationConfig {
     public static Integer RUN_MODE_PROD = 0;
     public static Integer RUN_MODE_DEV = 1;
 
-    public static final String EM = "EM";
+    // persistence options
+    public static String PROP_PERSIST_MODE = "proxy.soap.persist.mode";
+    public static final Integer PERSIST_MODE_MEMORY = 0;
+    public static final Integer PERSIST_MODE_DB = 1;
+    // persist xml of exchanges in db or not
+    public static String PROP_PERSIST_MODE_DB_XML = "proxy.soap.persist.mode.db.xml";
+    public static final Boolean PERSIST_MODE_DB_XML_OUT = false;
+    public static final Boolean PERSIST_MODE_DB_XML_IN = true;
+    public static String PROP_PERSIST_MODE_DB_DRIVER = "proxy.soap.persist.mode.db.driver";
+    public static String PROP_PERSIST_MODE_DB_URL = "proxy.soap.persist.mode.db.url";
+    public static String PROP_PERSIST_MODE_DB_USERNAME = "proxy.soap.persist.mode.db.username";
+    public static String PROP_PERSIST_MODE_DB_PASSWORD = "proxy.soap.persist.mode.db.password";
+    public static String PROP_PERSIST_MODE_DB_PROPERTIES = "proxy.soap.persist.mode.db.properties";
 
 }

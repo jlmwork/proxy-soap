@@ -28,5 +28,33 @@
             <property name="eclipselink.ddl-generation" value="create-tables"/>
         </properties>
     </persistence-unit>
+    <persistence-unit name="ProxyPUFull" transaction-type="RESOURCE_LOCAL">
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <!-- unactivate L2 cache-->
+        <shared-cache-mode>NONE</shared-cache-mode>
+        <!--<class>prototypes.ws.proxy.soap.monitor.SoapRequestMonitor</class>-->
+        <mapping-file>META-INF/mapping_full.xml</mapping-file>
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+        <properties>
+            <!--<jta-data-source>jdbc/proxyDS</jta-data-source>-->
+            <!-- Configure default connection pool. -->
+            <property name="eclipselink.connection-pool.default.initial" value="1" />
+            <property name="eclipselink.connection-pool.default.min" value="1" />
+            <property name="eclipselink.connection-pool.default.max" value="5" />
+            <!-- derby local -->
+            <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver"/><!--
+            <property name="javax.persistence.jdbc.url" value="jdbc:derby:proxy-soap_derby.db;create=true"/>
+            <property name="javax.persistence.jdbc.user" value="proxy"/>
+            <property name="javax.persistence.jdbc.password" value="soap"/> -->
+            <!--<property name="showSql" value="true"/>-->
+            <property name="eclipselink.logging.logger" value="prototypes.ws.proxy.soap.logging.Slf4jEclipseLinkSessionLogger"/>
+            <property name="eclipselink.logging.level" value="FINEST"/>
+            <property name="eclipselink.logging.level.sql" value="FINE"/>
+            <property name="eclipselink.logging.parameters" value="true"/>
+            <property name="eclipselink.deploy-on-startup" value="false"/>
+            <property name="eclipselink.weaving" value="static"/>
+            <property name="eclipselink.ddl-generation" value="create-tables"/>
+        </properties>
+    </persistence-unit>
 
 </persistence>

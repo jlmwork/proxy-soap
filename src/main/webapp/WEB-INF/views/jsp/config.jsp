@@ -9,7 +9,7 @@
         <c:if test="${!empty message}">
             <div class="panel-heading">
                 <fmt:message key="${message}">
-                    <fmt:param>${proxy.persistPath}</fmt:param>
+                    <fmt:param>${proxy.persistedConfPath}</fmt:param>
                 </fmt:message>
             </div>
         </c:if>

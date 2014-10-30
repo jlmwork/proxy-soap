@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="1.0"
+                 xmlns="http://java.sun.com/xml/ns/persistence/orm"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_1_0.xsd">
+    <description>The complete mappings for Proxy Objects. XML Requests and Responses will be stored in DB</description>
+    <entity name="SoapExchange" class="prototypes.ws.proxy.soap.io.SoapExchange" access="FIELD">
+        <!-- use distinct name of not full mapping -->
+        <table name="T_SOAPEXCHANGE_FULL"/>
+        <attributes>
+            <!-- just specified special columns or ignored fields -->
+            <id name="id"/>
+            <basic name="time">
+                <temporal>DATETIME</temporal>
+            </basic>
+            <basic name="from">
+                <column name="ipFrom" />
+            </basic>
+            <basic name="request">
+                <column name="REQUEST_XML" length="4096"/>
+            </basic>
+            <basic name="response">
+                <column name="RESPONSE_XML" length="4096"/>
+            </basic>
+        </attributes>
+    </entity>
+</entity-mappings>

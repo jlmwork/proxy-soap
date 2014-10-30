@@ -189,11 +189,11 @@ public class XmlStrings {
 
         try {
             xml = cleanXmlRequest(xml);
-            LOGGER.debug("create sax transformer");
+            LOGGER.trace("create sax transformer");
             Transformer serializer = SAXTransformerFactory.newInstance()
                     .newTransformer();
-            LOGGER.debug(serializer.getClass().getName());
-            LOGGER.debug("set output prop");
+            LOGGER.trace(serializer.getClass().getName());
+            LOGGER.trace("set output prop");
             serializer.setErrorListener(new ErrorListener() {
 
                 @Override
@@ -215,21 +215,21 @@ public class XmlStrings {
             // serializer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,
             // "yes");
 
-            LOGGER.debug("set output prop");
+            LOGGER.trace("set output prop");
             serializer.setOutputProperty(
                     "{http://xml.apache.org/xslt}indent-amount", "4");
             // serializer.setOutputProperty("{http://xml.customer.org/xslt}indent-amount",
             // "2");
 
-            LOGGER.debug("create sax source");
+            LOGGER.trace("create sax source");
             Source xmlSource = new SAXSource(new InputSource(
                     new ByteArrayInputStream(xml.getBytes())));
             StreamResult res = new StreamResult(new ByteArrayOutputStream());
 
-            LOGGER.debug("sax transform");
+            LOGGER.trace("sax transform");
             serializer.transform(xmlSource, res);
 
-            LOGGER.debug("get res");
+            LOGGER.trace("get res");
             return new String(
                     ((ByteArrayOutputStream) res.getOutputStream())
                     .toByteArray());
