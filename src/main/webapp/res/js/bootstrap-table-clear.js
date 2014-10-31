@@ -8,7 +8,10 @@
 
     $.extend($.fn.bootstrapTable.defaults, {
         showClear: false,
-        clearUrl: ""
+        clearUrl: "",
+        formatClear: function() {
+            return "Clear table"
+        }
     });
 
     var BootstrapTable = $.fn.bootstrapTable.Constructor,
@@ -53,7 +56,7 @@
                 $clear = $([
                     '<div class="clear btn-group">',
                     '<button class="btn btn-default " ' +
-                            ' type="button" name="clear">',
+                            ' type="button" name="clear" title="' + this.options.formatClear() + '">',
                     '<i class="glyphicon glyphicon-trash"></i> ',
                     '</button>',
                     '</div>'].join('')).appendTo($btnGroup);

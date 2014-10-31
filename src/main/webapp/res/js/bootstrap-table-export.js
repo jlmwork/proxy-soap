@@ -3,7 +3,7 @@
  * extensions: https://github.com/kayalshri/tableExport.jquery.plugin
  */
 
-(function ($) {
+(function($) {
     'use strict';
 
     var TYPE_NAME = {
@@ -22,54 +22,57 @@
     $.extend($.fn.bootstrapTable.defaults, {
         showExport: false,
         // 'json', 'xml', 'png', 'csv', 'txt', 'sql', 'doc', 'excel', 'powerpoint', 'pdf'
-        exportTypes: ['json', 'xml', 'csv', 'txt', 'sql', 'excel']
+        exportTypes: ['json', 'xml', 'csv', 'txt', 'sql', 'excel'],
+        formatExport: function() {
+            return "Export current table"
+        }
     });
 
     var BootstrapTable = $.fn.bootstrapTable.Constructor,
-        _initToolbar = BootstrapTable.prototype.initToolbar;
+            _initToolbar = BootstrapTable.prototype.initToolbar;
 
-    BootstrapTable.prototype.initToolbar = function () {
+    BootstrapTable.prototype.initToolbar = function() {
         _initToolbar.apply(this, Array.prototype.slice.apply(arguments));
 
         if (this.options.showExport) {
             var that = this,
-                $btnGroup = this.$toolbar.find('>.btn-group'),
-                $export = $btnGroup.find('div.export');
+                    $btnGroup = this.$toolbar.find('>.btn-group'),
+                    $export = $btnGroup.find('div.export');
 
             if (!$export.length) {
                 $export = $([
                     '<div class="export btn-group">',
-                        '<button class="btn btn-default dropdown-toggle" ' +
-                            'data-toggle="dropdown" type="button">',
-                            '<i class="glyphicon glyphicon-export icon-share"></i> ',
-                            '<span class="caret"></span>',
-                        '</button>',
-                        '<ul class="dropdown-menu" role="menu">',
-                        '</ul>',
+                    '<button class="btn btn-default dropdown-toggle" ' +
+                            'data-toggle="dropdown" type="button" title="' + this.options.formatExport() + '">',
+                    '<i class="glyphicon glyphicon-export icon-share"></i> ',
+                    '<span class="caret"></span>',
+                    '</button>',
+                    '<ul class="dropdown-menu" role="menu">',
+                    '</ul>',
                     '</div>'].join('')).appendTo($btnGroup);
 
                 var $menu = $export.find('.dropdown-menu'),
-                    exportTypes = this.options.exportTypes;
+                        exportTypes = this.options.exportTypes;
 
                 if (typeof this.options.exportTypes === 'string') {
                     var types = this.options.exportTypes.slice(1, -1).replace(/ /g, '').split(',');
 
                     exportTypes = [];
-                    $.each(types, function (i, value) {
+                    $.each(types, function(i, value) {
                         exportTypes.push(value.slice(1, -1));
                     });
                 }
-                $.each(exportTypes, function (i, type) {
+                $.each(exportTypes, function(i, type) {
                     if (TYPE_NAME.hasOwnProperty(type)) {
                         $menu.append(['<li data-type="' + type + '">',
-                                '<a href="javascript:void(0)">',
-                                    TYPE_NAME[type],
-                                '</a>',
+                            '<a href="javascript:void(0)">',
+                            TYPE_NAME[type],
+                            '</a>',
                             '</li>'].join(''));
                     }
                 });
 
-                $menu.find('li').click(function () {
+                $menu.find('li').click(function() {
                     that.$el.tableExport({
                         type: $(this).data('type'),
                         escape: false

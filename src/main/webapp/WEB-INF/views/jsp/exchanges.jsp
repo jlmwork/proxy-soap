@@ -2,7 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <fmt:setBundle basename="messages"/>
-<h4><fmt:message key="exchanges.pagetitle"/></h4>
+<%--<h4><fmt:message key="exchanges.pagetitle"/></h4>--%>
 
 <%--
 <div id="custom-toolbar">

@@ -530,7 +530,7 @@
         }
 
         // showColumns, showToggle, showRefresh
-        html = ['<div class="columns btn-group pull-right">'];
+        html = ['<div class="columns btn-group pull-right" data-toggle="collapse" aria-expanded="true" aria-controls="collapseOne">'];
 
         if (this.options.showRefresh) {
             html.push(sprintf('<button class="btn btn-default" type="button" name="refresh" title="%s">',
