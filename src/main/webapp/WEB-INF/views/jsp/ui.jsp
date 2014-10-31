@@ -1,3 +1,4 @@
+<%@page import="java.util.Locale"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -80,7 +81,17 @@
         <!-- Placed at the end of the document so the pages load faster -->
         <script src="res/lib/jquery/jquery.js"></script>
         <script src="res/lib/twitter-bootstrap/js/bootstrap.js"></script>
-        <script src="res/js/bootstrap-table.min.js"></script>
+        <script src="res/js/bootstrap-table.js"></script>
+        <script src="res/js/tableExport.js"></script>
+        <script src="res/js/jquery.base64.js"></script>
+        <script src="res/js/bootstrap-table-export.js"></script>
+        <script src="res/js/bootstrap-table-clear.js"></script>
+        <%
+            String userLocale = request.getHeader("Accept-Language");
+            if (userLocale != null && userLocale.startsWith("fr")) {
+        %><script src="res/js/bootstrap-table-fr-FR.min.js"></script><%
+            }
+        %>
         <script src="res/lib/highlight.js/highlight.pack.js"></script>
         <script src="res/js/jquery.fileDownload.js"></script>
         <script>

@@ -1174,7 +1174,7 @@
 
     BootstrapTable.prototype.trigger = function(name) {
         var args = Array.prototype.slice.call(arguments, 1);
-
+        args.push(this);
         name += '.bs.table';
         this.options[BootstrapTable.EVENTS[name]].apply(this.options, args);
         this.$el.trigger($.Event(name), args);

@@ -151,8 +151,9 @@ $(function() {
         if (trs.length > 1)
             $("#custom-toolbar").fadeIn('slow').show();
         else if (trs.length === 1) {
-            var tds = trs.find("td");
-            console.log(tds);
+            var tds = $.find('#exchangestable tbody tr td');
+            if (trs.length === 1)
+                $("#custom-toolbar").fadeIn('slow').hide();
         }
         else
             $("#custom-toolbar").fadeIn('slow').hide();

@@ -23,7 +23,7 @@ import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
 import prototypes.ws.proxy.soap.constantes.ApplicationConfig;
 import prototypes.ws.proxy.soap.context.ApplicationContext;
 import prototypes.ws.proxy.soap.repository.SoapExchangeRepository;
-import prototypes.ws.proxy.soap.repository.jpa.SoapExchangeRepositoryJpa;
+import prototypes.ws.proxy.soap.repository.SoapExchangeRepositoryFactory;
 import prototypes.ws.proxy.soap.validation.SoapValidatorFactory;
 
 /**
@@ -56,8 +56,8 @@ public class ApplicationInitListener implements ServletContextListener {
         // save config
         ApplicationContext.setProxyConfiguration(sce.getServletContext(), proxyConfig);
 
-        //SoapExchangeRepository exchangesRepo = new SoapExchangeRepositoryInMemory(proxyConfig);
-        SoapExchangeRepository exchangesRepo = new SoapExchangeRepositoryJpa(proxyConfig);
+        // create exchanges repository and attach it
+        SoapExchangeRepository exchangesRepo = SoapExchangeRepositoryFactory.getInstance().createRepository(proxyConfig);
         ApplicationContext.setSoapExchangeRepository(sce.getServletContext(), exchangesRepo);
 
     }

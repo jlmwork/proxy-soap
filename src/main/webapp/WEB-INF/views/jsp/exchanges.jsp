@@ -4,12 +4,12 @@
 <fmt:setBundle basename="messages"/>
 <h4><fmt:message key="exchanges.pagetitle"/></h4>
 
+<%--
 <div id="custom-toolbar">
     <div class="form-inline" role="form">
-        <button id="clear" data-href="ui/action/clearRequests" type="button" class="btn btn-default" title="<fmt:message key="exchanges.clear"/>"><span class="glyphicon glyphicon-trash"></span></button>
         <button id="export" data-href="exchanges?accept=application/zip" type="button" class="btn btn-default" title="<fmt:message key="exchanges.export"/>"><span class="glyphicon glyphicon-cloud-download"></span></button>
     </div>
-</div>
+</div>--%>
 <%--
 <c:choose>
     <c:when test="${!proxy.validationActive}">
@@ -26,10 +26,13 @@
 <table id="exchangestable" data-toggle="table"
        data-sort-order="desc"
        data-url="exchanges?accept=application/json" data-cache="false"
+       data-clear-url="exchanges"
        data-height="500"
        data-toolbar="#custom-toolbar"
        data-show-refresh="true"
        data-show-toggle=true"
+       data-show-export="true"
+       data-show-clear="true"
        data-pagination="true"
        data-search="true"
        data-show-columns="true"

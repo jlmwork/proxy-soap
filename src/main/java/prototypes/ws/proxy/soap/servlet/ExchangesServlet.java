@@ -46,6 +46,14 @@ public class ExchangesServlet extends HttpServlet {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(ExchangesServlet.class);
 
+    private SoapExchangeRepository exchangeRepository;
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        exchangeRepository = ApplicationContext.getSoapExchangeRepository(this.getServletContext());
+    }
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -68,10 +76,8 @@ public class ExchangesServlet extends HttpServlet {
                 ? pAccept : ((!Strings.isNullOrEmpty(hAccept)) ? hAccept : "");
         LOGGER.debug("Asked format : " + askedFormat);
 
-        SoapExchangeRepository repository = ApplicationContext.getSoapExchangeRepository(this.getServletContext());
-
         if ("text/csv".equals(askedFormat.toLowerCase())) {
-            List<SoapExchange> soapExchanges = repository.listWithoutContent();
+            List<SoapExchange> soapExchanges = exchangeRepository.listWithoutContent();
             LOGGER.debug("CSV format");
             response.setContentType("text/csv;charset=UTF-8");
             Cookie cookie = new Cookie("fileDownload", "true");
@@ -95,7 +101,7 @@ public class ExchangesServlet extends HttpServlet {
                 out.close();
             }
         } else if ("application/zip".equals(askedFormat.toLowerCase())) {
-            List<SoapExchange> soapExchanges = repository.listWithoutContent();
+            List<SoapExchange> soapExchanges = exchangeRepository.listWithoutContent();
             LOGGER.debug("ZIP format");
             response.setContentType("application/zip");
             Cookie cookie = new Cookie("fileDownload", "true");
@@ -120,7 +126,7 @@ public class ExchangesServlet extends HttpServlet {
             zipOut.finish();
 
         } else if ("application/json".equals(askedFormat.toLowerCase())) {
-            List<SoapExchange> soapExchanges = repository.listWithoutContent();
+            List<SoapExchange> soapExchanges = exchangeRepository.listWithoutContent();
             //JsonGenerator jg = jsonF.createJsonGenerator(new File("result.json"), JsonEncoding.UTF8);
             /*JsonObject model = Json.createObjectBuilder()
              .add("firstName", "Duke")
@@ -166,7 +172,7 @@ public class ExchangesServlet extends HttpServlet {
             jsonWriter.close();
             out.close();
         } else {
-            List<SoapExchange> soapExchanges = repository.list();
+            List<SoapExchange> soapExchanges = exchangeRepository.list();
             request.setAttribute("requestList", soapExchanges);
             request.getRequestDispatcher("/WEB-INF/views/jsp/exchanges.jsp").forward(request, response);
         }
@@ -280,6 +286,13 @@ public class ExchangesServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        exchangeRepository.removeAll();
+        LOGGER.info("Exchanges successfully deleted");
+        resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
 
     /**
