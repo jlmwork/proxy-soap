@@ -101,6 +101,7 @@ public class ValidationFilter extends HttpServletFilter {
             if (!requestValid && proxyConfig.isInBlockingMode()) {
                 wrappedResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,
                         "Request message invalid");
+                exchangeRepository.save(soapExchange);
                 return;
             }
 
@@ -109,7 +110,7 @@ public class ValidationFilter extends HttpServletFilter {
             chain.doFilter(wrappedRequest, wrappedResponse);
             long stop = System.currentTimeMillis();
             ProxyExchange proxyExchange = RequestContext.getProxyExchange(request);
-            soapExchange.setRequestHeaders(proxyExchange.getResponseHeaders());
+            soapExchange.setResponseHeaders(proxyExchange.getResponseHeaders());
             soapExchange.setResponseTime(stop - start);
 
             // 3] Response validation
