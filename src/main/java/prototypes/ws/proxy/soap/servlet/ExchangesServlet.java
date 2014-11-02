@@ -17,6 +17,7 @@ package prototypes.ws.proxy.soap.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.List;
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
@@ -77,7 +78,7 @@ public class ExchangesServlet extends HttpServlet {
         LOGGER.debug("Asked format : " + askedFormat);
 
         if ("text/csv".equals(askedFormat.toLowerCase())) {
-            List<SoapExchange> soapExchanges = exchangeRepository.listWithoutContent();
+            Collection<SoapExchange> soapExchanges = exchangeRepository.listWithoutContent();
             LOGGER.debug("CSV format");
             response.setContentType("text/csv;charset=UTF-8");
             Cookie cookie = new Cookie("fileDownload", "true");
@@ -101,7 +102,7 @@ public class ExchangesServlet extends HttpServlet {
                 out.close();
             }
         } else if ("application/zip".equals(askedFormat.toLowerCase())) {
-            List<SoapExchange> soapExchanges = exchangeRepository.listWithoutContent();
+            Collection<SoapExchange> soapExchanges = exchangeRepository.listWithoutContent();
             LOGGER.debug("ZIP format");
             response.setContentType("application/zip");
             Cookie cookie = new Cookie("fileDownload", "true");
@@ -126,7 +127,7 @@ public class ExchangesServlet extends HttpServlet {
             zipOut.finish();
 
         } else if ("application/json".equals(askedFormat.toLowerCase())) {
-            List<SoapExchange> soapExchanges = exchangeRepository.listWithoutContent();
+            Collection<SoapExchange> soapExchanges = exchangeRepository.listWithoutContent();
             //JsonGenerator jg = jsonF.createJsonGenerator(new File("result.json"), JsonEncoding.UTF8);
             /*JsonObject model = Json.createObjectBuilder()
              .add("firstName", "Duke")
@@ -158,7 +159,7 @@ public class ExchangesServlet extends HttpServlet {
                         .add("to", stripNull(soapRequest.getUri()))
                         .add("validator", stripNull(soapRequest.getValidatorId()))
                         .add("operation", stripNull(soapRequest.getOperation()))
-                        .add("resp_time", stripNull(soapRequest.getResponseTime()))
+                        .add("resp_time", soapRequest.getResponseTime())
                         .add("request_valid", stripNull(soapRequest.getRequestValid()))
                         .add("request_xml_valid", stripNull(soapRequest.getRequestXmlValid()))
                         .add("request_soap_valid", stripNull(soapRequest.getRequestSoapValid()))
@@ -172,7 +173,7 @@ public class ExchangesServlet extends HttpServlet {
             jsonWriter.close();
             out.close();
         } else {
-            List<SoapExchange> soapExchanges = exchangeRepository.list();
+            Collection<SoapExchange> soapExchanges = exchangeRepository.list();
             request.setAttribute("requestList", soapExchanges);
             request.getRequestDispatcher("/WEB-INF/views/jsp/exchanges.jsp").forward(request, response);
         }

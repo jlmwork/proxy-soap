@@ -15,7 +15,7 @@
  */
 package prototypes.ws.proxy.soap.repository;
 
-import java.util.List;
+import java.util.Collection;
 import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
 import prototypes.ws.proxy.soap.io.SoapExchange;
 
@@ -39,9 +39,11 @@ public abstract class SoapExchangeRepository {
 
     public abstract SoapExchange get(String id);
 
-    public abstract List<SoapExchange> list();
+    public abstract SoapExchange get(String id, String[] fields);
 
-    public abstract List<SoapExchange> listWithoutContent();
+    public abstract Collection<SoapExchange> list();
+
+    public abstract Collection<SoapExchange> listWithoutContent();
 
     public abstract void save(SoapExchange monitor);
 
