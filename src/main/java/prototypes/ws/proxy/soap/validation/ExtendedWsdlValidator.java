@@ -65,14 +65,12 @@ public class ExtendedWsdlValidator extends WsdlValidator {
             requestMessage.getOperation();
 
             NodeList nodes = ((SoapMessage) requestMessage).getHeaders();
-            System.out.println(nodes);
             List<XmlError> errorsH = new ArrayList<XmlError>();
             List<QName> foundHeaders = new ArrayList<QName>();
 
             if ((nodes != null) && (nodes.getLength() > 0)) {
                 Node header = nodes.item(0);
                 XmlObject x = XmlObject.Factory.parse(header.getFirstChild());
-                System.out.println(x);
                 String strY = x.toString().replaceAll(
                         header.getFirstChild().getPrefix() + ":"
                         + header.getFirstChild().getLocalName(),
