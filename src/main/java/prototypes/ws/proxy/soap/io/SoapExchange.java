@@ -16,12 +16,11 @@
 package prototypes.ws.proxy.soap.io;
 
 import com.eaio.uuid.UUID;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
+import prototypes.ws.proxy.soap.time.Dates;
 import prototypes.ws.proxy.soap.xml.XmlStrings;
 
 public class SoapExchange {
@@ -34,7 +33,7 @@ public class SoapExchange {
     private String message;
     private String operation;
     private String validatorId;
-    private long responseTime;
+    private long responseTime = -1L;
 
     // request
     private String request;
@@ -223,8 +222,7 @@ public class SoapExchange {
     }
 
     public String getDate() {
-        return new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
-                .format(time.getTime());
+        return Dates.getFormattedDate(time, Dates.YYYYMMDD_HHMMSS);
     }
 
     /**
