@@ -15,18 +15,6 @@ var Cookie = {
         }
 
         return null;
-    },
-    bake_cookie: function(name, value) {
-        var cookie = [name, '=', JSON.stringify(value), '; domain=.', window.location.host.toString(), '; path=/;'].join('');
-        document.cookie = cookie;
-    },
-    read_cookie: function(name) {
-        var result = document.cookie.match(new RegExp(name + '=([^;]+)'));
-        result && (result = JSON.parse(result[1]));
-        return result;
-    },
-    delete_cookie: function(name) {
-        document.cookie = [name, '=; expires=Thu, 01-Jan-1970 00:00:01 GMT; path=/; domain=.', window.location.host.toString()].join('');
     }
 };
 
@@ -68,24 +56,6 @@ $(function() {
         $(this).selectText();
     });
     $('#exchangestable').on('column-switch.bs.table', function(e, field, checked) {
-        //var fields = Cookie.get('fields');
-        //if (!fields)
-        //    fields = {};
-        /*
-         var fields = {};
-         console.log("Cookie fields : " + fields);
-         fields[field] = checked;
-         console.log("fields : " + fields);
-         for (var k in fields) {
-         // use hasOwnProperty to filter out keys from the Object.prototype
-         if (fields.hasOwnProperty(k)) {
-         console.log('key is: ' + k + ', value is: ' + fields[k]);
-         }
-         }
-         console.log("fields : " + fields[field]);
-         Cookie.set('fields', fields);
-         console.log('Event: column-switch.bs.table, data: ' +
-         field + ', ' + checked);*/
         // read
         var fields = $.cookie('fields')
         if (fields === undefined) {
@@ -95,7 +65,7 @@ $(function() {
         }
         fields[field] = checked;
         // save
-        $.cookie('fields', JSON.stringify(fields));
+        $.cookie('fields', JSON.stringify(fields), {expires: 7, path: '/'});
     });
 
     var fields = $.cookie('fields');
