@@ -260,6 +260,13 @@ public class ExchangesServlet extends HttpServlet {
         }
     }
 
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        exchangeRepository.removeAll();
+        LOGGER.info("Exchanges successfully deleted");
+        resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+    }
+
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
@@ -287,13 +294,6 @@ public class ExchangesServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
-    }
-
-    @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        exchangeRepository.removeAll();
-        LOGGER.info("Exchanges successfully deleted");
-        resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
 
     /**

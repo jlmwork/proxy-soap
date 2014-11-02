@@ -110,7 +110,7 @@ public class ValidationFilter extends HttpServletFilter {
             chain.doFilter(wrappedRequest, wrappedResponse);
             long stop = System.currentTimeMillis();
             ProxyExchange proxyExchange = RequestContext.getProxyExchange(request);
-            soapExchange.setResponseHeaders(proxyExchange.getResponseHeaders());
+            soapExchange.setRequestHeaders(proxyExchange.getRequestHeaders());
             soapExchange.setResponseTime(stop - start);
 
             // 3] Response validation

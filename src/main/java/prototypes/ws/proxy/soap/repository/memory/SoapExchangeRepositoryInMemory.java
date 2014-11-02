@@ -18,7 +18,6 @@ package prototypes.ws.proxy.soap.repository.memory;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +35,6 @@ public class SoapExchangeRepositoryInMemory extends SoapExchangeRepository {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(SoapExchangeRepositoryInMemory.class);
 
-    private final LinkedList<SoapExchange> exchanges = new LinkedList<SoapExchange>();
-
     private final Map<String, SoapExchange> exchangesMap;
 
     public SoapExchangeRepositoryInMemory(ProxyConfiguration proxyConfig) {
@@ -48,12 +45,13 @@ public class SoapExchangeRepositoryInMemory extends SoapExchangeRepository {
 
     @Override
     public SoapExchange get(String id) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return exchangesMap.get(id);
     }
 
     @Override
     public SoapExchange get(String id, String[] fields) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        // fields filtering is not available in this implementation
+        return exchangesMap.get(id);
     }
 
     @Override
@@ -79,7 +77,7 @@ public class SoapExchangeRepositoryInMemory extends SoapExchangeRepository {
 
     @Override
     public synchronized void removeAll() {
-        exchanges.clear();
+        exchangesMap.clear();
     }
 
     static class FifoMap<K, V> extends LinkedHashMap<K, V> {

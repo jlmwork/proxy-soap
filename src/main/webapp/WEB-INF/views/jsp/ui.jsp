@@ -38,18 +38,12 @@
     </c:choose>
     <body>
         <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-            <div class="container">
+            <div class="container-fluid">
                 <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
                     <a class="navbar-brand" href="ui">Proxy SOAP</a></a>
                 </div>
-                <div class="collapse navbar-collapse">
-                    <ul class="nav navbar-nav nav-pills" role="tablist">
+                <div class="collapse navbar-collapse ">
+                    <ul id="menutabs" class="nav navbar-nav nav-pills navbar-right" role="tablist">
                         <!-- nav -->
                         <li class="${exchangesActive}"><a href="#exchanges" role="tab" data-toggle="tab"><fmt:message key="exchanges.pagetitle"/></a></li>
                         <li class="${configActive}"><a href="#config" role="tab" data-toggle="tab"><fmt:message key="config.pagetitle"/></a></li>
@@ -59,19 +53,23 @@
                 </div><!--/.nav-collapse -->
             </div>
         </div>
-        <div class="container">
+        <div class="container-fluid">
             <div class="tab-content">
                 <div class="tab-pane ${exchangesActive} fade" id="exchanges">
                     <jsp:include page="./exchanges.jsp"/>
                 </div>
                 <div class="tab-pane ${configActive} fade" id="config">
-                    <jsp:include page="./config.jsp"/>
+                    <div class="container">
+                        <jsp:include page="./config.jsp"/>
+                    </div>
                 </div>
                 <div class="tab-pane fade" id="validators">
                     <jsp:include page="./validators.jsp"/>
                 </div>
                 <div class="tab-pane fade" id="help">
-                    <jsp:include page="./help.jsp"/>
+                    <div class="container">
+                        <jsp:include page="./help.jsp"/>
+                    </div>
                 </div>
             </div> <!-- /container -->
         </div>
@@ -80,6 +78,7 @@
         ================================================== -->
         <!-- Placed at the end of the document so the pages load faster -->
         <script src="res/lib/jquery/jquery.js"></script>
+        <script src="res/js/jquery-cookie.js"></script>
         <script src="res/lib/twitter-bootstrap/js/bootstrap.js"></script>
         <script src="res/js/bootstrap-table.js"></script>
         <script src="res/js/tableExport.js"></script>
@@ -104,7 +103,11 @@
                             e.preventDefault()
                         })
             });</script>
-        <script src="res/js/exchanges.js"></script>
+        <script src="res/js/exchanges.js"></script><%
+            if (userLocale != null && userLocale.startsWith("fr")) {
+        %><script src="res/js/exchanges-fr-FR.js"></script><%
+            }
+            %>
         <script src="res/js/config.js"></script>
         <script src="res/js/validators.js"></script>
         <script src="res/js/help.js"></script>

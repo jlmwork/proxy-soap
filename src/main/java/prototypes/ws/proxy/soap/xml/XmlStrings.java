@@ -242,7 +242,7 @@ public class XmlStrings {
         return xml;
     }
 
-    public static XmlObject createXmlObject(String input, XmlOptions xmlOptions)
+    public static XmlObject parseXml(String input, XmlOptions xmlOptions)
             throws XmlException {
         return XmlObject.Factory.parse(input, xmlOptions);
     }
@@ -256,10 +256,13 @@ public class XmlStrings {
             xmlOptions
                     .setLoadLineNumbers(XmlOptions.LOAD_LINE_NUMBERS_END_ELEMENT);
             // XmlObject.Factory.parse( request, xmlOptions );
-            XmlStrings.createXmlObject(xml, xmlOptions);
+            XmlStrings.parseXml(xml, xmlOptions);
         } catch (XmlException e) {
             if (e.getErrors() != null) {
-                errs.addAll(e.getErrors());
+                LOGGER.debug("XML errors found : " + e.getErrors());
+                for (Object error : e.getErrors()) {
+                    errs.add(error.toString());
+                }
             }
             errs.add(XmlError.forMessage(e.getMessage()).toString());
         } catch (Exception e) {

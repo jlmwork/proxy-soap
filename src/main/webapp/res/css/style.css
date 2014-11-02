@@ -19,7 +19,7 @@ body {
 
 /* Custom page CSS
 -------------------------------------------------- */
-body > .container {
+body > .container, body > .container-fluid {
     padding: 60px 15px 0;
 }
 .container .text-muted {
@@ -50,3 +50,18 @@ body .modal-dialog {
 }
 .white,.white:hover,.white:visited{color:white;}
 #exchangestable {font-size:12px;}
+#exchangedetails .tab-pane pre code {
+    min-height: 200px;
+    max-height: 200px;
+    height:200px;
+    overflow-y: visible;
+}
+#exchangedetails .nav-tabs a, #exchangedetails .nav-tabs a:hover{
+    color:#777;
+}
+#exchangedetails .panel-heading {
+    cursor: pointer;
+}
+.selected {
+    font-weight: bold;
+}

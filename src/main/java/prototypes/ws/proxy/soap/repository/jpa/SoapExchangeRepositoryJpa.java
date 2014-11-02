@@ -93,6 +93,11 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
     }
 
     @Override
+    public SoapExchange get(String id, String[] fields) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
     public List<SoapExchange> list() {
         LOGGER.debug("get soap exchanges from db");
         List<SoapExchange> exchanges = listWithoutContent();

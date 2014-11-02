@@ -26,19 +26,17 @@
             this.options.url = this.options.clearUrl;
             this.options.method = "DELETE";
             this.options.pageNumber = 1;
-            var oldFunction = this.options['onLoadError'];
+            var previousFunction = this.options['onLoadError'];
             // didnt find better way to reset view
             // and restore state if an error occurs
-            this.data = "";
-            this.options.data = "";
+            this.initData([]);
             this.options['onLoadError'] = function(args, bsTable) {
-                console.log("error");
-                bsTable.data = oldData;
-                bsTable.options.data = oldData;
+                console.log("error on delete");
+                this.initData(oldData);
                 return false;
             };
             this.initServer(false);
-            this.options['onLoadError'] = oldFunction;
+            this.options['onLoadError'] = previousFunction;
             this.options.url = oldUrl;
             this.options.method = oldMethod;
         }

@@ -5,7 +5,7 @@
 <h2><fmt:message key="config.pagetitle"/></h2>
 
 <form method="post" action="ui/action/config">
-    <div class="panel ${success}">
+    <div class="panel ${success} bootstrap-table">
         <c:if test="${!empty message}">
             <div class="panel-heading">
                 <fmt:message key="${message}">
@@ -13,7 +13,7 @@
                 </fmt:message>
             </div>
         </c:if>
-        <table class="table table-bordered" id="settings">
+        <table class="table table-bordered" id="settings" data-toggle="table" >
             <thead>
                 <tr>
                     <th><fmt:message key="config.key"/></th>

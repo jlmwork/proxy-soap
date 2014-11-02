@@ -5,7 +5,7 @@
 <style>.anchor{position:relative;top:-60px;}</style>
 <h2><fmt:message key="validators.title"/></h2>
 <p><em><fmt:message key="validators.description"/></em></p>
-<table class="table table-bordered" id="logs">
+<table class="table table-bordered" id="logs" data-toggle="table" data-height="500">
     <thead>
         <tr>
             <th><fmt:message key="validators.name"/></th>

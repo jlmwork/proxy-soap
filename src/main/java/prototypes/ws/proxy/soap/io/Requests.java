@@ -53,11 +53,6 @@ public class Requests {
         return target;
     }
 
-    public static String resolveSoapServiceFromRequest(
-            HttpServletRequest request) {
-        return resolveSoapServiceFromURL(Requests.getTarget(request));
-    }
-
     public static URL resolveTargetUrl(HttpServletRequest request) {
         String uri = Requests.getTarget(request);
         if (Strings.isNullOrEmpty(uri)) {

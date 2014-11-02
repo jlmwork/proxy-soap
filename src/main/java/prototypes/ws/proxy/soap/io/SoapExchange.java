@@ -16,6 +16,7 @@
 package prototypes.ws.proxy.soap.io;
 
 import com.eaio.uuid.UUID;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -249,6 +250,20 @@ public class SoapExchange {
     /**
      * @return the requestErrors
      */
+    public List<String> getRequestErrors() {
+        List allErrors = new ArrayList();
+        if (requestXmlErrors != null) {
+            allErrors.addAll(requestXmlErrors);
+        }
+        if (requestSoapErrors != null) {
+            allErrors.addAll(requestSoapErrors);
+        }
+        return allErrors;
+    }
+
+    /**
+     * @return the requestErrors
+     */
     public List<String> getRequestXmlErrors() {
         return requestXmlErrors;
     }
@@ -258,6 +273,20 @@ public class SoapExchange {
      */
     public void setRequestXmlErrors(List<String> requestErrors) {
         this.requestXmlErrors = requestErrors;
+    }
+
+    /**
+     * @return the requestErrors
+     */
+    public List<String> getResponseErrors() {
+        List allErrors = new ArrayList();
+        if (responseXmlErrors != null) {
+            allErrors.addAll(responseXmlErrors);
+        }
+        if (responseSoapErrors != null) {
+            allErrors.addAll(responseSoapErrors);
+        }
+        return allErrors;
     }
 
     /**

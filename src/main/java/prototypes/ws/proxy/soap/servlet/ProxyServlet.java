@@ -74,6 +74,7 @@ public class ProxyServlet extends AbstractServlet {
     protected void doRequest(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException {
         LOGGER.debug("doRequest");
+        ProxyExchange proxyExchange = RequestContext.getProxyExchange(request);
 
         URL targetUrl = null;
         try {
@@ -86,7 +87,6 @@ public class ProxyServlet extends AbstractServlet {
 
         byte[] body = Streams.getBytes(request.getInputStream());
 
-        ProxyExchange proxyExchange = RequestContext.getProxyExchange(request);
         HttpURLConnection httpConn = null;
 
         try {
