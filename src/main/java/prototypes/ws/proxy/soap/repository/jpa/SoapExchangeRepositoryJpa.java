@@ -83,7 +83,7 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
     @Override
     public SoapExchange get(String id) {
         EntityManager em = emf.createEntityManager();
-        SoapExchange exchange = em.createQuery("select s from SoapExchange s where id=:id", SoapExchange.class).setParameter("id", id).getSingleResult();
+        SoapExchange exchange = em.createQuery("select s from SoapExchange s where s.id=:id", SoapExchange.class).setParameter("id", id).getSingleResult();
         em.detach(exchange);
         if (!xmlInDbs) {
             exchange.setRequest(Files.read(getRequestFilePath(exchange)));
@@ -94,7 +94,7 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
 
     @Override
     public SoapExchange get(String id, String[] fields) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.get(id);
     }
 
     @Override

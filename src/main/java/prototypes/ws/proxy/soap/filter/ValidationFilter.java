@@ -98,6 +98,7 @@ public class ValidationFilter extends HttpServletFilter {
             // 1] Request validation
             boolean requestValid = validateInput(wrappedRequest,
                     soapExchange);
+            //TODO : save request headers when request is blocked
             if (!requestValid && proxyConfig.isInBlockingMode()) {
                 wrappedResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,
                         "Request message invalid");
@@ -120,6 +121,8 @@ public class ValidationFilter extends HttpServletFilter {
                 LOGGER.info("Proxy is in blocking mode.");
                 wrappedResponse.sendError(HttpServletResponse.SC_BAD_GATEWAY,
                         "Response message invalid");
+                // store the exchange
+                exchangeRepository.save(soapExchange);
                 return;
             }
             // store the exchange
