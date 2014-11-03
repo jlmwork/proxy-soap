@@ -32,5 +32,13 @@
         </attributes>
         <convert converter="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter" attribute-name="requestHeaders"/>
         <convert converter="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter" attribute-name="responseHeaders"/>
+        <entity-listeners>
+            <entity-listener class="prototypes.ws.proxy.soap.repository.jpa.ExternalStorageListener">
+                <pre-persist method-name="marshall"/>
+                <pre-update method-name="marshall"/>
+                <post-load method-name="unmarshall"/>
+                <post-update method-name="unmarshall"/>
+            </entity-listener>
+        </entity-listeners>
     </entity>
 </entity-mappings>

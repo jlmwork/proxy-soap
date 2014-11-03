@@ -7,7 +7,9 @@
     </appender>
     <logger name="prototypes" level="debug"/>
     <logger name="org.eclipse.persistence" level="info"/>
-    <root level="error">
+    <logger name="org.eclipse.persistence.logging.sql" level="TRACE"/>
+    <logger name="eclipselink.logging" level="info"/>
+    <root level="debug">
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>

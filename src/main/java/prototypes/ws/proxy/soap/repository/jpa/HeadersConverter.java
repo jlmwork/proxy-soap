@@ -52,6 +52,7 @@ public class HeadersConverter implements AttributeConverter<Map<String, List<Str
                 String compatKey = (key == null) ? "_" : key;
                 oBuilder.add(compatKey, aBuilder.build());
             }
+            // TODO : add compression
             return oBuilder.build().toString();
         } else {
             return "";
@@ -62,6 +63,7 @@ public class HeadersConverter implements AttributeConverter<Map<String, List<Str
     public Map<String, List<String>> convertToEntityAttribute(String dbData) {
         Map outMap = new HashMap<String, List<String>>();
         if (!Strings.isNullOrEmpty(dbData)) {
+            // TODO : add uncompression
             JsonReader reader = Json.createReader(new StringReader(dbData));
             JsonStructure jsonst = reader.read();
 

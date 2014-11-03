@@ -161,7 +161,6 @@ public class Slf4jEclipseLinkSessionLogger extends AbstractSessionLog {
         for (String category : SessionLog.loggerCatagories) {
             addLogger(category, ECLIPSELINK_NAMESPACE + "." + category);
         }
-// Logger default para cuando no hay categoría.
         addLogger(DEFAULT_CATEGORY, DEFAULT_ECLIPSELINK_NAMESPACE);
     }
 
@@ -177,8 +176,7 @@ public class Slf4jEclipseLinkSessionLogger extends AbstractSessionLog {
      * INTERNAL: Return the Logger for the given category
      */
     private Logger getLogger(String category) {
-
-        if (!Strings.isNullOrEmpty(category)
+        if (Strings.isNullOrEmpty(category)
                 || !this.categoryLoggers.containsKey(category)) {
             category = DEFAULT_CATEGORY;
         }
