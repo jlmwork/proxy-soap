@@ -16,13 +16,21 @@
             <basic name="from">
                 <column name="ipFrom" />
             </basic>
-            <transient name="request"/>
-            <transient name="response"/>
             <basic name="requestHeaders">
                 <column name="REQUESTHEADERS" length="2048"/>
             </basic>
             <basic name="responseHeaders">
                 <column name="RESPONSEHEADERS" length="2048"/>
+            </basic>
+            <!-- requests & responses are no more transient as
+            External storage has been implemented
+            <transient name="request"/>
+            <transient name="response"/>-->
+            <basic name="request">
+                <column name="REQUEST_XML" length="512"/>
+            </basic>
+            <basic name="response">
+                <column name="RESPONSE_XML" length="512"/>
             </basic>
             <!--
             <transient name="requestSoapErrors"/>

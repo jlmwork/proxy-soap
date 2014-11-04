@@ -85,10 +85,6 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
         EntityManager em = emf.createEntityManager();
         SoapExchange exchange = em.createQuery("select s from SoapExchange s where s.id=:id", SoapExchange.class).setParameter("id", id).getSingleResult();
         em.detach(exchange);
-        if (!xmlInDbs) {
-            exchange.setRequest(Files.read(getRequestFilePath(exchange)));
-            exchange.setResponse(Files.read(getRequestFilePath(exchange)));
-        }
         return exchange;
     }
 
@@ -101,13 +97,11 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
     public List<SoapExchange> list() {
         LOGGER.debug("get soap exchanges from db");
         List<SoapExchange> exchanges = listWithoutContent();
-        if (!xmlInDbs) {
-            // TODO : eager loading - not a good idea for high volumes
-            for (SoapExchange exchange : exchanges) {
-                // em.detach(exchange);
-                exchange.setRequest(Files.read(getRequestFilePath(exchange)));
-                exchange.setResponse(Files.read(getRequestFilePath(exchange)));
-            }
+        // TODO : eager loading - not a good idea for high volumes
+        for (SoapExchange exchange : exchanges) {
+            // em.detach(exchange);
+            exchange.setRequest(Files.read(getRequestFilePath(exchange)));
+            exchange.setResponse(Files.read(getRequestFilePath(exchange)));
         }
         LOGGER.debug("get soap exchanges from db {} ", exchanges.size());
         return exchanges;
@@ -131,10 +125,6 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
                 em.getTransaction().begin();
                 em.persist(exchange);
                 em.getTransaction().commit();
-                if (!xmlInDbs) {
-                    Files.write(getRequestFilePath(exchange), exchange.getRequestAsXML());
-                    Files.write(getResponseFilePath(exchange), exchange.getResponseAsXML());
-                }
                 LOGGER.debug("exchange saved");
             } catch (Exception e) {
                 LOGGER.error(e.getMessage());
