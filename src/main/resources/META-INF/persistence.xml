@@ -29,13 +29,13 @@
             <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
         </properties>
     </persistence-unit>
-    <persistence-unit name="ProxyPUFull" transaction-type="RESOURCE_LOCAL">
+    <persistence-unit name="ProxyPULobs" transaction-type="RESOURCE_LOCAL">
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
         <!-- unactivate L2 cache-->
         <shared-cache-mode>NONE</shared-cache-mode>
         <class>prototypes.ws.proxy.soap.repository.jpa.HeadersConverter</class>
         <!--<class>prototypes.ws.proxy.soap.monitor.SoapRequestMonitor</class>-->
-        <mapping-file>META-INF/mapping_full.xml</mapping-file>
+        <mapping-file>META-INF/mapping_lobs.xml</mapping-file>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <properties>
             <!--<jta-data-source>jdbc/proxyDS</jta-data-source>-->

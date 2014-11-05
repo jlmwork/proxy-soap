@@ -16,20 +16,18 @@
             <basic name="from">
                 <column name="ipFrom" />
             </basic>
-            <basic name="requestHeaders">
+            <basic name="requestHeaders" fetch="LAZY">
                 <column name="REQUESTHEADERS" length="2048"/>
             </basic>
-            <basic name="responseHeaders">
+            <basic name="responseHeaders" fetch="LAZY">
                 <column name="RESPONSEHEADERS" length="2048"/>
             </basic>
             <!-- requests & responses are no more transient as
-            External storage has been implemented
-            <transient name="request"/>
-            <transient name="response"/>-->
-            <basic name="request">
+            External storage has been implemented -->
+            <basic name="request" fetch="LAZY">
                 <column name="REQUEST_XML" length="512"/>
             </basic>
-            <basic name="response">
+            <basic name="response" fetch="LAZY">
                 <column name="RESPONSE_XML" length="512"/>
             </basic>
             <!--

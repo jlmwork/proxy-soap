@@ -16,8 +16,11 @@
 package prototypes.ws.proxy.soap.repository.jpa;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import javax.persistence.EntityGraph;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -74,7 +77,7 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
         connectionProps.setProperty("javax.persistence.jdbc.user", proxyConfig.getPersistenceDbUsername());
         connectionProps.setProperty("javax.persistence.jdbc.password", proxyConfig.getPersistenceDbPassword());
         xmlInDbs = proxyConfig.persistXmlInDb();
-        persistenceUnitName = (proxyConfig.persistXmlInDb()) ? "ProxyPUFull" : "ProxyPU";
+        persistenceUnitName = (xmlInDbs) ? "ProxyPULobs" : "ProxyPU";
         emf = (EntityManagerFactory) Persistence.createEntityManagerFactory(persistenceUnitName, connectionProps);
         //try to start
         emf.createEntityManager().close();
@@ -83,7 +86,13 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
     @Override
     public SoapExchange get(String id) {
         EntityManager em = emf.createEntityManager();
-        SoapExchange exchange = em.createQuery("select s from SoapExchange s where s.id=:id", SoapExchange.class).setParameter("id", id).getSingleResult();
+        EntityGraph<SoapExchange> loadGraph = em.createEntityGraph(SoapExchange.class);
+        loadGraph.addAttributeNodes("request", "response", "requestHeaders", "responseHeaders");
+        Map hints = new HashMap();
+        hints.put("javax.persistence.fetchgraph", loadGraph);
+
+        SoapExchange exchange = em.find(SoapExchange.class, id, hints);
+        //SoapExchange exchange = em.createQuery("select s from SoapExchange s where s.id=:id", SoapExchange.class).setParameter("id", id).getSingleResult();
         em.detach(exchange);
         return exchange;
     }
@@ -96,13 +105,13 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
     @Override
     public List<SoapExchange> list() {
         LOGGER.debug("get soap exchanges from db");
-        List<SoapExchange> exchanges = listWithoutContent();
-        // TODO : eager loading - not a good idea for high volumes
-        for (SoapExchange exchange : exchanges) {
-            // em.detach(exchange);
-            exchange.setRequest(Files.read(getRequestFilePath(exchange)));
-            exchange.setResponse(Files.read(getRequestFilePath(exchange)));
-        }
+        EntityManager em = emf.createEntityManager();
+        EntityGraph<SoapExchange> loadGraph = em.createEntityGraph(SoapExchange.class);
+        loadGraph.addAttributeNodes("request", "response", "requestHeaders", "responseHeaders");
+
+        List<SoapExchange> exchanges = em.createQuery("select s from SoapExchange s ORDER BY s.time DESC", SoapExchange.class)
+                .setHint("javax.persistence.fetchgraph", loadGraph)
+                .getResultList();
         LOGGER.debug("get soap exchanges from db {} ", exchanges.size());
         return exchanges;
     }
