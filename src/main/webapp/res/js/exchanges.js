@@ -26,6 +26,7 @@ var Cookie = {
 jQuery.fn.selectText = function() {
     var doc = document;
     var element = this[0];
+    // add blur / click behavior
     console.log(this, element);
     if (doc.body.createTextRange) {
         var range = document.body.createTextRange();

@@ -59,19 +59,6 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
         System.setProperty("derby.system.home", derbyHome);
         System.setProperty("derby.database.forceDatabaseLock", "false");
         cleanupDb();
-        /*
-         try {
-         InitialContext ic = new InitialContext();
-         // Construct BasicDataSource
-         BasicDataSource bds = new BasicDataSource();
-         bds.setDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
-         bds.setUrl("jdbc:derby:proxy-soap_derby.db;create=true");
-         bds.setUsername("proxy");
-         bds.setPassword("soap");
-         ic.bind("jdbc/proxyDS", bds);
-         } catch (NamingException nE) {
-         LOGGER.warn("Datasource creation failed : " + nE.getMessage(), nE);
-         }*/
         // externalize DB connection
         Properties connectionProps = new Properties();
         connectionProps.setProperty("javax.persistence.jdbc.driver", proxyConfig.getPersistenceDbDriver());
@@ -79,6 +66,7 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
         connectionProps.setProperty("javax.persistence.jdbc.user", proxyConfig.getPersistenceDbUsername());
         connectionProps.setProperty("javax.persistence.jdbc.password", proxyConfig.getPersistenceDbPassword());
         xmlInDbs = proxyConfig.persistXmlInDb();
+        LOGGER.debug(" XML stored in DB : {}", xmlInDbs);
         persistenceUnitName = (xmlInDbs) ? "ProxyPULobs" : "ProxyPU";
         emf = (EntityManagerFactory) Persistence.createEntityManagerFactory(persistenceUnitName, connectionProps);
         //try to start
