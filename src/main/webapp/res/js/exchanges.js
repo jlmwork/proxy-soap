@@ -149,10 +149,13 @@ function rowStyle(row, index) {
 function validatorFieldFormatter(value, row) {
     return '<a class="viewvalidator" href="ui#' + value + '" onclick="viewValidator(\'' + value + '\');return false;">' + value + '</a>';
 }
-function responseTimeFieldFormatter(value, row) {
+function responseTimeFieldFormatter(value) {
+    console.log("responseTimeFieldFormatter");
     if (value === -1) {
         return "Not available";
     }
+    console.log(value);
+    return value;
 }
 function viewValidator(validator) {
     $('#menutabs a[href="#validators"]').tab('show');

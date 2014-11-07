@@ -29,19 +29,18 @@ import javax.json.JsonValue;
 import javax.persistence.AttributeConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import prototypes.ws.proxy.soap.io.Strings;
 
 /**
  *
  * @author JL06436S
  */
-public class HeadersConverter implements AttributeConverter<Map<String, List<String>>, String> {
+public class HeadersConverter implements AttributeConverter<Map<String, List<String>>, byte[]> {
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(HeadersConverter.class);
 
     @Override
-    public String convertToDatabaseColumn(Map<String, List<String>> map) {
+    public byte[] convertToDatabaseColumn(Map<String, List<String>> map) {
         if (map != null) {
             JsonObjectBuilder oBuilder = Json.createObjectBuilder();
             for (String key : map.keySet()) {
@@ -52,19 +51,22 @@ public class HeadersConverter implements AttributeConverter<Map<String, List<Str
                 String compatKey = (key == null) ? "_" : key;
                 oBuilder.add(compatKey, aBuilder.build());
             }
+            String finalColumnContent = oBuilder.build().toString();
             // TODO : add compression
-            return oBuilder.build().toString();
+            byte[] bytes = (new CompressionConverter()).convertToDatabaseColumn(finalColumnContent);
+            return bytes;
         } else {
-            return "";
+            return new byte[0];
         }
     }
 
     @Override
-    public Map<String, List<String>> convertToEntityAttribute(String dbData) {
+    public Map<String, List<String>> convertToEntityAttribute(byte[] dbData) {
         Map outMap = new HashMap<String, List<String>>();
-        if (!Strings.isNullOrEmpty(dbData)) {
+        if (dbData.length > 0) {
             // TODO : add uncompression
-            JsonReader reader = Json.createReader(new StringReader(dbData));
+            String dbDataString = (new CompressionConverter()).convertToEntityAttribute(dbData);
+            JsonReader reader = Json.createReader(new StringReader(dbDataString));
             JsonStructure jsonst = reader.read();
 
             try {

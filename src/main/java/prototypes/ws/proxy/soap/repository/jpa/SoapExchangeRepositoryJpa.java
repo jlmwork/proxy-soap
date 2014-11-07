@@ -16,9 +16,7 @@
 package prototypes.ws.proxy.soap.repository.jpa;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import javax.persistence.EntityGraph;
 import javax.persistence.EntityManager;
@@ -97,13 +95,12 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
         // So we need to use a fetch graph and to add all attributes to use a fetch graph ! So ugly !
         EntityGraph<SoapExchange> fetchGraph = em.createEntityGraph(SoapExchange.class);
         fetchGraph.addAttributeNodes(exchangeFields);
-        Map<String, Object> hints = new HashMap<String, Object>();
+
         // The loadgraph if it worked
         // EntityGraph<SoapExchange> loadGraph = em.createEntityGraph(SoapExchange.class);
         // loadGraph.addAttributeNodes("request", "response", "requestHeaders", "responseHeaders");
         // Map<String, Object> hints = new HashMap<String, Object>();
         // hints.put("javax.persistence.loadgraph", loadGraph);
-
         SoapExchange exchange = em.createQuery("select s from SoapExchange s where s.id=:id", SoapExchange.class)
                 .setParameter("id", id)
                 .setHint("javax.persistence.fetchgraph", fetchGraph)
@@ -128,6 +125,7 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
         // EclipseLink produces 2 queries ! One for normal graph and one for added nodes. Too bad
         // So we need to use a fetch graph and to add all attributes to use a fetch graph ! So ugly !
         EntityGraph<SoapExchange> fetchGraph = em.createEntityGraph(SoapExchange.class);
+        fetchGraph.addAttributeNodes("frontEndRequest", "backEndResponse", "frontEndRequestHeaders", "backEndResponseHeaders");
         fetchGraph.addAttributeNodes(exchangeFields);
         List<SoapExchange> exchanges = em.createQuery("select s from SoapExchange s", SoapExchange.class)
                 .setHint("javax.persistence.fetchgraph", fetchGraph)
@@ -139,9 +137,6 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
         // List<SoapExchange> exchanges = em.createQuery("select s from SoapExchange s ORDER BY s.time DESC", SoapExchange.class)
         //        .setHint("javax.persistence.loadgraph", loadGraph)
         //        .getResultList();
-        EntityGraph<SoapExchange> loadGraph = em.createEntityGraph(SoapExchange.class);
-        loadGraph.addAttributeNodes("request", "response", "requestHeaders", "responseHeaders");
-
         LOGGER.debug("get soap exchanges from db : {} ", exchanges.size());
         return exchanges;
     }

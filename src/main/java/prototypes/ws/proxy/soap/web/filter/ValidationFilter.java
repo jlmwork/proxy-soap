@@ -111,7 +111,7 @@ public class ValidationFilter extends HttpServletFilter {
             chain.doFilter(wrappedRequest, wrappedResponse);
             long stop = System.currentTimeMillis();
             ProxyExchange proxyExchange = RequestContext.getProxyExchange(request);
-            soapExchange.setRequestHeaders(proxyExchange.getRequestHeaders());
+            soapExchange.setFrontEndRequestHeaders(proxyExchange.getRequestHeaders());
             soapExchange.setResponseTime(stop - start);
 
             // 3] Response validation
@@ -129,7 +129,7 @@ public class ValidationFilter extends HttpServletFilter {
             exchangeRepository.save(soapExchange);
             // send response back to the client
             wrappedResponse.addHeader("X-Filtered-By", "proxy-soap");
-            out.write(soapExchange.getResponse().getBytes());
+            out.write(soapExchange.getBackEndResponse().getBytes());
             LOGGER.debug("Response written");
         } else {
             // pass the request along the filter chain
@@ -179,7 +179,7 @@ public class ValidationFilter extends HttpServletFilter {
             soapExchange.setRequestXmlErrors(errors);
             LOGGER.debug("XML Errors : " + errors);
         }
-        soapExchange.setRequest(requestBodyContent);
+        soapExchange.setFrontEndRequest(requestBodyContent);
         return valid;
     }
 
@@ -232,7 +232,7 @@ public class ValidationFilter extends HttpServletFilter {
             } else {
                 soapExchange.setResponseXmlErrors(errors);
             }
-            soapExchange.setResponseHeaders(proxyExchange.getResponseHeaders());
+            soapExchange.setBackEndResponseHeaders(proxyExchange.getResponseHeaders());
         }
         soapExchange.setResponse(responseBodyContent);
         return valid;

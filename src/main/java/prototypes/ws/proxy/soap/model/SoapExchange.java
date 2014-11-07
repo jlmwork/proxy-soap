@@ -37,17 +37,21 @@ public class SoapExchange {
     private long responseTime = -1L;
 
     // request
-    private String request;
-    private Map<String, List<String>> requestHeaders;
+    private String frontEndRequest;
+    private String proxyRequest;
+    private Map<String, List<String>> frontEndRequestHeaders;
+    private Map<String, List<String>> proxyRequestHeaders;
     private Boolean requestSoapValid;
     private Boolean requestXmlValid;
     private List<String> requestSoapErrors;
     private List<String> responseSoapErrors;
     // response
-    private String response;
+    private String backEndResponse;
+    private String proxyResponse;
     private Boolean responseSoapValid;
     private Boolean responseXmlValid;
-    private Map<String, List<String>> responseHeaders;
+    private Map<String, List<String>> backEndResponseHeaders;
+    private Map<String, List<String>> proxyResponseHeaders;
     private List<String> requestXmlErrors;
     private List<String> responseXmlErrors;
 
@@ -91,8 +95,8 @@ public class SoapExchange {
     /**
      * @return the request
      */
-    public String getRequest() {
-        return request;
+    public String getFrontEndRequest() {
+        return frontEndRequest;
     }
 
     /**
@@ -100,23 +104,23 @@ public class SoapExchange {
      *
      * @return
      */
-    public String getRequestAsXML() {
-        return XmlStrings.format(request);
+    public String getFrontEndRequestAsXML() {
+        return XmlStrings.format(frontEndRequest);
     }
 
     /**
      * @param request the request to set
      */
-    public SoapExchange setRequest(String request) {
-        this.request = request;
+    public SoapExchange setFrontEndRequest(String request) {
+        this.frontEndRequest = request;
         return this;
     }
 
     /**
      * @return the response
      */
-    public String getResponse() {
-        return response;
+    public String getBackEndResponse() {
+        return backEndResponse;
     }
 
     /**
@@ -124,16 +128,32 @@ public class SoapExchange {
      *
      * @return
      */
-    public String getResponseAsXML() {
-        return XmlStrings.format(response);
+    public String getBackendResponseAsXML() {
+        return XmlStrings.format(backEndResponse);
     }
 
     /**
      * @param response the response to set
      */
     public SoapExchange setResponse(String response) {
-        this.response = response;
+        this.backEndResponse = response;
         return this;
+    }
+
+    public String getProxyRequest() {
+        return proxyRequest;
+    }
+
+    public void setProxyRequest(String proxyRequest) {
+        this.proxyRequest = proxyRequest;
+    }
+
+    public String getProxyResponse() {
+        return proxyResponse;
+    }
+
+    public void setProxyResponse(String proxyResponse) {
+        this.proxyResponse = proxyResponse;
     }
 
     /**
@@ -347,20 +367,36 @@ public class SoapExchange {
         this.responseXmlValid = responseXmlValid;
     }
 
-    public Map<String, List<String>> getRequestHeaders() {
-        return requestHeaders;
+    public Map<String, List<String>> getFrontEndRequestHeaders() {
+        return frontEndRequestHeaders;
     }
 
-    public void setRequestHeaders(Map<String, List<String>> requestHeaders) {
-        this.requestHeaders = requestHeaders;
+    public void setFrontEndRequestHeaders(Map<String, List<String>> requestHeaders) {
+        this.frontEndRequestHeaders = requestHeaders;
     }
 
-    public Map<String, List<String>> getResponseHeaders() {
-        return responseHeaders;
+    public Map<String, List<String>> getBackendResponseHeaders() {
+        return backEndResponseHeaders;
     }
 
-    public void setResponseHeaders(Map<String, List<String>> responseHeaders) {
-        this.responseHeaders = responseHeaders;
+    public void setBackEndResponseHeaders(Map<String, List<String>> responseHeaders) {
+        this.backEndResponseHeaders = responseHeaders;
+    }
+
+    public Map<String, List<String>> getProxyRequestHeaders() {
+        return proxyRequestHeaders;
+    }
+
+    public void setProxyRequestHeaders(Map<String, List<String>> proxyRequestHeaders) {
+        this.proxyRequestHeaders = proxyRequestHeaders;
+    }
+
+    public Map<String, List<String>> getProxyResponseHeaders() {
+        return proxyResponseHeaders;
+    }
+
+    public void setProxyResponseHeaders(Map<String, List<String>> proxyResponseHeaders) {
+        this.proxyResponseHeaders = proxyResponseHeaders;
     }
 
 }

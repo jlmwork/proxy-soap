@@ -16,7 +16,6 @@
 package prototypes.ws.proxy.soap.repository.jpa;
 
 import javax.persistence.AttributeConverter;
-import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.io.Strings;
@@ -25,34 +24,36 @@ import prototypes.ws.proxy.soap.io.Strings;
  *
  * @author JL06436S
  */
-public class CompressionConverter implements AttributeConverter<String, String> {
+public class CompressionConverter implements AttributeConverter<String, byte[]> {
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(ExternalStorageConverter.class);
 
     @Override
-    public String convertToDatabaseColumn(String x) {
+    public byte[] convertToDatabaseColumn(String x) {
         if (!Strings.isNullOrEmpty(x)) {
             LOGGER.debug("Compressing Column");
+            LOGGER.trace("Column original size : {}", x.length());
             try {
-                return new String((new Base64()).encode(Strings.compressString(x)));
+                byte[] bytes = Strings.compressString(x);
+                LOGGER.trace("Compressed numer of bytes : {}", bytes.length);
+                return bytes;
             } catch (Exception ex) {
                 LOGGER.warn("Error when compressing Column {}", ex.getMessage());
-                return x;
             }
         }
-        return x;
+        return new byte[0];
     }
 
     @Override
-    public String convertToEntityAttribute(String y) {
-        if (!Strings.isNullOrEmpty(y)) {
+    public String convertToEntityAttribute(byte[] bytes) {
+        if (bytes.length > 0) {
             LOGGER.debug("Uncompress Column");
             try {
-                return Strings.uncompressString((byte[]) (new Base64()).decode(y.getBytes()));
+                return Strings.uncompressString(bytes);
             } catch (Exception ex) {
                 LOGGER.warn("Error when uncompressing Column {}", ex.getMessage());
-                return y;
+                return new String(bytes);
             }
         }
         return "";

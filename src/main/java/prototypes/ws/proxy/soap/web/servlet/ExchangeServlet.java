@@ -33,10 +33,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import prototypes.ws.proxy.soap.web.context.ApplicationContext;
-import prototypes.ws.proxy.soap.model.SoapExchange;
 import prototypes.ws.proxy.soap.io.Strings;
+import prototypes.ws.proxy.soap.model.SoapExchange;
 import prototypes.ws.proxy.soap.repository.SoapExchangeRepository;
+import prototypes.ws.proxy.soap.web.context.ApplicationContext;
 
 /**
  *
@@ -90,6 +90,7 @@ public class ExchangeServlet extends HttpServlet {
             SoapExchange soapExchange = exchangeRepository.get(exchangeId, fields);
 
             if ("application/json".equals(askedFormat.toLowerCase())) {
+                response.setHeader("Content-Type", "application/json; charset=UTF-8");
                 // TODO : use "fields" parameter for field selection
                 PrintWriter out = response.getWriter();
                 JsonWriter jsonWriter = Json.createWriter(out);
@@ -101,16 +102,16 @@ public class ExchangeServlet extends HttpServlet {
                         .add("validator", stripNull(soapExchange.getValidatorId()))
                         .add("operation", stripNull(soapExchange.getOperation()))
                         .add("resp_time", soapExchange.getResponseTime())
-                        .add("request_content", stripNull(soapExchange.getRequest()))
-                        .add("request_headers", formatJsonMap(soapExchange.getRequestHeaders()))
+                        .add("request_content", stripNull(soapExchange.getFrontEndRequestAsXML()))
+                        .add("request_headers", formatJsonMap(soapExchange.getFrontEndRequestHeaders()))
                         .add("request_errors", formatJsonList(soapExchange.getRequestErrors()))
                         .add("request_xml_errors", formatJsonList(soapExchange.getRequestXmlErrors()))
                         .add("request_soap_errors", formatJsonList(soapExchange.getRequestSoapErrors()))
                         .add("request_valid", stripNull(soapExchange.getRequestValid()))
                         .add("request_xml_valid", stripNull(soapExchange.getRequestXmlValid()))
                         .add("request_soap_valid", stripNull(soapExchange.getRequestSoapValid()))
-                        .add("response_content", stripNull(soapExchange.getResponse()))
-                        .add("response_headers", formatJsonMap(soapExchange.getResponseHeaders()))
+                        .add("response_content", stripNull(soapExchange.getBackendResponseAsXML()))
+                        .add("response_headers", formatJsonMap(soapExchange.getBackendResponseHeaders()))
                         .add("response_errors", formatJsonList(soapExchange.getResponseErrors()))
                         .add("response_xml_errors", formatJsonList(soapExchange.getResponseXmlErrors()))
                         .add("response_soap_errors", formatJsonList(soapExchange.getResponseSoapErrors()))

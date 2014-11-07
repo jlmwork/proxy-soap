@@ -36,9 +36,7 @@ import javax.wsdl.Part;
 import javax.xml.namespace.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
-import prototypes.ws.proxy.soap.constantes.SoapConstantes;
 import prototypes.ws.proxy.soap.constantes.SoapErrorConstantes;
 import prototypes.ws.proxy.soap.web.io.Requests;
 import prototypes.ws.proxy.soap.reflect.Classes;
@@ -222,28 +220,6 @@ public class SoapValidatorSoapUI implements SoapValidator {
         // XML Validation
         if (!validateXml(responseMessage.getResponseContent(), errors)) {
             return false;
-        }
-        // Fault test
-        Node opNode;
-        try {
-            opNode = XmlStrings.firstChild(responseMessage.getResponseContent(),
-                    SoapConstantes.BODY);
-        } catch (IOException e) {
-            LOGGER.error("Response get body first child fail", e);
-            return false;
-        } catch (SAXException e) {
-            LOGGER.error("Response get body first child fail", e);
-            return false;
-        }
-
-        // No body, or no body's children
-        if (opNode == null) {
-            return false;
-        }
-
-        // Response is fault, validation ok
-        if (FAULT.equals(opNode.getLocalName())) {
-            return true;
         }
 
         // Response validation with wsdl

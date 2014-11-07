@@ -18,23 +18,46 @@
             <basic name="from">
                 <column name="ipFrom" />
             </basic>
-            <basic name="request" fetch="LAZY">
-                <lob name="REQUEST_XML" />
+            <basic name="frontEndRequestHeaders" fetch="LAZY">
+                <lob />
+                <column name="FE_REQUEST_HEADERS" length="2048"/>
             </basic>
-            <basic name="response" fetch="LAZY">
-                <lob name="RESPONSE_XML"/>
+            <basic name="backEndResponseHeaders" fetch="LAZY">
+                <lob />
+                <column name="BE_RESPONSE_HEADERS" length="2048"/>
             </basic>
-            <basic name="requestHeaders" fetch="LAZY">
-                <column name="REQUESTHEADERS" length="2048"/>
+            <basic name="proxyRequestHeaders" fetch="LAZY">
+                <lob />
+                <column name="PROXY_REQUEST_HEADERS" length="2048" />
             </basic>
-            <basic name="responseHeaders" fetch="LAZY">
-                <column name="RESPONSEHEADERS" length="2048"/>
+            <basic name="proxyResponseHeaders" fetch="LAZY">
+                <lob />
+                <column name="PROXY_RESPONSE_HEADERS" length="2048"/>
+            </basic>
+            <basic name="frontEndRequest" fetch="LAZY">
+                <lob />
+                <column name="FE_REQUEST_XML" />
+            </basic>
+            <basic name="backEndResponse" fetch="LAZY">
+                <lob />
+                <column name="BE_RESPONSE_XML"/>
+            </basic>
+            <basic name="proxyRequest" fetch="LAZY">
+                <lob />
+                <column name="PROXY_REQUEST_XML" />
+            </basic>
+            <basic name="proxyResponse" fetch="LAZY">
+                <lob />
+                <column name="PROXY_RESPONSE_XML"/>
             </basic>
         </attributes>
-        <convert converter="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter" attribute-name="requestHeaders"/>
-        <convert converter="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter" attribute-name="responseHeaders"/>
-        <convert converter="prototypes.ws.proxy.soap.repository.jpa.CompressionConverter" attribute-name="request"/>
-        <convert converter="prototypes.ws.proxy.soap.repository.jpa.CompressionConverter" attribute-name="response"/>
-
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter" attribute-name="frontEndRequestHeaders"/>
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter" attribute-name="backEndResponseHeaders"/>
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter" attribute-name="proxyRequestHeaders"/>
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter" attribute-name="proxyResponseHeaders"/>
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.CompressionConverter" attribute-name="frontEndRequest"/>
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.CompressionConverter" attribute-name="backEndResponse"/>
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.CompressionConverter" attribute-name="proxyRequest"/>
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.CompressionConverter" attribute-name="proxyResponse"/>
     </entity>
 </entity-mappings>

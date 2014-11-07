@@ -17,38 +17,44 @@
             <basic name="from">
                 <column name="ipFrom" />
             </basic>
-            <basic name="requestHeaders" fetch="LAZY">
-                <column name="REQUESTHEADERS" length="2048"/>
+            <basic name="frontEndRequestHeaders" fetch="LAZY">
+                <lob />
+                <column name="FE_REQUEST_HEADERS" length="2048"/>
             </basic>
-            <basic name="responseHeaders" fetch="LAZY">
-                <column name="RESPONSEHEADERS" length="2048"/>
+            <basic name="backEndResponseHeaders" fetch="LAZY">
+                <lob />
+                <column name="BE_RESPONSE_HEADERS" length="2048"/>
             </basic>
-            <!-- requests & responses are no more transient as
-            External storage has been implemented -->
-            <basic name="request" fetch="LAZY">
-                <column name="REQUEST_XML" length="512"/>
+            <basic name="proxyRequestHeaders" fetch="LAZY">
+                <lob />
+                <column name="PROXY_REQUEST_HEADERS" length="2048"/>
             </basic>
-            <basic name="response" fetch="LAZY">
-                <column name="RESPONSE_XML" length="512"/>
+            <basic name="proxyResponseHeaders" fetch="LAZY">
+                <lob />
+                <column name="PROXY_RESPONSE_HEADERS" length="2048"/>
             </basic>
-            <!--
-            <transient name="requestSoapErrors"/>
-            <transient name="responseSoapErrors"/>
-            <transient name="requestXmlErrors"/>
-            <transient name="responseXmlErrors"/>-->
+            <!-- requests & responses are not transient as
+            External storage is used. File paths are stored in DB -->
+            <basic name="frontEndRequest" fetch="LAZY">
+                <column name="FE_REQUEST_XML" length="512"/>
+            </basic>
+            <basic name="backEndResponse" fetch="LAZY">
+                <column name="BE_RESPONSE_XML" length="512"/>
+            </basic>
+            <basic name="proxyRequest" fetch="LAZY">
+                <column name="PROXY_REQUEST_XML" length="512"/>
+            </basic>
+            <basic name="proxyResponse" fetch="LAZY">
+                <column name="PROXY_RESPONSE_XML" length="512"/>
+            </basic>
         </attributes>
-        <convert converter="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter" attribute-name="requestHeaders"/>
-        <convert converter="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter" attribute-name="responseHeaders"/>
-        <convert converter="prototypes.ws.proxy.soap.repository.jpa.ExternalStorageConverter" attribute-name="request"/>
-        <convert converter="prototypes.ws.proxy.soap.repository.jpa.ExternalStorageConverter" attribute-name="response"/>
-
-        <!--<entity-listeners>
-            <entity-listener class="prototypes.ws.proxy.soap.repository.jpa.ExternalStorageListener">
-                <pre-persist method-name="marshall"/>
-                <pre-update method-name="marshall"/>
-                <post-load method-name="unmarshall"/>
-                <post-update method-name="unmarshall"/>
-            </entity-listener>
-        </entity-listeners>-->
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter" attribute-name="frontEndRequestHeaders"/>
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter" attribute-name="backEndResponseHeaders"/>
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter" attribute-name="proxyRequestHeaders"/>
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter" attribute-name="proxyResponseHeaders"/>
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.ExternalStorageConverter" attribute-name="frontEndRequest"/>
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.ExternalStorageConverter" attribute-name="backEndResponse"/>
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.ExternalStorageConverter" attribute-name="proxyRequest"/>
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.ExternalStorageConverter" attribute-name="proxyResponse"/>
     </entity>
 </entity-mappings>
