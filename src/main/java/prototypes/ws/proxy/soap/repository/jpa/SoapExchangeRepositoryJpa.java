@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
 import prototypes.ws.proxy.soap.constantes.ApplicationConfig;
 import prototypes.ws.proxy.soap.io.Files;
-import prototypes.ws.proxy.soap.io.SoapExchange;
+import prototypes.ws.proxy.soap.model.SoapExchange;
 import prototypes.ws.proxy.soap.reflect.Classes;
 import prototypes.ws.proxy.soap.repository.SoapExchangeRepository;
 import prototypes.ws.proxy.soap.time.Dates;

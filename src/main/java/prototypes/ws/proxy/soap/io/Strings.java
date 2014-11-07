@@ -15,6 +15,7 @@
  */
 package prototypes.ws.proxy.soap.io;
 
+import java.io.ByteArrayInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,5 +83,15 @@ public class Strings {
 
     public static String toWellFormatedString(String str, String token) {
         return str.replaceAll(token, "\n\t");
+    }
+
+    public static byte[] compressString(String input) {
+        ByteArrayInputStream bAIS = new ByteArrayInputStream(input.getBytes());
+        return Streams.compressString(input);
+    }
+
+    public static String uncompressString(byte[] input) {
+        ByteArrayInputStream bAIS = new ByteArrayInputStream(input);
+        return Streams.getString(bAIS, true);
     }
 }

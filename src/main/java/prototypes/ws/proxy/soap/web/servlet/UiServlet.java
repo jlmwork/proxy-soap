@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package prototypes.ws.proxy.soap.servlet;
+package prototypes.ws.proxy.soap.web.servlet;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
-import prototypes.ws.proxy.soap.context.ApplicationContext;
+import prototypes.ws.proxy.soap.web.context.ApplicationContext;
 import prototypes.ws.proxy.soap.io.Streams;
 import prototypes.ws.proxy.soap.repository.SoapExchangeRepository;
 import prototypes.ws.proxy.soap.validation.SoapValidatorFactory;

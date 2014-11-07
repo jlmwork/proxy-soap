@@ -21,11 +21,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.apache.commons.io.FileUtils;
@@ -235,21 +238,44 @@ public class Files {
         return localPath;
     }
 
+    public static String readCompressed(String svgPath) {
+        return read(svgPath, true);
+    }
+
     public static String read(String svgPath) {
+        return read(svgPath, false);
+    }
+
+    public static String read(String svgPath, boolean compressed) {
         String content = null;
         try {
-            content = Streams.getString(new FileInputStream(svgPath));
+            InputStream is = new FileInputStream(svgPath);
+            if (compressed) {
+                is = new GZIPInputStream(is);
+            }
+            content = Streams.getString(is);
         } catch (IOException ex) {
             LOGGER.warn("Error reading {}, {}", svgPath, ex.getMessage());
         }
         return content;
     }
 
+    public static String writeCompressed(String svgPath, String content) {
+        return write(svgPath, content, true);
+    }
+
     public static String write(String svgPath, String content) {
+        return write(svgPath, content, false);
+    }
+
+    public static String write(String svgPath, String content, boolean compressed) {
         OutputStream os = null;
         String finalFileName = svgPath;
         try {
             os = new FileOutputStream(new File(finalFileName));
+            if (compressed) {
+                os = new GZIPOutputStream(os);
+            }
             os.write(content.getBytes());
         } catch (IOException ex) {
             finalFileName = "-1";

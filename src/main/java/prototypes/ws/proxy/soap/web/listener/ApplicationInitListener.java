@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package prototypes.ws.proxy.soap.listener;
+package prototypes.ws.proxy.soap.web.listener;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
 import prototypes.ws.proxy.soap.constantes.ApplicationConfig;
-import prototypes.ws.proxy.soap.context.ApplicationContext;
+import prototypes.ws.proxy.soap.web.context.ApplicationContext;
 import prototypes.ws.proxy.soap.repository.SoapExchangeRepository;
 import prototypes.ws.proxy.soap.repository.SoapExchangeRepositoryFactory;
 import prototypes.ws.proxy.soap.validation.SoapValidatorFactory;

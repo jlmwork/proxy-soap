@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package prototypes.ws.proxy.soap.servlet;
+package prototypes.ws.proxy.soap.web.servlet;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -31,10 +31,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
 import prototypes.ws.proxy.soap.constantes.ProxyErrorConstantes;
-import prototypes.ws.proxy.soap.context.ApplicationContext;
-import prototypes.ws.proxy.soap.context.RequestContext;
-import prototypes.ws.proxy.soap.io.ProxyExchange;
-import prototypes.ws.proxy.soap.io.Requests;
+import prototypes.ws.proxy.soap.web.context.ApplicationContext;
+import prototypes.ws.proxy.soap.web.context.RequestContext;
+import prototypes.ws.proxy.soap.model.ProxyExchange;
+import prototypes.ws.proxy.soap.web.io.Requests;
 import prototypes.ws.proxy.soap.io.Streams;
 import prototypes.ws.proxy.soap.io.Strings;
 

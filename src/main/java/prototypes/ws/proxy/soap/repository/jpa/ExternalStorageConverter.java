@@ -40,9 +40,9 @@ public class ExternalStorageConverter implements AttributeConverter<String, Stri
             // dir to store contents
             String storagePath = createStorageDir();
             String id = new UUID().toString();
-            String requestStoragePath = storagePath + id + "-content.xml";
+            String requestStoragePath = storagePath + id + "-content.xml.gz";
             LOGGER.debug("Column stored to : {}", requestStoragePath);
-            Files.write(requestStoragePath, x);
+            Files.writeCompressed(requestStoragePath, x);
             return requestStoragePath;
         }
         return "";
@@ -53,7 +53,7 @@ public class ExternalStorageConverter implements AttributeConverter<String, Stri
         if (!Strings.isNullOrEmpty(y)) {
             String requestStoragePath = y;
             LOGGER.debug("Column loaded from : {}", requestStoragePath);
-            return Files.read(requestStoragePath);
+            return Files.readCompressed(requestStoragePath);
         }
         return "";
     }

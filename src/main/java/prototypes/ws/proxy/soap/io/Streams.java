@@ -19,12 +19,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.zip.GZIPOutputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author julamand
  */
 public class Streams {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Streams.class);
 
     public static void putStringAndClose(OutputStream os, String data)
             throws IOException {
@@ -59,8 +65,34 @@ public class Streams {
         return getString(finalIS);
     }
 
+    public static byte[] compressString(String toCompress) {
+        GZIPOutputStream finalOS = null;
+        try {
+            ByteArrayOutputStream bAOS = new ByteArrayOutputStream();
+            finalOS = new GZIPOutputStream(bAOS);
+            finalOS.write(toCompress.getBytes());
+            finalOS.close();
+            return bAOS.toByteArray();
+        } catch (IOException e) {
+            LOGGER.warn("Error on compressing {} ", e.getMessage());
+        } finally {
+            if (finalOS != null) {
+                try {
+                    finalOS.close();
+                } catch (Exception e) {
+                }
+            }
+        }
+        return toCompress.getBytes();
+    }
+
     public static String getString(InputStream is) {
-        return new String(getBytes(is));
+        try {
+            return new String(getBytes(is), "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            LOGGER.warn("Error converting string : " + ex.getMessage());
+            return "";
+        }
 
     }
 

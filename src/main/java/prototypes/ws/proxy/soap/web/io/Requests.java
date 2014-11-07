@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package prototypes.ws.proxy.soap.io;
+package prototypes.ws.proxy.soap.web.io;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.constantes.ProxyErrorConstantes;
+import prototypes.ws.proxy.soap.io.Strings;
 
 public class Requests {
 

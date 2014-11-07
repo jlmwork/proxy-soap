@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package prototypes.ws.proxy.soap.context;
+package prototypes.ws.proxy.soap.web.context;
 
 import javax.servlet.http.HttpServletRequest;
-import prototypes.ws.proxy.soap.io.ProxyExchange;
+import prototypes.ws.proxy.soap.model.ProxyExchange;
 
 /**
  *

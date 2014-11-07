@@ -22,7 +22,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
-import prototypes.ws.proxy.soap.io.SoapExchange;
+import prototypes.ws.proxy.soap.model.SoapExchange;
 import prototypes.ws.proxy.soap.repository.SoapExchangeRepository;
 
 /**

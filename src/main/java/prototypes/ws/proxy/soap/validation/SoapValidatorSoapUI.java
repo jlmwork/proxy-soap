@@ -40,7 +40,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import prototypes.ws.proxy.soap.constantes.SoapConstantes;
 import prototypes.ws.proxy.soap.constantes.SoapErrorConstantes;
-import prototypes.ws.proxy.soap.io.Requests;
+import prototypes.ws.proxy.soap.web.io.Requests;
 import prototypes.ws.proxy.soap.reflect.Classes;
 import prototypes.ws.proxy.soap.xml.XmlStrings;
 

@@ -13,24 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package prototypes.ws.proxy.soap.servlet;
+package prototypes.ws.proxy.soap.web.servlet;
 
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class ErrorServlet extends HttpServlet {
+public abstract class AbstractServlet extends HttpServlet {
 
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(ErrorServlet.class);
     /**
      *
      */
-    private static final long serialVersionUID = 753782663465493431L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * Recept all request.
@@ -40,25 +36,8 @@ public class ErrorServlet extends HttpServlet {
      * @throws ServletException
      * @throws IOException
      */
-    protected void doRequest(HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException {
-        LOGGER.debug("doRequest");
-
-        Throwable throwable = (Throwable) request
-                .getAttribute("javax.servlet.error.exception");
-        request.getAttribute("javax.servlet.error.status_code");
-        request.getAttribute("javax.servlet.error.servlet_name");
-
-        String error = "" + throwable.getMessage();
-
-        if ((throwable.getCause() != null)
-                && (throwable.getCause().getMessage() != null)) {
-            error += " (Cause : " + throwable.getCause().getMessage() + ")";
-        }
-
-        // Error Monitoring
-        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, error);
-    }
+    protected abstract void doRequest(HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException;
 
     /**
      * Handles the HTTP <code>GET</code> method.

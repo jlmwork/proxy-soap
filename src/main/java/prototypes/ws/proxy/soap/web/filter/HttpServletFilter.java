@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package prototypes.ws.proxy.soap.filter;
+package prototypes.ws.proxy.soap.web.filter;
 
 import java.io.IOException;
 import javax.servlet.Filter;

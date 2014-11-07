@@ -6,7 +6,7 @@
     <description>The minimal mappings for a persistent entity in XML.</description>
     <converter class="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter"/>
     <converter class="prototypes.ws.proxy.soap.repository.jpa.ExternalStorageConverter"/>
-    <entity name="SoapExchange" class="prototypes.ws.proxy.soap.io.SoapExchange" access="FIELD">
+    <entity name="SoapExchange" class="prototypes.ws.proxy.soap.model.SoapExchange" access="FIELD">
         <table name="T_SOAPEXCHANGE"/>
         <attributes>
             <!-- just specified special columns or ignored fields -->

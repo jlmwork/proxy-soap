@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package prototypes.ws.proxy.soap.filter;
+package prototypes.ws.proxy.soap.web.filter;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,15 +29,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
-import prototypes.ws.proxy.soap.context.ApplicationContext;
-import prototypes.ws.proxy.soap.context.RequestContext;
-import prototypes.ws.proxy.soap.io.ProxyExchange;
-import prototypes.ws.proxy.soap.io.Requests;
-import prototypes.ws.proxy.soap.io.SoapExchange;
+import prototypes.ws.proxy.soap.web.context.ApplicationContext;
+import prototypes.ws.proxy.soap.web.context.RequestContext;
+import prototypes.ws.proxy.soap.model.ProxyExchange;
+import prototypes.ws.proxy.soap.web.io.Requests;
+import prototypes.ws.proxy.soap.model.SoapExchange;
 import prototypes.ws.proxy.soap.io.Streams;
 import prototypes.ws.proxy.soap.io.Strings;
-import prototypes.ws.proxy.soap.io.wrapper.BufferedHttpResponseWrapper;
-import prototypes.ws.proxy.soap.io.wrapper.MultiReadHttpServletRequest;
+import prototypes.ws.proxy.soap.web.io.BufferedHttpResponseWrapper;
+import prototypes.ws.proxy.soap.web.io.MultiReadHttpServletRequest;
 import prototypes.ws.proxy.soap.repository.SoapExchangeRepository;
 import prototypes.ws.proxy.soap.validation.SoapMessage;
 import prototypes.ws.proxy.soap.validation.SoapValidator;

@@ -5,7 +5,8 @@
                  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd">
     <description>The complete mappings for Proxy Objects. XML Requests and Responses will be stored in DB</description>
     <converter class="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter"/>
-    <entity name="SoapExchange" class="prototypes.ws.proxy.soap.io.SoapExchange" access="FIELD">
+    <converter class="prototypes.ws.proxy.soap.repository.jpa.CompressionConverter"/>
+    <entity name="SoapExchange" class="prototypes.ws.proxy.soap.model.SoapExchange" access="FIELD">
         <!-- use distinct name of not full mapping -->
         <table name="T_SOAPEXCHANGE_LOBS"/>
         <attributes>
@@ -32,6 +33,8 @@
         </attributes>
         <convert converter="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter" attribute-name="requestHeaders"/>
         <convert converter="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter" attribute-name="responseHeaders"/>
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.CompressionConverter" attribute-name="request"/>
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.CompressionConverter" attribute-name="response"/>
 
     </entity>
 </entity-mappings>

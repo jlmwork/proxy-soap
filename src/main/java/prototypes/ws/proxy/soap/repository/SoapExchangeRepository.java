@@ -17,7 +17,7 @@ package prototypes.ws.proxy.soap.repository;
 
 import java.util.Collection;
 import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
-import prototypes.ws.proxy.soap.io.SoapExchange;
+import prototypes.ws.proxy.soap.model.SoapExchange;
 
 /**
  *

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package prototypes.ws.proxy.soap.io.wrapper;
+package prototypes.ws.proxy.soap.web.io;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
