@@ -18,6 +18,7 @@ package prototypes.ws.proxy.soap.reflect;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,5 +112,26 @@ public class Classes {
                 }
             }
         }
+    }
+
+    public static String[] getAllFieldsName(Class<? extends Object> clazz, String[] prefixFilters) {
+        ArrayList<String> arList = new ArrayList();
+        try {
+            Field[] fields = clazz.getDeclaredFields();
+            for (Field field : fields) {
+                boolean foundInFilters = false;
+                for (String filter : prefixFilters) {
+                    if (field.getName().startsWith(filter)) {
+                        foundInFilters = true;
+                    }
+                }
+                if (!foundInFilters) {
+                    arList.add(field.getName());
+                }
+            }
+        } catch (SecurityException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        return arList.toArray(new String[arList.size()]);
     }
 }

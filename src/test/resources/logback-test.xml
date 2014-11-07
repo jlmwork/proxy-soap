@@ -5,7 +5,10 @@
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
-    <logger name="fr.erdf" level="debug"/>
+    <logger name="prototypes" level="debug"/>
+    <logger name="org.eclipse.persistence" level="info"/>
+    <logger name="org.eclipse.persistence.logging.sql" level="TRACE"/>
+    <logger name="eclipselink.logging" level="info"/>
     <root level="debug">
         <appender-ref ref="STDOUT" />
     </root>

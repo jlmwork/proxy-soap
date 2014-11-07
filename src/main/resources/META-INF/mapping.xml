@@ -5,6 +5,7 @@
                  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd">
     <description>The minimal mappings for a persistent entity in XML.</description>
     <converter class="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter"/>
+    <converter class="prototypes.ws.proxy.soap.repository.jpa.ExternalStorageConverter"/>
     <entity name="SoapExchange" class="prototypes.ws.proxy.soap.io.SoapExchange" access="FIELD">
         <table name="T_SOAPEXCHANGE"/>
         <attributes>
@@ -38,13 +39,16 @@
         </attributes>
         <convert converter="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter" attribute-name="requestHeaders"/>
         <convert converter="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter" attribute-name="responseHeaders"/>
-        <entity-listeners>
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.ExternalStorageConverter" attribute-name="request"/>
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.ExternalStorageConverter" attribute-name="response"/>
+
+        <!--<entity-listeners>
             <entity-listener class="prototypes.ws.proxy.soap.repository.jpa.ExternalStorageListener">
                 <pre-persist method-name="marshall"/>
                 <pre-update method-name="marshall"/>
                 <post-load method-name="unmarshall"/>
                 <post-update method-name="unmarshall"/>
             </entity-listener>
-        </entity-listeners>
+        </entity-listeners>-->
     </entity>
 </entity-mappings>

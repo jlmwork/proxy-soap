@@ -31,6 +31,7 @@ import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
 import prototypes.ws.proxy.soap.constantes.ApplicationConfig;
 import prototypes.ws.proxy.soap.io.Files;
 import prototypes.ws.proxy.soap.io.SoapExchange;
+import prototypes.ws.proxy.soap.reflect.Classes;
 import prototypes.ws.proxy.soap.repository.SoapExchangeRepository;
 import prototypes.ws.proxy.soap.time.Dates;
 
@@ -48,6 +49,9 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
     private final Boolean xmlInDbs;
 
     private final String persistenceUnitName;
+
+    // TODO : delete when loadgraph will work in EclipseLink
+    String[] exchangeFields = Classes.getAllFieldsName(SoapExchange.class, new String[]{"serial", "_"});
 
     public SoapExchangeRepositoryJpa(ProxyConfiguration proxyConfig) {
         super(proxyConfig);
@@ -85,15 +89,28 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
 
     @Override
     public SoapExchange get(String id) {
+        LOGGER.debug("get soap exchange {} from db", id);
         EntityManager em = emf.createEntityManager();
-        EntityGraph<SoapExchange> loadGraph = em.createEntityGraph(SoapExchange.class);
-        loadGraph.addAttributeNodes("request", "response", "requestHeaders", "responseHeaders");
-        Map hints = new HashMap();
-        hints.put("javax.persistence.fetchgraph", loadGraph);
 
-        SoapExchange exchange = em.find(SoapExchange.class, id, hints);
-        //SoapExchange exchange = em.createQuery("select s from SoapExchange s where s.id=:id", SoapExchange.class).setParameter("id", id).getSingleResult();
-        em.detach(exchange);
+        // TODO : as long as loadgraph doesnt work in EclipseLink
+        // EclipseLink produces 2 queries ! One for normal graph and one for added nodes. Too bad
+        // So we need to use a fetch graph and to add all attributes to use a fetch graph ! So ugly !
+        EntityGraph<SoapExchange> fetchGraph = em.createEntityGraph(SoapExchange.class);
+        fetchGraph.addAttributeNodes(exchangeFields);
+        Map<String, Object> hints = new HashMap<String, Object>();
+        // The loadgraph if it worked
+        // EntityGraph<SoapExchange> loadGraph = em.createEntityGraph(SoapExchange.class);
+        // loadGraph.addAttributeNodes("request", "response", "requestHeaders", "responseHeaders");
+        // Map<String, Object> hints = new HashMap<String, Object>();
+        // hints.put("javax.persistence.loadgraph", loadGraph);
+
+        SoapExchange exchange = em.createQuery("select s from SoapExchange s where s.id=:id", SoapExchange.class)
+                .setParameter("id", id)
+                .setHint("javax.persistence.fetchgraph", fetchGraph)
+                .getSingleResult();
+
+        //em.detach(exchange);
+        LOGGER.debug("soap exchange {} loaded from db", id);
         return exchange;
     }
 
@@ -106,13 +123,26 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
     public List<SoapExchange> list() {
         LOGGER.debug("get soap exchanges from db");
         EntityManager em = emf.createEntityManager();
+
+        // TODO : as long as loadgraph doesnt work in EclipseLink
+        // EclipseLink produces 2 queries ! One for normal graph and one for added nodes. Too bad
+        // So we need to use a fetch graph and to add all attributes to use a fetch graph ! So ugly !
+        EntityGraph<SoapExchange> fetchGraph = em.createEntityGraph(SoapExchange.class);
+        fetchGraph.addAttributeNodes(exchangeFields);
+        List<SoapExchange> exchanges = em.createQuery("select s from SoapExchange s", SoapExchange.class)
+                .setHint("javax.persistence.fetchgraph", fetchGraph)
+                .getResultList();
+
+        // The loadgraph if it worked
+        // EntityGraph<SoapExchange> loadGraph = em.createEntityGraph(SoapExchange.class);
+        // loadGraph.addAttributeNodes("request", "response", "requestHeaders", "responseHeaders");
+        // List<SoapExchange> exchanges = em.createQuery("select s from SoapExchange s ORDER BY s.time DESC", SoapExchange.class)
+        //        .setHint("javax.persistence.loadgraph", loadGraph)
+        //        .getResultList();
         EntityGraph<SoapExchange> loadGraph = em.createEntityGraph(SoapExchange.class);
         loadGraph.addAttributeNodes("request", "response", "requestHeaders", "responseHeaders");
 
-        List<SoapExchange> exchanges = em.createQuery("select s from SoapExchange s ORDER BY s.time DESC", SoapExchange.class)
-                .setHint("javax.persistence.fetchgraph", loadGraph)
-                .getResultList();
-        LOGGER.debug("get soap exchanges from db {} ", exchanges.size());
+        LOGGER.debug("get soap exchanges from db : {} ", exchanges.size());
         return exchanges;
     }
 
