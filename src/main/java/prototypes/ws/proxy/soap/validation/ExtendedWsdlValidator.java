@@ -15,19 +15,27 @@
  */
 package prototypes.ws.proxy.soap.validation;
 
+import com.eviware.soapui.impl.wsdl.WsdlOperation;
 import com.eviware.soapui.impl.wsdl.submit.WsdlMessageExchange;
 import com.eviware.soapui.impl.wsdl.support.wsdl.WsdlContext;
 import com.eviware.soapui.impl.wsdl.support.wsdl.WsdlUtils;
 import com.eviware.soapui.impl.wsdl.support.wsdl.WsdlValidator;
+import com.eviware.soapui.support.xml.XmlUtils;
 import com.ibm.wsdl.PartImpl;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import javax.wsdl.BindingFault;
+import javax.wsdl.BindingOperation;
 import javax.wsdl.Part;
 import javax.xml.namespace.QName;
+import org.apache.xmlbeans.SchemaGlobalElement;
 import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.apache.xmlbeans.XmlOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -36,7 +44,7 @@ import prototypes.ws.proxy.soap.reflect.Classes;
 
 public class ExtendedWsdlValidator extends WsdlValidator {
 
-    private static final Logger LOG = LoggerFactory
+    private static final Logger LOGGER = LoggerFactory
             .getLogger(ExtendedWsdlValidator.class);
 
     WsdlContext wsdlContext;
@@ -61,7 +69,7 @@ public class ExtendedWsdlValidator extends WsdlValidator {
     public List<String> assertHeaders(WsdlMessageExchange requestMessage) {
         List<String> errors = new ArrayList<String>();
         try {
-            LOG.debug("Headers validation");
+            LOGGER.debug("Headers validation");
             requestMessage.getOperation();
 
             NodeList nodes = ((SoapMessage) requestMessage).getHeaders();
@@ -110,9 +118,9 @@ public class ExtendedWsdlValidator extends WsdlValidator {
             return errors;
 
         } catch (XmlException e) {
-            LOG.warn("XMLError : " + e.getMessage());
+            LOGGER.warn("Headers Validation XMLError : " + e.getMessage());
         } catch (Exception e) {
-            LOG.warn("Exception : " + e.getMessage());
+            LOGGER.warn("Headers Validation Exception : " + e.getMessage());
         }
         return errors;
     }
@@ -122,6 +130,156 @@ public class ExtendedWsdlValidator extends WsdlValidator {
         Classes.callPrivateMethod(WsdlValidator.class, "validateMessageBody",
                 this, new Class<?>[]{List.class, SchemaType.class,
                     XmlObject.class}, new Object[]{errors, type, msg});
+    }
+
+    public boolean validateSoapFaults(WsdlMessageExchange responseMessage, WsdlContext wsdlContext, List<String> errsF) {
+        if (errsF == null) {
+            errsF = new ArrayList<String>();
+        }
+        boolean foundFault = false;
+        List<XmlError> xmlErrors = new ArrayList<XmlError>();
+        try {
+            XmlOptions xmlOptions = new XmlOptions();
+            xmlOptions.setLoadLineNumbers("LOAD_LINE_NUMBERS_END_ELEMENT");
+            xmlOptions.setErrorListener(xmlErrors);
+            XmlObject xml;
+            xml = XmlUtils.createXmlObject(responseMessage.getResponseContent(), xmlOptions);
+            String xPath = (new StringBuilder()).append("declare namespace env='")
+                    .append(wsdlContext.getSoapVersion().getEnvelopeNamespace())
+                    .append("';")
+                    .append("$this/env:Envelope/env:Body/env:Fault")
+                    .toString();
+            XmlObject paths[] = xml.selectPath(xPath);
+            if (paths.length == 0) {
+                LOGGER.debug("No Fault found");
+            } else if (paths.length == 1) {
+                foundFault = true;
+                LOGGER.debug("Found a fault in message so will validate it");
+                WsdlOperation operation = responseMessage.getOperation();
+                BindingOperation bindingOperation = operation.getBindingOperation();
+                validateSoapFault(wsdlContext, bindingOperation, paths[0], errsF);
+            } else {
+                errsF.add("Too many faults found in message");
+            }
+        } catch (XmlException ex) {
+            LOGGER.debug("Error validating faults");
+        } catch (Exception ex) {
+            LOGGER.debug("Error validating faults");
+        }
+        for (XmlError xmlError : xmlErrors) {
+            errsF.add(xmlError.toString());
+        }
+        return foundFault;
+    }
+
+    private void validateSoapFault(WsdlContext wsdlContext, BindingOperation bindingOperation, XmlObject msgXml, List errors)
+            throws Exception {
+        Map faults = bindingOperation.getBindingFaults();
+        Iterator<BindingFault> i = faults.values().iterator();
+
+        // create internal error list
+        List<?> list = new ArrayList<Object>();
+
+        XmlOptions xmlOptions = new XmlOptions();
+        xmlOptions.setErrorListener(list);
+        xmlOptions.setValidateTreatLaxAsSkip();
+        msgXml.validate(xmlOptions);
+
+        for (Object o : list) {
+            if (o instanceof XmlError) {
+                errors.add((XmlError) o);
+            } else {
+                errors.add(XmlError.forMessage(o.toString()));
+            }
+        }
+
+        // XML Valid
+        if (list.size() < 1) {
+            LOGGER.debug("Search Fault Type among WSDL Operation Fault Parts ");
+
+            while (i.hasNext()) {
+                BindingFault bindingFault = i.next();
+                String faultName = bindingFault.getName();
+
+                Part[] faultParts = WsdlUtils.getFaultParts(bindingOperation, faultName);
+                if (faultParts.length == 0) {
+                    LOGGER.warn("Missing fault parts in wsdl for fault [" + faultName + "] in bindingOperation ["
+                            + bindingOperation.getName() + "]");
+                    continue;
+                }
+
+                if (faultParts.length != 1) {
+                    LOGGER.info("Too many fault parts in wsdl for fault [" + faultName + "] in bindingOperation ["
+                            + bindingOperation.getName() + "]");
+                    continue;
+                }
+
+                Part part = faultParts[0];
+                QName elementName = part.getElementName();
+                LOGGER.debug("Binding Fault found in WSDL : {}", elementName);
+
+                if (elementName != null) {
+                    String faultXPath = "declare namespace env='"
+                            + wsdlContext.getSoapVersion().getEnvelopeNamespace() + "'; declare namespace flt='"
+                            + wsdlContext.getSoapVersion().getFaultDetailNamespace() + "';" + "declare namespace ns='"
+                            + elementName.getNamespaceURI() + "';" + "$this/flt:detail/ns:" + elementName.getLocalPart();
+                    LOGGER.debug("XML : {}", msgXml);
+                    LOGGER.debug("Fault XPath : {}", faultXPath);
+                    XmlObject[] paths = msgXml.selectPath(faultXPath);
+                    LOGGER.debug("Found Fault XPaths : ", paths.length);
+
+                    if (paths.length == 1) {
+                        LOGGER.debug("Found Fault");
+                        SchemaGlobalElement elm = wsdlContext.getSchemaTypeLoader().findElement(elementName);
+                        if (elm != null) {
+                            //validateMessageBody(errors, elm.getType(), paths[0]);
+                        } else {
+                            errors.add(XmlError.forMessage("Missing fault part element [" + elementName + "] for fault ["
+                                    + part.getName() + "] in associated schema"));
+                        }
+
+                        return;
+                    }
+                } // this is not allowed by Basic Profile.. remove?
+                else if (part.getTypeName() != null) {
+                    QName typeName = part.getTypeName();
+
+                    XmlObject[] paths = msgXml.selectPath("declare namespace env='"
+                            + wsdlContext.getSoapVersion().getEnvelopeNamespace() + "'; declare namespace flt='"
+                            + wsdlContext.getSoapVersion().getFaultDetailNamespace() + "';" + "declare namespace ns='"
+                            + typeName.getNamespaceURI() + "';" + "$this/flt:detail/ns:" + part.getName());
+
+                    if (paths.length == 1) {
+                        SchemaType type = wsdlContext.getSchemaTypeLoader().findType(typeName);
+                        if (type != null) {
+                            validateMessageBody(errors, type, paths[0]);
+                        } else {
+                            errors.add(XmlError.forMessage("Missing fault part type [" + typeName + "] for fault ["
+                                    + part.getName() + "] in associated schema"));
+                        }
+
+                        return;
+                    }
+                }
+            }
+
+            // if we get here, no matching fault was found.. this is not an error but
+            // should be warned..
+            String noMatchXPath = "declare namespace env='"
+                    + wsdlContext.getSoapVersion().getEnvelopeNamespace() + "'; declare namespace flt='"
+                    + wsdlContext.getSoapVersion().getFaultDetailNamespace() + "';$this/flt:detail";
+            LOGGER.debug("XML : {}", msgXml);
+            LOGGER.debug("Fault XPath : {}", noMatchXPath);
+            XmlObject[] paths = msgXml.selectPath(noMatchXPath);
+
+            if (paths.length == 0) {
+                LOGGER.warn("Missing matching Fault in wsdl for bindingOperation [{}]", bindingOperation.getName());
+            } else {
+                String xmlText = paths[0].xmlText(new XmlOptions().setSaveOuter());
+                LOGGER.warn("Missing matching Fault in wsdl for Fault Detail element [{}] in bindingOperation [{}]",
+                        XmlUtils.removeUnneccessaryNamespaces(xmlText), bindingOperation.getName());
+            }
+        }
     }
 
 }

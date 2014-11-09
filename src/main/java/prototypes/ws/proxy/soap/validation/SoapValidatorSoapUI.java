@@ -38,8 +38,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import prototypes.ws.proxy.soap.constantes.SoapErrorConstantes;
-import prototypes.ws.proxy.soap.web.io.Requests;
 import prototypes.ws.proxy.soap.reflect.Classes;
+import prototypes.ws.proxy.soap.web.io.Requests;
 import prototypes.ws.proxy.soap.xml.XmlStrings;
 
 public class SoapValidatorSoapUI implements SoapValidator {
@@ -222,21 +222,36 @@ public class SoapValidatorSoapUI implements SoapValidator {
             return false;
         }
 
-        // Response validation with wsdl
-        // this asserts only the soap body
-        LOGGER.debug("Response body validation");
-        AssertionError[] errs = wsdlValidator.assertResponse(responseMessage,
-                false);
+        // need to process custom soap faults validation as the one of SoapUI
+        // is not well implemented
+        List<String> errsF = new ArrayList();
+        boolean foundFault = wsdlValidator.validateSoapFaults(responseMessage, this.wsdlInterface.getWsdlContext(), errsF);
+        if (errsF.size() > 0) {
+            LOGGER.debug("Errors on Response Fault validation");
+            errors.addAll(errsF);
+            return false;
+        }
 
-        if (errs != null) {
-            for (AssertionError error : errs) {
-                errors.add(error.toString());
+        // no fault so validate response
+        if (!foundFault) {
+            // Response validation with wsdl
+            // this asserts only the soap body
+            LOGGER.debug("Response body validation");
+            AssertionError[] errs = wsdlValidator.assertResponse(responseMessage,
+                    false);
+
+            if (errs != null) {
+                LOGGER.debug("Errors on Response body validation");
+                for (AssertionError error : errs) {
+                    errors.add(error.toString());
+                }
             }
         }
 
         LOGGER.debug("Response headers validation");
         List<String> errsH = wsdlValidator.assertHeaders(responseMessage);
         if (errsH != null) {
+            LOGGER.debug("Errors on Response headers validation");
             errors.addAll(errsH);
         }
 
