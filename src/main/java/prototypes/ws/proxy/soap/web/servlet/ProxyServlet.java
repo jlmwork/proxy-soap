@@ -75,6 +75,7 @@ public class ProxyServlet extends AbstractServlet {
         HttpURLConnection httpConn = null;
         LOGGER.debug("doRequest");
         BackendExchange backendExchange = RequestContext.getBackendExchange(request);
+        LOGGER.trace("BackendExchange Hashcode : {}", Integer.toHexString(backendExchange.hashCode()));
         try {
             URL targetUrl = Requests.resolveTargetUrl(request, backendExchange.getUri());
             httpConn = prepareBackendConnection(targetUrl, request, backendExchange.getRequestHeaders());
@@ -152,6 +153,7 @@ public class ProxyServlet extends AbstractServlet {
             Requests.sendInternalErrorServer(request, response,
                     e.getMessage());
         } finally {
+            LOGGER.trace("BackendExchange Hashcode : {}", Integer.toHexString(backendExchange.hashCode()));
             LOGGER.debug("BackendExchange : {}", backendExchange);
             // lost the reference to backend exchange from filters
             RequestContext.getBackendExchange(request);

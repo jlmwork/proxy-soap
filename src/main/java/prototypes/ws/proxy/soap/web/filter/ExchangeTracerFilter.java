@@ -63,7 +63,7 @@ public class ExchangeTracerFilter extends HttpServletFilter {
         CaptureServletResponseWrapper wrappedResponse = Requests.wrap(response);
 
         // get or create the exchange
-        SoapExchange soapExchange = RequestContext.getSoapExchange(request);
+        SoapExchange soapExchange = RequestContext.getSoapExchange(wrappedRequest);
 
         // Frontend Request : extract all data from incoming request
         soapExchange.setFrontEndRequest(Streams.getString(wrappedRequest.getInputStream()));
@@ -74,7 +74,8 @@ public class ExchangeTracerFilter extends HttpServletFilter {
         chain.doFilter(wrappedRequest, wrappedResponse);
 
         // Backend Exchange
-        BackendExchange backendExchange = RequestContext.getBackendExchange(request);
+        BackendExchange backendExchange = RequestContext.getBackendExchange(wrappedRequest);
+        logger.trace("BackendExchange Hashcode : {}", Integer.toHexString(backendExchange.hashCode()));
         logger.debug("Backend exchange view from Filter : {}", backendExchange);
         // the request
         soapExchange.setProxyRequest(backendExchange.getRequestBody());

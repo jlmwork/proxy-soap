@@ -6,6 +6,7 @@
         </encoder>
     </appender>
     <logger name="prototypes" level="debug"/>
+    <logger name="prototypes.ws.proxy.soap.web" level="TRACE"/>
     <logger name="prototypes.ws.proxy.soap.repository" level="TRACE"/>
     <logger name="org.eclipse.persistence" level="info"/>
     <logger name="org.eclipse.persistence.logging.sql" level="TRACE"/>
