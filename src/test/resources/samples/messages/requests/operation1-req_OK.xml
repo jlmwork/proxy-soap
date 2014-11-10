@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:oper="http://www.example.org/sampleservice/operation1">
+    <soapenv:Header/>
+    <soapenv:Body>
+        <oper:operation1>
+            <in>OK</in>
+        </oper:operation1>
+    </soapenv:Body>
+</soapenv:Envelope>

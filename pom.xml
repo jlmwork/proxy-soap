@@ -100,12 +100,6 @@
             <version>3.2</version>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.11</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>eviware</groupId>
             <artifactId>soapui</artifactId>
             <version>4.0.1</version>
@@ -216,6 +210,19 @@
             <artifactId>zip4j</artifactId>
             <version>1.3.2</version>
         </dependency>
+        <!-- TESTING -->
+        <dependency>
+            <groupId>com.jayway.restassured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <version>2.3.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
@@ -246,6 +253,15 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/*IT.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <version>2.4</version>
                 <configuration>
@@ -260,6 +276,7 @@
                     <!--rather use dependencies
                     <useProvidedScope>true</useProvidedScope>-->
                     <scanIntervalSeconds>5</scanIntervalSeconds>
+                    <reload>manual</reload>
                     <stopKey>foo</stopKey>
                     <stopPort>9999</stopPort>
                     <jvmArgs>-XX:+CMSClassUnloadingEnabled -XX:PermSize=128M -XX:MaxPermSize=128M</jvmArgs>
@@ -332,6 +349,21 @@
                                 <contextPath>/proxy-soap</contextPath>
                                 <defaultsDescriptor>${project.basedir}/src/test/resources/jetty/webdefault.xml</defaultsDescriptor>
                             </webApp>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>all-tests</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                            </excludes>
                         </configuration>
                     </plugin>
                 </plugins>

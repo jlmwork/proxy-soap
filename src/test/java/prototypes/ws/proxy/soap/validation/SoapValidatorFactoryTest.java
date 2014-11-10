@@ -22,7 +22,7 @@ import org.junit.Test;
 
 public class SoapValidatorFactoryTest {
 
-    private final String schemaPath1 = "src/test/resources/simple.wsdl";
+    private final String schemaPath1 = "src/test/resources/samples/definitions/SampleService.wsdl";
 
     private final String schemaPath2 = "src/test/resources/simple2.wsdl";
 

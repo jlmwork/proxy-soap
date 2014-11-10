@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://www.example.org/sampleservice/operation1"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xsd:element name="operation1">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="in">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:pattern value="OK" />
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xsd:element>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="operation1Response">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="out">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:pattern value="OK" />
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xsd:element>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="operation1Fault">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="customfault">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:pattern value="OK" />
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xsd:element>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+</xsd:schema>

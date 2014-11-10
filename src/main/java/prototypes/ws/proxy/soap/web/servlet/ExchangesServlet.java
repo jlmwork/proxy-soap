@@ -127,6 +127,7 @@ public class ExchangesServlet extends AbstractServlet {
             zipOut.finish();
 
         } else if ("application/json".equals(askedFormat.toLowerCase())) {
+            response.setContentType("application/json");
             Collection<SoapExchange> soapExchanges = exchangeRepository.listWithoutContent();
             //JsonGenerator jg = jsonF.createJsonGenerator(new File("result.json"), JsonEncoding.UTF8);
             /*JsonObject model = Json.createObjectBuilder()

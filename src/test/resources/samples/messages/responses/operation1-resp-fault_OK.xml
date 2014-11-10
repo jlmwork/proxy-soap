@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"  xmlns:oper="http://www.example.org/sampleservice/operation1">
+    <soapenv:Body>
+        <soapenv:Fault>
+            <faultcode>XXX</faultcode>
+            <faultstring xml:lang="en">soapenv:Server</faultstring>
+            <detail>
+                <oper:operation1Fault>
+                    <customfault>OK</customfault>
+                </oper:operation1Fault>
+            </detail>
+        </soapenv:Fault>
+    </soapenv:Body>
+</soapenv:Envelope>
