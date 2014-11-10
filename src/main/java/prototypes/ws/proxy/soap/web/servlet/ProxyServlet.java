@@ -147,6 +147,7 @@ public class ProxyServlet extends AbstractServlet {
             Requests.sendErrorServer(request, response,
                     e.getMessage());
         } catch (Exception e) {
+            LOGGER.error("Error during proxying : {}", e.getMessage());
             // protect from all exceptions
             Requests.sendInternalErrorServer(request, response,
                     e.getMessage());
@@ -174,7 +175,7 @@ public class ProxyServlet extends AbstractServlet {
         // Headers
         List<String> headersToIgnore = new ArrayList<String>(REQ_HEADERS_TO_IGNORE);
         useAuth(request, headersToIgnore, httpConn);
-        Requests.setRequestHeaders(httpConn.getRequestProperties(), headers, headersToIgnore);
+        Requests.setRequestHeaders(httpConn, headers, headersToIgnore);
         httpConn.setRequestProperty("X-Forwarded-For", request.getRemoteAddr());
 
         // some more headers

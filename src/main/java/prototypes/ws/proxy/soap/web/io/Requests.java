@@ -16,6 +16,7 @@
 package prototypes.ws.proxy.soap.web.io;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -137,10 +138,12 @@ public class Requests {
         return headersMap;
     }
 
-    public static void setRequestHeaders(Map<String, List<String>> headersTo, Map<String, List<String>> headersFrom, List<String> headersToForget) {
+    public static void setRequestHeaders(HttpURLConnection httpConn, Map<String, List<String>> headersFrom, List<String> headersToForget) {
         for (String headerName : headersFrom.keySet()) {
-            if (headerName != null && headersToForget.contains(headerName.toLowerCase())) {
-                headersTo.put(headerName, headersFrom.get(headerName));
+            if (headerName != null && !headersToForget.contains(headerName.toLowerCase())) {
+                for (String headerValue : headersFrom.get(headerName)) {
+                    httpConn.setRequestProperty(headerName, headerValue);
+                }
             }
         }
     }
