@@ -24,11 +24,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
 import prototypes.ws.proxy.soap.io.Streams;
+import prototypes.ws.proxy.soap.model.BackendExchange;
 import prototypes.ws.proxy.soap.model.SoapExchange;
 import prototypes.ws.proxy.soap.repository.SoapExchangeRepository;
 import prototypes.ws.proxy.soap.web.context.ApplicationContext;
 import prototypes.ws.proxy.soap.web.context.RequestContext;
-import prototypes.ws.proxy.soap.web.io.BufferedHttpResponseWrapper;
+import prototypes.ws.proxy.soap.web.io.CaptureServletResponseWrapper;
 import prototypes.ws.proxy.soap.web.io.MultiReadHttpServletRequest;
 import prototypes.ws.proxy.soap.web.io.Requests;
 
@@ -56,27 +57,46 @@ public class ExchangeTracerFilter extends HttpServletFilter {
 
     @Override
     protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+        long start = System.currentTimeMillis();
+        // Prepare Objects
+        MultiReadHttpServletRequest wrappedRequest = Requests.wrap(request);
+        CaptureServletResponseWrapper wrappedResponse = Requests.wrap(response);
 
         // get or create the exchange
         SoapExchange soapExchange = RequestContext.getSoapExchange(request);
-        soapExchange.setFrontEndRequest(Streams.getString(request.getInputStream()));
+
+        // Frontend Request : extract all data from incoming request
+        soapExchange.setFrontEndRequest(Streams.getString(wrappedRequest.getInputStream()));
         soapExchange.setFrontEndRequestHeaders(Requests.getRequestHeaders(request));
         soapExchange.setFrom(request.getRemoteAddr());
         soapExchange.setUri(Requests.getTarget(request));
-        soapExchange.setFrontEndRequest(new String(Streams.getBytes(request.getInputStream())));
 
-        // Prepare Objects
-        // wraps request for allowing to read request body more than once
-        // This wrapping must occur in the first called ServletFilter
-        HttpServletRequest wrappedRequest = new MultiReadHttpServletRequest(request);
-        // wraps response for post processing
-        HttpServletResponse wrappedResponse = new BufferedHttpResponseWrapper(response);
         chain.doFilter(wrappedRequest, wrappedResponse);
 
+        // Backend Exchange
+        BackendExchange backendExchange = RequestContext.getBackendExchange(request);
+        logger.debug("Backend exchange view from Filter : {}", backendExchange);
+        // the request
+        soapExchange.setProxyRequest(backendExchange.getRequestBody());
+        soapExchange.setProxyRequestHeaders(backendExchange.getRequestHeaders());
+        // the response
+        soapExchange.setBackEndResponseCode(backendExchange.getResponseCode());
+        soapExchange.setBackEndResponseHeaders(backendExchange.getResponseHeaders());
+        soapExchange.setBackEndResponse(backendExchange.getResponseBody());
+
+        // final return of the proxy
+        soapExchange.setProxyResponse(wrappedResponse.getContent());
+        soapExchange.setProxyResponseHeaders(wrappedResponse.getHeaders());
+
+        logger.debug("SoapExchange : {}", soapExchange);
         OutputStream out = response.getOutputStream();
-        out.write(soapExchange.getBackEndResponse().getBytes());
+        out.write(wrappedResponse.getBuffer());
+        logger.debug("response written");
         // save exchange after response has been sent back to client
+        long stop = System.currentTimeMillis();
+        soapExchange.setProxyInternalTime(stop - start);
         exchangeRepository.save(soapExchange);
+        logger.debug("response saved");
     }
 
 }

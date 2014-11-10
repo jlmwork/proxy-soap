@@ -101,7 +101,7 @@ public class ExchangeServlet extends AbstractServlet {
                         .add("to", stripNull(soapExchange.getUri()))
                         .add("validator", stripNull(soapExchange.getValidatorId()))
                         .add("operation", stripNull(soapExchange.getOperation()))
-                        .add("resp_time", soapExchange.getResponseTime())
+                        .add("resp_time", soapExchange.getBackEndResponseTime())
                         .add("request_content", stripNull(soapExchange.getFrontEndRequestAsXML()))
                         .add("request_headers", formatJsonMap(soapExchange.getFrontEndRequestHeaders()))
                         .add("request_errors", formatJsonList(soapExchange.getRequestErrors()))

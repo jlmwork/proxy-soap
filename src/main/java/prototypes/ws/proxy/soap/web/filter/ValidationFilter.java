@@ -27,13 +27,15 @@ import javax.xml.namespace.QName;
 import org.xml.sax.SAXException;
 import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
 import prototypes.ws.proxy.soap.io.Strings;
-import prototypes.ws.proxy.soap.model.BackendExchange;
 import prototypes.ws.proxy.soap.model.SoapExchange;
 import prototypes.ws.proxy.soap.validation.SoapMessage;
 import prototypes.ws.proxy.soap.validation.SoapValidator;
 import prototypes.ws.proxy.soap.validation.SoapValidatorFactory;
 import prototypes.ws.proxy.soap.web.context.ApplicationContext;
 import prototypes.ws.proxy.soap.web.context.RequestContext;
+import prototypes.ws.proxy.soap.web.io.CaptureServletResponseWrapper;
+import prototypes.ws.proxy.soap.web.io.MultiReadHttpServletRequest;
+import prototypes.ws.proxy.soap.web.io.Requests;
 import prototypes.ws.proxy.soap.xml.XmlStrings;
 
 /**
@@ -68,6 +70,7 @@ public class ValidationFilter extends HttpServletFilter {
 
         // only validate POST request if validation is activated
         if (proxyConfig.isValidationActive() && "POST".equals(request.getMethod())) {
+            // TODO : avoid to use the SoapExchange object, but better a Validation-like object
             SoapExchange soapExchange = RequestContext.getSoapExchange(request);
             logger.info("Validation is active.");
 
@@ -76,26 +79,29 @@ public class ValidationFilter extends HttpServletFilter {
                     soapExchange);
             //TODO : save request headers when request is blocked
             if (!requestValid && proxyConfig.isInBlockingMode()) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                Requests.sendErrorClient(request, response,
                         "Request message invalid");
                 return;
             }
 
+            MultiReadHttpServletRequest wrappedRequest = Requests.wrap(request);
+            CaptureServletResponseWrapper wrappedResponse = Requests.wrap(response);
+
             // 2] pass the request along the filter chain
-            chain.doFilter(request, response);
+            chain.doFilter(wrappedRequest, wrappedResponse);
 
             // 3] Response validation
-            boolean responseValid = validateOutput(request, response,
+            boolean responseValid = validateOutput(wrappedRequest, wrappedResponse,
                     soapExchange);
             if (!responseValid && proxyConfig.isInBlockingMode()) {
                 logger.info("Proxy is in blocking mode.");
-                response.sendError(HttpServletResponse.SC_BAD_GATEWAY,
+                Requests.sendErrorServer(request, response,
                         "Response message invalid");
                 return;
             }
             // send response back to the client
-            response.addHeader("X-Filtered-By", "proxy-soap");
-            response.addHeader("X-Filtered-ID", soapExchange.getId());
+            wrappedResponse.addHeader("X-Filtered-By", "proxy-soap");
+            wrappedResponse.addHeader("X-Filtered-ID", soapExchange.getId());
         } else {
             // pass the request along the filter chain
             chain.doFilter(request, response);
@@ -156,15 +162,15 @@ public class ValidationFilter extends HttpServletFilter {
      * @throws IOException
      */
     private boolean validateOutput(HttpServletRequest request,
-            HttpServletResponse response,
+            CaptureServletResponseWrapper response,
             SoapExchange soapExchange)
             throws IOException {
         boolean valid = false;
-        String responseBodyContent = soapExchange.getBackEndResponse();
+        String responseBodyContent = response.getContent();
 
-        BackendExchange proxyExchange = RequestContext.getBackendExchange(request);
-
-        if (proxyExchange != null && proxyExchange.getResponseCode() == HttpServletResponse.SC_OK) {
+        // validate only responses of code or 500 for SoapFaults
+        if (!Strings.isNullOrEmpty(responseBodyContent) && (response.getStatus() == HttpServletResponse.SC_OK
+                || response.getStatus() == HttpServletResponse.SC_INTERNAL_SERVER_ERROR)) {
             // 1] XML Well formed ?
             List<String> errors = XmlStrings.validateXml(responseBodyContent);
             valid = (errors.isEmpty());
@@ -195,9 +201,7 @@ public class ValidationFilter extends HttpServletFilter {
             } else {
                 soapExchange.setResponseXmlErrors(errors);
             }
-            soapExchange.setBackEndResponseHeaders(proxyExchange.getResponseHeaders());
         }
-        soapExchange.setResponse(responseBodyContent);
         return valid;
     }
 

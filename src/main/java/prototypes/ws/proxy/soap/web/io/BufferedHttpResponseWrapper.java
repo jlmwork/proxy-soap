@@ -33,6 +33,10 @@ public class BufferedHttpResponseWrapper extends HttpServletResponseWrapper {
         super(origResponse);
     }
 
+    public String getContent() {
+        return new String(this.getBuffer());
+    }
+
     public byte[] getBuffer() {
         return this.bufferedServletOut.getBuffer();
     }

@@ -25,12 +25,16 @@ import prototypes.ws.proxy.soap.model.SoapExchange;
  */
 public class RequestContext {
 
+    public static void setBackendExchange(HttpServletRequest request, BackendExchange backendExchange) {
+        request.setAttribute(BackendExchange.UID, backendExchange);
+    }
+
     public static BackendExchange getBackendExchange(HttpServletRequest request) {
         // try to get the backend exchange from the soap exchange
         SoapExchange soapExchange = (SoapExchange) request.getAttribute(SoapExchange.UID);
         BackendExchange backendExchange = null;
         if (soapExchange != null) {
-            backendExchange = soapExchange.getBackendExchange();
+            backendExchange = soapExchange.createBackendExchange();
         }
         // not found
         if (backendExchange == null) {

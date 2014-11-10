@@ -37,16 +37,16 @@
             <!-- requests & responses are not transient as
             External storage is used. File paths are stored in DB -->
             <basic name="frontEndRequest" fetch="LAZY">
-                <column name="FE_REQUEST_XML" length="512"/>
+                <column name="FE_REQUEST_PATH" length="512"/>
             </basic>
             <basic name="backEndResponse" fetch="LAZY">
-                <column name="BE_RESPONSE_XML" length="512"/>
+                <column name="BE_RESPONSE_PATH" length="512"/>
             </basic>
             <basic name="proxyRequest" fetch="LAZY">
-                <column name="PROXY_REQUEST_XML" length="512"/>
+                <column name="PROXY_REQUEST_PATH" length="512"/>
             </basic>
             <basic name="proxyResponse" fetch="LAZY">
-                <column name="PROXY_RESPONSE_XML" length="512"/>
+                <column name="PROXY_RESPONSE_PATH" length="512"/>
             </basic>
         </attributes>
         <convert converter="prototypes.ws.proxy.soap.repository.jpa.converter.HeadersConverter" attribute-name="frontEndRequestHeaders"/>

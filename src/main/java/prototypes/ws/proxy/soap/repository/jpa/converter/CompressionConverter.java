@@ -36,7 +36,7 @@ public class CompressionConverter implements AttributeConverter<String, byte[]> 
             LOGGER.trace("Column original size : {}", x.length());
             try {
                 byte[] bytes = Strings.compressString(x);
-                LOGGER.trace("Compressed numer of bytes : {}", bytes.length);
+                LOGGER.trace("Compressed number of bytes : {}", bytes.length);
                 return bytes;
             } catch (Exception ex) {
                 LOGGER.warn("Error when compressing Column {}", ex.getMessage());

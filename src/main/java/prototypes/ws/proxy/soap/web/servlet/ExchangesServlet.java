@@ -159,7 +159,7 @@ public class ExchangesServlet extends AbstractServlet {
                         .add("to", stripNull(soapRequest.getUri()))
                         .add("validator", stripNull(soapRequest.getValidatorId()))
                         .add("operation", stripNull(soapRequest.getOperation()))
-                        .add("resp_time", soapRequest.getResponseTime())
+                        .add("resp_time", soapRequest.getBackEndResponseTime())
                         .add("request_valid", stripNull(soapRequest.getRequestValid()))
                         .add("request_xml_valid", stripNull(soapRequest.getRequestXmlValid()))
                         .add("request_soap_valid", stripNull(soapRequest.getRequestSoapValid()))

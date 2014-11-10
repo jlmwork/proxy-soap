@@ -139,7 +139,7 @@ public class Requests {
 
     public static void setRequestHeaders(Map<String, List<String>> headersTo, Map<String, List<String>> headersFrom, List<String> headersToForget) {
         for (String headerName : headersFrom.keySet()) {
-            if (headersToForget.contains(headerName)) {
+            if (headerName != null && headersToForget.contains(headerName.toLowerCase())) {
                 headersTo.put(headerName, headersFrom.get(headerName));
             }
         }
@@ -155,6 +155,49 @@ public class Requests {
         response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
         request.setAttribute("javax.servlet.error.message", message);
         request.getRequestDispatcher("/WEB-INF/views/jsp/soap-fault-server.jsp").forward(request, response);
+    }
+
+    public static void sendInternalErrorServer(HttpServletRequest request, HttpServletResponse response, String message) throws IOException, ServletException {
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        request.setAttribute("javax.servlet.error.message", message);
+        request.getRequestDispatcher("/WEB-INF/views/jsp/soap-fault-server.jsp").forward(request, response);
+    }
+
+    /**
+     * wraps request for allowing to read request body more than once
+     *
+     * This wrapping may occur in any ServletFilter as the method is idempotent
+     *
+     * @param request
+     * @return
+     */
+    public static MultiReadHttpServletRequest wrap(HttpServletRequest request) {
+        MultiReadHttpServletRequest wrappedRequest;
+        if (!(request instanceof MultiReadHttpServletRequest)) {
+            wrappedRequest = new MultiReadHttpServletRequest(request);
+        } else {
+            wrappedRequest = (MultiReadHttpServletRequest) request;
+        }
+        return wrappedRequest;
+    }
+
+    /**
+     * wraps response for post processing its content
+     *
+     * This wrapping may occur in any ServletFilter as the method is idempotent
+     *
+     * @param response
+     * @return
+     */
+    public static CaptureServletResponseWrapper wrap(HttpServletResponse response) {
+        CaptureServletResponseWrapper wrappedResponse;
+        if (!(response instanceof CaptureServletResponseWrapper)) {
+            // buffer response content
+            wrappedResponse = new CaptureServletResponseWrapper(response);
+        } else {
+            wrappedResponse = (CaptureServletResponseWrapper) response;
+        }
+        return wrappedResponse;
     }
 
 }

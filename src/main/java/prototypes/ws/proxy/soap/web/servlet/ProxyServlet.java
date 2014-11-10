@@ -51,7 +51,7 @@ public class ProxyServlet extends AbstractServlet {
 
     // following headers must not go back unchanged to the client
     private static final List<String> REQ_HEADERS_TO_IGNORE = Arrays
-            .asList(new String[]{"transfer-encoding"});
+            .asList(new String[]{"transfer-encoding", "cookie"});
 
     private ProxyConfiguration proxyConfig;
 
@@ -137,20 +137,23 @@ public class ProxyServlet extends AbstractServlet {
             // bad url
             Requests.sendErrorClient(request, response,
                     e1.getMessage());
-            return;
         } catch (ClassCastException ex) {
             // bad url
             Requests.sendErrorClient(request, response,
                     ex.getMessage());
-            return;
         } catch (IOException e) {
             LOGGER.error("Backend call in ERROR");
             // bad call
             Requests.sendErrorServer(request, response,
                     e.getMessage());
-            return;
+        } catch (Exception e) {
+            // protect from all exceptions
+            Requests.sendInternalErrorServer(request, response,
+                    e.getMessage());
         } finally {
             LOGGER.debug("BackendExchange : {}", backendExchange);
+            // lost the reference to backend exchange from filters
+            RequestContext.getBackendExchange(request);
             if (httpConn != null) {
                 httpConn.disconnect();
             }

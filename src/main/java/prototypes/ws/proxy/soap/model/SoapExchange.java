@@ -35,7 +35,8 @@ public class SoapExchange {
     private String from;
     private String operation;
     private String validatorId;
-    private long responseTime = -1L;
+    private long backEndResponseTime = -1L;
+    private long proxyInternalTime = -1L;
 
     // request
     private String frontEndRequest;
@@ -57,7 +58,7 @@ public class SoapExchange {
     private List<String> requestXmlErrors;
     private List<String> responseXmlErrors;
 
-    public BackendExchange getBackendExchange() {
+    public BackendExchange createBackendExchange() {
         return new BackendExchange(uri, frontEndRequest, frontEndRequestHeaders);
     }
 
@@ -87,8 +88,26 @@ public class SoapExchange {
 
     @Override
     public String toString() {
-        return time + " " + uri + " " + requestSoapValid + " "
-                + responseSoapValid + " " + responseTime;
+        return "SoapExchange{" + "time=" + time + ", id=" + id + ", uri=" + uri + ", from=" + from + ", "
+                + "operation=" + operation + ", validatorId=" + validatorId
+                + ", backEndResponseTime=" + backEndResponseTime + ", proxyInternalTime=" + proxyInternalTime
+                + "\n, frontEndRequest=" + frontEndRequest
+                + "\n, frontEndRequestHeaders=" + frontEndRequestHeaders
+                + "\n, proxyRequest=" + proxyRequest
+                + "\n, proxyRequestHeaders=" + proxyRequestHeaders
+                + "\n, proxyResponseHeaders=" + proxyResponseHeaders
+                + "\n, proxyResponse=" + proxyResponse
+                + "\n, backEndResponse=" + backEndResponse
+                + "\n, backEndResponseCode=" + backEndResponseCode
+                + "\n, backEndResponseHeaders=" + backEndResponseHeaders
+                + "\n, responseSoapValid=" + responseSoapValid
+                + ", responseXmlValid=" + responseXmlValid
+                + ", requestSoapValid=" + requestSoapValid
+                + ", requestXmlValid=" + requestXmlValid
+                + ", requestSoapErrors=" + requestSoapErrors
+                + ", responseSoapErrors=" + responseSoapErrors
+                + ", requestXmlErrors=" + requestXmlErrors
+                + ", responseXmlErrors=" + responseXmlErrors + '}';
     }
 
     /**
@@ -120,6 +139,13 @@ public class SoapExchange {
     public SoapExchange setFrontEndRequest(String request) {
         this.frontEndRequest = request;
         return this;
+    }
+
+    /**
+     * @return the response
+     */
+    public void setBackEndResponse(String response) {
+        this.backEndResponse = response;
     }
 
     /**
@@ -219,16 +245,24 @@ public class SoapExchange {
     /**
      * @return the reponseTime
      */
-    public long getResponseTime() {
-        return responseTime;
+    public long getBackEndResponseTime() {
+        return backEndResponseTime;
     }
 
     /**
      * @param reponseTime the reponseTime to set
      */
-    public SoapExchange setResponseTime(long reponseTime) {
-        this.responseTime = reponseTime;
+    public SoapExchange setBackEndResponseTime(long reponseTime) {
+        this.backEndResponseTime = reponseTime;
         return this;
+    }
+
+    public long getProxyInternalTime() {
+        return proxyInternalTime;
+    }
+
+    public void setProxyInternalTime(long proxyInternalTime) {
+        this.proxyInternalTime = proxyInternalTime;
     }
 
     /**

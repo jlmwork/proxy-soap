@@ -41,6 +41,7 @@ public class HeadersConverter implements AttributeConverter<Map<String, List<Str
 
     @Override
     public byte[] convertToDatabaseColumn(Map<String, List<String>> map) {
+        LOGGER.debug("Convert headers to DB");
         if (map != null) {
             JsonObjectBuilder oBuilder = Json.createObjectBuilder();
             for (String key : map.keySet()) {
@@ -62,6 +63,7 @@ public class HeadersConverter implements AttributeConverter<Map<String, List<Str
 
     @Override
     public Map<String, List<String>> convertToEntityAttribute(byte[] dbData) {
+        LOGGER.debug("Convert headers from DB");
         Map outMap = new HashMap<String, List<String>>();
         if (dbData != null && dbData.length > 0) {
             // TODO : add uncompression
