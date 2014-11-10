@@ -16,7 +16,8 @@
 package prototypes.ws.proxy.soap.web.context;
 
 import javax.servlet.http.HttpServletRequest;
-import prototypes.ws.proxy.soap.model.ProxyExchange;
+import prototypes.ws.proxy.soap.model.BackendExchange;
+import prototypes.ws.proxy.soap.model.SoapExchange;
 
 /**
  *
@@ -24,12 +25,33 @@ import prototypes.ws.proxy.soap.model.ProxyExchange;
  */
 public class RequestContext {
 
-    public static ProxyExchange getProxyExchange(HttpServletRequest request) {
-        ProxyExchange proxyMonitor = (ProxyExchange) request.getAttribute(ProxyExchange.UID);
-        if (proxyMonitor == null) {
-            proxyMonitor = new ProxyExchange();
-            request.setAttribute(ProxyExchange.UID, proxyMonitor);
+    public static BackendExchange getBackendExchange(HttpServletRequest request) {
+        // try to get the backend exchange from the soap exchange
+        SoapExchange soapExchange = (SoapExchange) request.getAttribute(SoapExchange.UID);
+        BackendExchange backendExchange = null;
+        if (soapExchange != null) {
+            backendExchange = soapExchange.getBackendExchange();
         }
-        return proxyMonitor;
+        // not found
+        if (backendExchange == null) {
+            // try to get the backend exchange from request
+            backendExchange = (BackendExchange) request.getAttribute(BackendExchange.UID);
+            if (backendExchange == null) {
+                // create it
+                backendExchange = new BackendExchange(request);
+            }
+        }
+        // references it
+        request.setAttribute(BackendExchange.UID, backendExchange);
+        return backendExchange;
+    }
+
+    public static SoapExchange getSoapExchange(HttpServletRequest request) {
+        SoapExchange soapExchange = (SoapExchange) request.getAttribute(SoapExchange.UID);
+        if (soapExchange == null) {
+            soapExchange = new SoapExchange();
+            request.setAttribute(SoapExchange.UID, soapExchange);
+        }
+        return soapExchange;
     }
 }

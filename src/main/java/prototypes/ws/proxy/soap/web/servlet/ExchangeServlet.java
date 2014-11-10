@@ -28,7 +28,6 @@ import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonWriter;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -42,14 +41,14 @@ import prototypes.ws.proxy.soap.web.context.ApplicationContext;
  *
  * @author jlamande
  */
-public class ExchangeServlet extends HttpServlet {
+public class ExchangeServlet extends AbstractServlet {
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(ExchangeServlet.class);
 
     private SoapExchangeRepository exchangeRepository;
 
-    private Pattern p = Pattern.compile(".*/exchange/([^\\?]+)");
+    private final Pattern p = Pattern.compile(".*/exchange/([^\\?]+)");
 
     @Override
     public void init() throws ServletException {
@@ -66,7 +65,8 @@ public class ExchangeServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    @Override
+    protected void doRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         LOGGER.info("Exchanges");
 
@@ -170,16 +170,5 @@ public class ExchangeServlet extends HttpServlet {
         }
         return aBuilder.build();
     }
-
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
 
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package prototypes.ws.proxy.soap.repository.jpa;
+package prototypes.ws.proxy.soap.repository.jpa.converter;
 
 import javax.persistence.AttributeConverter;
 import org.slf4j.Logger;
@@ -47,7 +47,7 @@ public class CompressionConverter implements AttributeConverter<String, byte[]> 
 
     @Override
     public String convertToEntityAttribute(byte[] bytes) {
-        if (bytes.length > 0) {
+        if (bytes != null && bytes.length > 0) {
             LOGGER.debug("Uncompress Column");
             try {
                 return Strings.uncompressString(bytes);

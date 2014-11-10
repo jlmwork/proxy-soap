@@ -25,6 +25,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -33,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 public abstract class HttpServletFilter implements Filter {
 
     protected FilterConfig config;
+    protected Logger logger;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response,
@@ -48,6 +51,7 @@ public abstract class HttpServletFilter implements Filter {
      */
     @Override
     public void init(FilterConfig config) throws ServletException {
+        logger = LoggerFactory.getLogger(this.getClass().getName());
         this.config = config;
     }
 

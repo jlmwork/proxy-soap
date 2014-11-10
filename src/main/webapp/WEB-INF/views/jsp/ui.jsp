@@ -45,10 +45,10 @@
                 <div class="collapse navbar-collapse ">
                     <ul id="menutabs" class="nav navbar-nav nav-pills navbar-right" role="tablist">
                         <!-- nav -->
-                        <li class="${exchangesActive}"><a href="#exchanges" role="tab" data-toggle="tab"><fmt:message key="exchanges.pagetitle"/></a></li>
-                        <li class="${configActive}"><a href="#config" role="tab" data-toggle="tab"><fmt:message key="config.pagetitle"/></a></li>
-                        <li><a href="#validators" role="tab" data-toggle="tab"><fmt:message key="validators.title"/></a></li>
-                        <li><a href="#help" role="tab" data-toggle="tab"><fmt:message key="help.pagetitle"/></a></li>
+                        <li class="${exchangesActive}"><a href="#exchanges" role="tab" data-toggle="tab" accesskey="e"><fmt:message key="exchanges.pagetitle"/></a></li>
+                        <li class="${configActive}"><a href="#config" role="tab" data-toggle="tab" accesskey="c"><fmt:message key="config.pagetitle"/></a></li>
+                        <li><a href="#validators" role="tab" data-toggle="tab" accesskey="v"><fmt:message key="validators.title"/></a></li>
+                        <li><a href="#help" role="tab" data-toggle="tab" accesskey="h"><fmt:message key="help.pagetitle"/></a></li>
                     </ul>
                 </div><!--/.nav-collapse -->
             </div>
@@ -93,16 +93,7 @@
         %>
         <script src="res/lib/highlight.js/highlight.pack.js"></script>
         <script src="res/js/jquery.fileDownload.js"></script>
-        <script>
-            hljs.initHighlightingOnLoad();
-            $(document).ready(function() {
-                // popover demo
-                $("a[data-toggle=popover]")
-                        .popover()
-                        .click(function(e) {
-                            e.preventDefault()
-                        })
-            });</script>
+        <script src="res/js/jquery.hotkeys.js" type="text/javascript"></script>
         <script src="res/js/exchanges.js"></script><%
             if (userLocale != null && userLocale.startsWith("fr")) {
         %><script src="res/js/exchanges-fr-FR.js"></script><%

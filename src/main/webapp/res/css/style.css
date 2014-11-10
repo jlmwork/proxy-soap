@@ -64,4 +64,6 @@ body .modal-dialog {
 }
 .selected {
     font-weight: bold;
+    font-size: 11px;
+    text-decoration: underline;
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package prototypes.ws.proxy.soap.repository.jpa;
+package prototypes.ws.proxy.soap.repository.jpa.converter;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -63,7 +63,7 @@ public class HeadersConverter implements AttributeConverter<Map<String, List<Str
     @Override
     public Map<String, List<String>> convertToEntityAttribute(byte[] dbData) {
         Map outMap = new HashMap<String, List<String>>();
-        if (dbData.length > 0) {
+        if (dbData != null && dbData.length > 0) {
             // TODO : add uncompression
             String dbDataString = (new CompressionConverter()).convertToEntityAttribute(dbData);
             JsonReader reader = Json.createReader(new StringReader(dbDataString));

@@ -4,13 +4,14 @@
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd">
     <description>The minimal mappings for a persistent entity in XML.</description>
-    <converter class="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter"/>
-    <converter class="prototypes.ws.proxy.soap.repository.jpa.ExternalStorageConverter"/>
+    <converter class="prototypes.ws.proxy.soap.repository.jpa.converter.HeadersConverter"/>
+    <converter class="prototypes.ws.proxy.soap.repository.jpa.converter.ExternalStorageConverter"/>
     <entity name="SoapExchange" class="prototypes.ws.proxy.soap.model.SoapExchange" access="FIELD">
         <table name="T_SOAPEXCHANGE"/>
         <attributes>
             <!-- just specified special columns or ignored fields -->
             <id name="id"/>
+            <transient name="UID" />
             <basic name="time">
                 <temporal>DATETIME</temporal>
             </basic>
@@ -48,13 +49,13 @@
                 <column name="PROXY_RESPONSE_XML" length="512"/>
             </basic>
         </attributes>
-        <convert converter="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter" attribute-name="frontEndRequestHeaders"/>
-        <convert converter="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter" attribute-name="backEndResponseHeaders"/>
-        <convert converter="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter" attribute-name="proxyRequestHeaders"/>
-        <convert converter="prototypes.ws.proxy.soap.repository.jpa.HeadersConverter" attribute-name="proxyResponseHeaders"/>
-        <convert converter="prototypes.ws.proxy.soap.repository.jpa.ExternalStorageConverter" attribute-name="frontEndRequest"/>
-        <convert converter="prototypes.ws.proxy.soap.repository.jpa.ExternalStorageConverter" attribute-name="backEndResponse"/>
-        <convert converter="prototypes.ws.proxy.soap.repository.jpa.ExternalStorageConverter" attribute-name="proxyRequest"/>
-        <convert converter="prototypes.ws.proxy.soap.repository.jpa.ExternalStorageConverter" attribute-name="proxyResponse"/>
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.converter.HeadersConverter" attribute-name="frontEndRequestHeaders"/>
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.converter.HeadersConverter" attribute-name="backEndResponseHeaders"/>
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.converter.HeadersConverter" attribute-name="proxyRequestHeaders"/>
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.converter.HeadersConverter" attribute-name="proxyResponseHeaders"/>
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.converter.ExternalStorageConverter" attribute-name="frontEndRequest"/>
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.converter.ExternalStorageConverter" attribute-name="backEndResponse"/>
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.converter.ExternalStorageConverter" attribute-name="proxyRequest"/>
+        <convert converter="prototypes.ws.proxy.soap.repository.jpa.converter.ExternalStorageConverter" attribute-name="proxyResponse"/>
     </entity>
 </entity-mappings>

@@ -26,12 +26,13 @@ import prototypes.ws.proxy.soap.xml.XmlStrings;
 
 public class SoapExchange {
 
+    public static final transient String UID = "proxy-soap.exchange";
+
     private Calendar time = new GregorianCalendar();
     // give the request an unique attribute id
     private final String id = new UUID().toString();
     private String uri;
     private String from;
-    private String message;
     private String operation;
     private String validatorId;
     private long responseTime = -1L;
@@ -47,6 +48,7 @@ public class SoapExchange {
     private List<String> responseSoapErrors;
     // response
     private String backEndResponse;
+    private int backEndResponseCode;
     private String proxyResponse;
     private Boolean responseSoapValid;
     private Boolean responseXmlValid;
@@ -54,6 +56,10 @@ public class SoapExchange {
     private Map<String, List<String>> proxyResponseHeaders;
     private List<String> requestXmlErrors;
     private List<String> responseXmlErrors;
+
+    public BackendExchange getBackendExchange() {
+        return new BackendExchange(uri, frontEndRequest, frontEndRequestHeaders);
+    }
 
     public String getValidatorId() {
         return validatorId;
@@ -124,6 +130,20 @@ public class SoapExchange {
     }
 
     /**
+     * @return the response
+     */
+    public int getBackEndResponseCode() {
+        return backEndResponseCode;
+    }
+
+    /**
+     * @return the response
+     */
+    public void setBackEndResponseCode(int code) {
+        this.backEndResponseCode = code;
+    }
+
+    /**
      * Fomatted xml response.
      *
      * @return
@@ -154,30 +174,6 @@ public class SoapExchange {
 
     public void setProxyResponse(String proxyResponse) {
         this.proxyResponse = proxyResponse;
-    }
-
-    /**
-     * @return the message
-     */
-    public String getMessage() {
-        return message;
-    }
-
-    /**
-     * @param message the message to set
-     */
-    public SoapExchange setMessage(String message) {
-        this.message = message;
-        return this;
-    }
-
-    /**
-     * True if message is empty.
-     *
-     * @return
-     */
-    public boolean isEmptyMessage() {
-        return (message == null) || (message.length() == 0);
     }
 
     /**

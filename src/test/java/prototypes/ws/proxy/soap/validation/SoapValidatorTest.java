@@ -67,6 +67,7 @@ public class SoapValidatorTest {
          */
         requestMessage = requestMessage.setResponseContent(response);
         if (!validator.validateResponse(requestMessage, errors)) {
+            System.out.println(errors);
             fail("Response message not valid");
         }
     }
@@ -81,6 +82,7 @@ public class SoapValidatorTest {
          */
         requestMessage = requestMessage.setResponseContent(fault);
         if (!validator.validateResponse(requestMessage, errors)) {
+            System.out.println(errors);
             fail("Response message not valid");
         }
     }

@@ -15,9 +15,17 @@
  */
 package prototypes.ws.proxy.soap.web.io;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.constantes.ProxyErrorConstantes;
@@ -54,8 +62,7 @@ public class Requests {
         return target;
     }
 
-    public static URL resolveTargetUrl(HttpServletRequest request) {
-        String uri = Requests.getTarget(request);
+    public static URL resolveTargetUrl(HttpServletRequest request, String uri) {
         if (Strings.isNullOrEmpty(uri)) {
             throw new IllegalStateException(
                     ProxyErrorConstantes.TARGET_IS_EMPTY);
@@ -74,6 +81,10 @@ public class Requests {
                     ProxyErrorConstantes.INVALID_TARGET, uri));
         }
         return targetUrl;
+    }
+
+    public static URL resolveTargetUrl(HttpServletRequest request) {
+        return resolveTargetUrl(request, Requests.getTarget(request));
     }
 
     public static String resolveSoapServiceFromURL(String url) {
@@ -102,6 +113,48 @@ public class Requests {
         str = str.toLowerCase();
 
         return str.startsWith("http:/") || str.startsWith("https:/");
+    }
+
+    public static Map<String, List<String>> getRequestHeaders(HttpServletRequest req) {
+        return getRequestHeaders(req, new ArrayList<String>());
+    }
+
+    public static Map<String, List<String>> getRequestHeaders(HttpServletRequest req, List<String> headersToIgnore) {
+        String headerName = null;
+        Map<String, List<String>> headersMap = new HashMap<String, List<String>>();
+        for (Enumeration<String> e = req.getHeaderNames(); e.hasMoreElements(); headerName = e
+                .nextElement()) {
+            if (headerName != null
+                    && !headersToIgnore.contains(headerName.toLowerCase())) {
+                List<String> values = headersMap.get(headerName);
+                if (values == null) {
+                    values = new ArrayList<String>();
+                }
+                values.add(req.getHeader(headerName));
+                headersMap.put(headerName, values);
+            }
+        }
+        return headersMap;
+    }
+
+    public static void setRequestHeaders(Map<String, List<String>> headersTo, Map<String, List<String>> headersFrom, List<String> headersToForget) {
+        for (String headerName : headersFrom.keySet()) {
+            if (headersToForget.contains(headerName)) {
+                headersTo.put(headerName, headersFrom.get(headerName));
+            }
+        }
+    }
+
+    public static void sendErrorClient(HttpServletRequest request, HttpServletResponse response, String message) throws IOException, ServletException {
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        request.setAttribute("javax.servlet.error.message", message);
+        request.getRequestDispatcher("/WEB-INF/views/jsp/soap-fault-client.jsp").forward(request, response);
+    }
+
+    public static void sendErrorServer(HttpServletRequest request, HttpServletResponse response, String message) throws IOException, ServletException {
+        response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+        request.setAttribute("javax.servlet.error.message", message);
+        request.getRequestDispatcher("/WEB-INF/views/jsp/soap-fault-server.jsp").forward(request, response);
     }
 
 }

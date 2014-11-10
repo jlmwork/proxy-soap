@@ -83,8 +83,6 @@ $(function() {
         }
     }
 
-
-
     var exchangesCache = {};
     $('#exchangestable').on('click-row.bs.table', function(e, rowData, elem) {
         if (rowData.id) {
@@ -110,9 +108,13 @@ $(function() {
         }
     });
 
-    $('.viewvalidator').click(function() {
-        $('#myTab a[href="#validators"]').tab('show');
-    });
+    $('#menutabs a[href="#validators"]').on('shown.bs.tab', function(e) {
+        validator = window.location.hash;
+        console.log(validator);
+        if (validator) {
+            $('html,body').scrollTop($(validator).offset().top);
+        }
+    })
 
     $('.autorefresh')
             .click(function() {
@@ -133,6 +135,12 @@ $(function() {
             })
             .data('enabled', Cookie.get('autorefresh') != "true")
             .click();
+
+    $('[accesskey]').each(function() {
+        $(document).on('keyup', null, $(this).attr('accesskey'), function(e) {
+            $('[accesskey=' + e.key + ']').click();
+        });
+    });
 }
 );
 
@@ -148,7 +156,7 @@ function rowStyle(row, index) {
 }
 
 function validatorFieldFormatter(value, row) {
-    return '<a class="viewvalidator" href="ui#' + value + '" onclick="viewValidator(\'' + value + '\');return false;">' + value + '</a>';
+    return '<a class="viewvalidator" href="ui#AffaireServiceWrite" onclick="viewValidator(this);">' + value + '</a>';
 }
 function responseTimeFieldFormatter(value) {
     console.log("responseTimeFieldFormatter");
@@ -158,9 +166,11 @@ function responseTimeFieldFormatter(value) {
     console.log(value);
     return value;
 }
-function viewValidator(validator) {
+function viewValidator(validatorLink) {
     $('#menutabs a[href="#validators"]').tab('show');
+    var validator = validatorLink.href.split('#')[1];
     window.location.hash = validator;
+    return false;
 }
 function formatList(list) {
     var str = "";

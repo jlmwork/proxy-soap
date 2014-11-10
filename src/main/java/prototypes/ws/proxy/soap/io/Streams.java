@@ -34,8 +34,10 @@ public class Streams {
 
     public static void putStringAndClose(OutputStream os, String data)
             throws IOException {
-        putString(os, data, false);
-        os.close();
+        if (os != null) {
+            putString(os, data, false);
+            os.close();
+        }
     }
 
     public static OutputStream putString(OutputStream os, String data,

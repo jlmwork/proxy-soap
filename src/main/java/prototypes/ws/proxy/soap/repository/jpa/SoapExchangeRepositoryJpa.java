@@ -48,8 +48,9 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
 
     private final String persistenceUnitName;
 
-    // TODO : delete when loadgraph will work in EclipseLink
-    String[] exchangeFields = Classes.getAllFieldsName(SoapExchange.class, new String[]{"serial", "_"});
+    // TODO : this is a workaround. delete it when loadgraph will work in EclipseLink
+    // view below for more details
+    String[] exchangeFields = Classes.getAllFieldsName(SoapExchange.class, new String[]{"serial", "_", "UID"});
 
     public SoapExchangeRepositoryJpa(ProxyConfiguration proxyConfig) {
         super(proxyConfig);

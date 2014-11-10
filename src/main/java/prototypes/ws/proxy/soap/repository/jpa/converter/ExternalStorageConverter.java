@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package prototypes.ws.proxy.soap.repository.jpa;
+package prototypes.ws.proxy.soap.repository.jpa.converter;
 
 import com.eaio.uuid.UUID;
 import java.io.File;

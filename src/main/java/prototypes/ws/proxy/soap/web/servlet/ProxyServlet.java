@@ -20,7 +20,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.ServletException;
@@ -31,19 +30,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
 import prototypes.ws.proxy.soap.constantes.ProxyErrorConstantes;
-import prototypes.ws.proxy.soap.web.context.ApplicationContext;
-import prototypes.ws.proxy.soap.web.context.RequestContext;
-import prototypes.ws.proxy.soap.model.ProxyExchange;
-import prototypes.ws.proxy.soap.web.io.Requests;
 import prototypes.ws.proxy.soap.io.Streams;
 import prototypes.ws.proxy.soap.io.Strings;
+import prototypes.ws.proxy.soap.model.BackendExchange;
+import prototypes.ws.proxy.soap.web.context.ApplicationContext;
+import prototypes.ws.proxy.soap.web.context.RequestContext;
+import prototypes.ws.proxy.soap.web.io.Requests;
 
 public class ProxyServlet extends AbstractServlet {
 
+    private static final long serialVersionUID = 753782663465493431L;
+
     private static final Logger LOGGER = LoggerFactory
             .getLogger(ProxyServlet.class);
-
-    private static final long serialVersionUID = 753782663465493431L;
 
     // following headers must not go back unchanged to the client
     private static final List<String> RESP_HEADERS_TO_IGNORE = Arrays
@@ -73,144 +72,128 @@ public class ProxyServlet extends AbstractServlet {
     @Override
     protected void doRequest(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException {
-        LOGGER.debug("doRequest");
-        ProxyExchange proxyExchange = RequestContext.getProxyExchange(request);
-
-        URL targetUrl = null;
-        try {
-            targetUrl = Requests.resolveTargetUrl(request);
-        } catch (IllegalStateException e1) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                    e1.getMessage());
-            return;
-        }
-
-        byte[] body = Streams.getBytes(request.getInputStream());
-
         HttpURLConnection httpConn = null;
-
+        LOGGER.debug("doRequest");
+        BackendExchange backendExchange = RequestContext.getBackendExchange(request);
         try {
-            httpConn = (HttpURLConnection) targetUrl.openConnection();
-            // timeouts
-            httpConn.setConnectTimeout(proxyConfig.getConnectTimeout());
-            httpConn.setReadTimeout(proxyConfig.getReadTimeout());
-            httpConn.setDoOutput(false);
+            URL targetUrl = Requests.resolveTargetUrl(request, backendExchange.getUri());
+            httpConn = prepareBackendConnection(targetUrl, request, backendExchange.getRequestHeaders());
 
-            // Headers
-            List<String> headersToIgnore = new ArrayList<String>(REQ_HEADERS_TO_IGNORE);
-            if (!Strings.isNullOrEmpty(request.getParameter("username"))
-                    && !Strings.isNullOrEmpty(request.getParameter("password"))) {
-                LOGGER.info("Use different username/password pari for backend");
-                String userpass = request.getParameter("username") + ":" + request.getParameter("password");
-                String basicAuth = "Basic " + new String(new Base64().encode(userpass.getBytes()));
-                headersToIgnore.add(Requests.HEADER_AUTH.toLowerCase());
-                httpConn.setRequestProperty(Requests.HEADER_AUTH, basicAuth);
-            }
-            this.addRequestHeaders(request, httpConn, headersToIgnore);
-            proxyExchange.setRequestHeaders(httpConn.getRequestProperties());
-
-            httpConn.setRequestMethod(request.getMethod());
-            String reqContentType = (!Strings.isNullOrEmpty(request.getContentType()))
-                    ? request.getContentType()
-                    : (!Strings.isNullOrEmpty(request.getHeader("Content-Type"))
-                    ? request.getHeader("Content-Type")
-                    : "text/xml");
-            httpConn.setRequestProperty("Content-Type", reqContentType);
-            httpConn.setDoOutput(true);
-
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Body Content : " + new String(body));
-            }
+            // save final state of request headers
+            backendExchange.setRequestHeaders(httpConn.getRequestProperties());
 
             // Send request
+            byte[] body = backendExchange.getRequestBody().getBytes();
+            backendExchange.start();
             if (body.length > 0) {
-                LOGGER.warn("Body Content not Empty");
                 httpConn.getOutputStream().write(body);
+            } else {
+                LOGGER.warn("Body Empty");
             }
-            boolean gzipped = "gzip".equals(httpConn.getContentEncoding());
 
+            boolean gzipped = "gzip".equals(httpConn.getContentEncoding());
             // Get response. If response is gzipped, uncompress it
             try {
-                proxyExchange.setResponseBody(Streams.getString(
+                backendExchange.setResponseBody(Streams.getString(
                         httpConn.getInputStream(), gzipped));
+            } catch (java.net.SocketTimeoutException ex) {
+                throw new IOException("Time out");
             } catch (IOException e) {
-                LOGGER.debug("Failed to read target response body", e);
-                proxyExchange.setResponseBody(Streams.getString(httpConn.getErrorStream(), gzipped));
+                LOGGER.warn("Failed to read target response body {}", e.getMessage());
+                backendExchange.setResponseBody(Streams.getString(httpConn.getErrorStream(), gzipped));
+            } finally {
+                backendExchange.stop();
             }
 
-            // Make Proxy Result
-            proxyExchange.setResponseCode(httpConn.getResponseCode());
-            proxyExchange.setResponseMessage(httpConn.getResponseMessage());
-            proxyExchange.setResponseHeaders(httpConn.getHeaderFields());
-            proxyExchange.setContentType(httpConn.getContentType());
-            proxyExchange.setContentEncoding(httpConn.getContentEncoding());
-            proxyExchange.setGzipped(gzipped);
+            // Stores infos
+            backendExchange.setResponseCode(httpConn.getResponseCode());
+            backendExchange.setResponseHeaders(httpConn.getHeaderFields());
 
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Proxy result : " + proxyExchange);
+            // Specific error code treatment
+            switch (backendExchange.getResponseCode()) {
+                case 0:
+                    // No response
+                    LOGGER.debug("ResponseCode =  0 !!!");
+                    Requests.sendErrorServer(request, response, String
+                            .format(ProxyErrorConstantes.EMPTY_RESPONSE,
+                                    targetUrl.toString()));
+                    return;
+                case 404:
+                    LOGGER.debug("404 returned");
+                    Requests.sendErrorServer(request, response,
+                            String.format(ProxyErrorConstantes.NOT_FOUND,
+                                    targetUrl.toString()));
+                    return;
             }
 
+            // return response with filtered headers
+            List<String> respHeadersToIgnore = new ArrayList<String>(RESP_HEADERS_TO_IGNORE);
+            addResponseHeaders(response, backendExchange, respHeadersToIgnore);
+            response.setStatus(backendExchange.getResponseCode());
+
+            Streams.putStringAndClose(response.getOutputStream(),
+                    backendExchange.getResponseBody());
+        } catch (IllegalStateException e1) {
+            // bad url
+            Requests.sendErrorClient(request, response,
+                    e1.getMessage());
+            return;
+        } catch (ClassCastException ex) {
+            // bad url
+            Requests.sendErrorClient(request, response,
+                    ex.getMessage());
+            return;
         } catch (IOException e) {
-            LOGGER.error("Proxy call in ERROR");
+            LOGGER.error("Backend call in ERROR");
+            // bad call
+            Requests.sendErrorServer(request, response,
+                    e.getMessage());
+            return;
+        } finally {
+            LOGGER.debug("BackendExchange : {}", backendExchange);
             if (httpConn != null) {
                 httpConn.disconnect();
             }
         }
-        List<String> respHeadersToIgnore = new ArrayList<String>(RESP_HEADERS_TO_IGNORE);
-        // Specific error code treatment
-        switch (proxyExchange.getResponseCode()) {
-            case 0:
-                // No response
-                LOGGER.debug("ResponseCode =  0 !!!");
-                response.sendError(HttpServletResponse.SC_BAD_GATEWAY, String
-                        .format(ProxyErrorConstantes.EMPTY_RESPONSE,
-                                targetUrl.toString()));
-                return;
-            case 404:
-                LOGGER.debug("404 returned");
-                response.sendError(
-                        HttpServletResponse.SC_BAD_GATEWAY,
-                        String.format(ProxyErrorConstantes.NOT_FOUND,
-                                targetUrl.toString()));
-                return;
-            //case 401:
-            //    respHeadersToIgnore.add("Content-Length".toLowerCase());
-            //    break;
-        }
-
-        // return response with filtered headers
-        addResponseHeaders(response, proxyExchange, respHeadersToIgnore);
-        response.setStatus(proxyExchange.getResponseCode());
-
-        Streams.putStringAndClose(response.getOutputStream(),
-                proxyExchange.getResponseBody());
     }
 
-    /**
-     * Set header from http request to http connection.
-     *
-     * @param req
-     * @param httpConn
-     */
-    private void addRequestHeaders(HttpServletRequest req,
-            HttpURLConnection httpConn, List<String> headersToIgnore) {
-        String headerName = null;
-        for (Enumeration<String> e = req.getHeaderNames(); e.hasMoreElements(); headerName = e
-                .nextElement()) {
-            // unactivate gzipped request with remote host
-            if (headerName != null
-                    && !headersToIgnore.contains(headerName.toLowerCase())) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Add Request header [" + headerName + "=" + req.getHeader(headerName) + "]");
-                }
-                httpConn.setRequestProperty(headerName, req.getHeader(headerName));
-            } else {
-                if (headerName != null) {
-                    LOGGER.debug("Ignore Request header [" + headerName + "=" + req.getHeader(headerName) + "]");
-                }
-            }
+    private HttpURLConnection prepareBackendConnection(URL targetUrl, HttpServletRequest request, Map<String, List<String>> headers) throws IOException {
+        HttpURLConnection httpConn = null;
+        httpConn = (HttpURLConnection) targetUrl.openConnection();
+        // timeouts
+        httpConn.setConnectTimeout(proxyConfig.getConnectTimeout());
+        httpConn.setReadTimeout(proxyConfig.getReadTimeout());
+
+        // type of connection
+        httpConn.setDoOutput(true);
+        httpConn.setRequestMethod(request.getMethod());
+
+        // Headers
+        List<String> headersToIgnore = new ArrayList<String>(REQ_HEADERS_TO_IGNORE);
+        useAuth(request, headersToIgnore, httpConn);
+        Requests.setRequestHeaders(httpConn.getRequestProperties(), headers, headersToIgnore);
+        httpConn.setRequestProperty("X-Forwarded-For", request.getRemoteAddr());
+
+        // some more headers
+        String reqContentType = (!Strings.isNullOrEmpty(request.getContentType()))
+                ? request.getContentType()
+                : (!Strings.isNullOrEmpty(request.getHeader("Content-Type"))
+                        ? request.getHeader("Content-Type")
+                        : "text/xml");
+        httpConn.setRequestProperty("Content-Type", reqContentType);
+
+        return httpConn;
+    }
+
+    private void useAuth(HttpServletRequest request, List<String> headersToIgnore, HttpURLConnection httpConn) {
+        if (!Strings.isNullOrEmpty(request.getParameter("username"))
+                && !Strings.isNullOrEmpty(request.getParameter("password"))) {
+            LOGGER.info("Use different username/password pari for backend");
+            String userpass = request.getParameter("username") + ":" + request.getParameter("password");
+            String basicAuth = "Basic " + new String(new Base64().encode(userpass.getBytes()));
+            headersToIgnore.add(Requests.HEADER_AUTH.toLowerCase());
+            httpConn.setRequestProperty(Requests.HEADER_AUTH, basicAuth);
         }
-        httpConn.setRequestProperty("X-Forwarded-For", req.getRemoteHost());
     }
 
     /**
@@ -221,7 +204,7 @@ public class ProxyServlet extends AbstractServlet {
      * @param headersToIgnore allow filtering of headers
      */
     private void addResponseHeaders(HttpServletResponse resp,
-            ProxyExchange proxyResult, List<String> headersToIgnore) {
+            BackendExchange proxyResult, List<String> headersToIgnore) {
 
         if (proxyResult.getResponseHeaders() == null) {
             return;
