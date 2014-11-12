@@ -36,8 +36,8 @@ public class SamlTokenAssertionGenerator {
     /**
      * SAML Version hard-coded
      *
-     * @TODO: use factory pattern and an interface for Generators for more
-     * supported versions
+     * TODO: only supports SAML 1.1. Use factory pattern and an interface for
+     * Generators for more supported versions
      *
      */
     //private static final String SAML_VERSION = "1.1";
@@ -76,8 +76,9 @@ public class SamlTokenAssertionGenerator {
 
     protected void traceAssertion(SAMLAssertion assertion) throws Exception {
         // Print the assertion to standard output
-        LOGGER.debug("Assertion (pretty printed) : ");
-        LOGGER.debug(XMLHelper.prettyPrintXML(assertion.toDOM()));
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Assertion (pretty printed) : {} ", XMLHelper.prettyPrintXML(assertion.toDOM()));
+        }
     }
 
 }

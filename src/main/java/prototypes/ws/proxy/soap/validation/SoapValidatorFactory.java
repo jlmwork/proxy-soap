@@ -163,7 +163,7 @@ public class SoapValidatorFactory {
 
         for (String path : toScanPaths) {
             // TODO : normalize paths for os portability
-            // FileSystem.getFileSystem().normalize(path);
+            // FileSystem.getFileSystem().normalize(path); or FilenameUtils.normalize(path);
 
             // Direct access to a WSDL
             if (path.toUpperCase().endsWith(".WSDL")

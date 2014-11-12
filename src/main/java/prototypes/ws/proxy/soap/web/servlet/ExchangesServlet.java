@@ -78,100 +78,95 @@ public class ExchangesServlet extends AbstractServlet {
         LOGGER.debug("Asked format : " + askedFormat);
 
         if ("text/csv".equals(askedFormat.toLowerCase())) {
-            Collection<SoapExchange> soapExchanges = exchangeRepository.listWithoutContent();
-            LOGGER.debug("CSV format");
-            response.setContentType("text/csv;charset=UTF-8");
-            Cookie cookie = new Cookie("fileDownload", "true");
-            cookie.setPath("/");
-            response.addCookie(cookie);
-            response.setHeader("Content-Description", "File Transfer");
-            response.setHeader("Content-Type", "application/octet-stream");
-            response.setHeader("Content-Disposition", "attachment; filename=" + generateFilename("csv"));
-            response.setHeader("Content-Transfer-Encoding", "binary");
-            response.setHeader("Expires", "0");
-            response.setHeader("Cache-Control", "must-revalidate");
-            response.setHeader("Pragma", "public");
-            PrintWriter out = response.getWriter();
-            try {
-                CsvWriter csvBuilder = new CsvWriter(out);
-                LOGGER.debug("Export " + soapExchanges.size() + " soapExchanges");
-                for (SoapExchange soapRequest : soapExchanges) {
-                    csvBuilder.append(soapRequest).flush();
-                }
-            } finally {
-                out.close();
-            }
+            respondInCsv(response);
         } else if ("application/zip".equals(askedFormat.toLowerCase())) {
-            Collection<SoapExchange> soapExchanges = exchangeRepository.listWithoutContent();
-            LOGGER.debug("ZIP format");
-            response.setContentType("application/zip");
-            Cookie cookie = new Cookie("fileDownload", "true");
-            cookie.setPath("/");
-            response.addCookie(cookie);
-            response.setHeader("Content-Description", "File Transfer");
-            response.setHeader("Content-Type", "application/octet-stream");
-            response.setHeader("Content-Disposition", "attachment; filename=" + generateFilename("zip"));
-            response.setHeader("Content-Transfer-Encoding", "binary");
-            response.setHeader("Expires", "0");
-            response.setHeader("Cache-Control", "must-revalidate");
-            response.setHeader("Pragma", "public");
-            ZipOut zipOut = new ZipOut(response.getOutputStream());
-            PrintWriter writer = zipOut.getFileWriter(generateFilename("csv"));
-            CsvWriter csvBuilder = new CsvWriter(writer);
+            respondInZip(response);
+
+        } else if ("application/json".equals(askedFormat.toLowerCase())) {
+            respondInJson(response);
+        }
+    }
+
+    private void respondInZip(HttpServletResponse response) throws IOException {
+        Collection<SoapExchange> soapExchanges = exchangeRepository.listWithoutContent();
+        LOGGER.debug("ZIP format");
+        response.setContentType("application/zip");
+        Cookie cookie = new Cookie("fileDownload", "true");
+        cookie.setPath("/");
+        response.addCookie(cookie);
+        response.setHeader("Content-Description", "File Transfer");
+        response.setHeader("Content-Type", "application/octet-stream");
+        response.setHeader("Content-Disposition", "attachment; filename=" + generateFilename("zip"));
+        response.setHeader("Content-Transfer-Encoding", "binary");
+        response.setHeader("Expires", "0");
+        response.setHeader("Cache-Control", "must-revalidate");
+        response.setHeader("Pragma", "public");
+        ZipOut zipOut = new ZipOut(response.getOutputStream());
+        PrintWriter writer = zipOut.getFileWriter(generateFilename("csv"));
+        CsvWriter csvBuilder = new CsvWriter(writer);
+        LOGGER.debug("Export " + soapExchanges.size() + " soapExchanges");
+        for (SoapExchange soapRequest : soapExchanges) {
+            csvBuilder.append(soapRequest).flush();
+        }
+        zipOut.closeFileWriter();
+        zipOut.addDirToZipStream(ApplicationConfig.EXCHANGES_STORAGE_PATH, new String[]{"xml"});
+        zipOut.finish();
+    }
+
+    private void respondInJson(HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        Collection<SoapExchange> soapExchanges = exchangeRepository.listWithoutContent();
+        // TODO : use "fields" parameter for field selection
+        PrintWriter out = response.getWriter();
+        JsonWriter jsonWriter = Json.createWriter(out);
+        LOGGER.debug("Export " + soapExchanges.size() + " soapExchanges");
+        JsonObjectBuilder oBuilder = Json.createObjectBuilder();
+        JsonArrayBuilder aBuilder = Json.createArrayBuilder();
+        for (SoapExchange soapRequest : soapExchanges) {
+            aBuilder.add(Json.createObjectBuilder()
+                    .add("id", stripNull(soapRequest.getId()))
+                    .add("date", stripNull(soapRequest.getDate()))
+                    .add("from", stripNull(soapRequest.getFrom()))
+                    .add("to", stripNull(soapRequest.getUri()))
+                    .add("validator", stripNull(soapRequest.getValidatorId()))
+                    .add("operation", stripNull(soapRequest.getOperation()))
+                    .add("resp_time", soapRequest.getBackEndResponseTime())
+                    .add("request_valid", stripNull(soapRequest.getRequestValid()))
+                    .add("request_xml_valid", stripNull(soapRequest.getRequestXmlValid()))
+                    .add("request_soap_valid", stripNull(soapRequest.getRequestSoapValid()))
+                    .add("response_valid", stripNull(soapRequest.getResponseValid()))
+                    .add("response_xml_valid", stripNull(soapRequest.getResponseXmlValid()))
+                    .add("response_soap_valid", stripNull(soapRequest.getResponseSoapValid()))
+            );
+        }
+        //oBuilder.add("exchanges", aBuilder.build());
+        jsonWriter.write(aBuilder.build());
+        jsonWriter.close();
+        out.close();
+    }
+
+    private void respondInCsv(HttpServletResponse response) throws IOException {
+        Collection<SoapExchange> soapExchanges = exchangeRepository.listWithoutContent();
+        LOGGER.debug("CSV format");
+        response.setContentType("text/csv;charset=UTF-8");
+        Cookie cookie = new Cookie("fileDownload", "true");
+        cookie.setPath("/");
+        response.addCookie(cookie);
+        response.setHeader("Content-Description", "File Transfer");
+        response.setHeader("Content-Type", "application/octet-stream");
+        response.setHeader("Content-Disposition", "attachment; filename=" + generateFilename("csv"));
+        response.setHeader("Content-Transfer-Encoding", "binary");
+        response.setHeader("Expires", "0");
+        response.setHeader("Cache-Control", "must-revalidate");
+        response.setHeader("Pragma", "public");
+        PrintWriter out = response.getWriter();
+        try {
+            CsvWriter csvBuilder = new CsvWriter(out);
             LOGGER.debug("Export " + soapExchanges.size() + " soapExchanges");
             for (SoapExchange soapRequest : soapExchanges) {
                 csvBuilder.append(soapRequest).flush();
             }
-            zipOut.closeFileWriter();
-            zipOut.addDirToZipStream(ApplicationConfig.EXCHANGES_STORAGE_PATH, new String[]{"xml"});
-            zipOut.finish();
-
-        } else if ("application/json".equals(askedFormat.toLowerCase())) {
-            response.setContentType("application/json");
-            Collection<SoapExchange> soapExchanges = exchangeRepository.listWithoutContent();
-            //JsonGenerator jg = jsonF.createJsonGenerator(new File("result.json"), JsonEncoding.UTF8);
-            /*JsonObject model = Json.createObjectBuilder()
-             .add("firstName", "Duke")
-             .add("lastName", "Java")
-             .add("age", 18)
-             .add("streetAddress", "100 Internet Dr")
-             .add("city", "JavaTown")
-             .add("state", "JA")
-             .add("postalCode", "12345")
-             .add("phoneNumbers", Json.createArrayBuilder()
-             .add(Json.createObjectBuilder()
-             .add("type", "mobile")
-             .add("number", "111-111-1111"))
-             .add(Json.createObjectBuilder()
-             .add("type", "home")
-             .add("number", "222-222-2222")))
-             .build();*/
-            // TODO : use "fields" parameter for field selection
-            PrintWriter out = response.getWriter();
-            JsonWriter jsonWriter = Json.createWriter(out);
-            LOGGER.debug("Export " + soapExchanges.size() + " soapExchanges");
-            JsonObjectBuilder oBuilder = Json.createObjectBuilder();
-            JsonArrayBuilder aBuilder = Json.createArrayBuilder();
-            for (SoapExchange soapRequest : soapExchanges) {
-                aBuilder.add(Json.createObjectBuilder()
-                        .add("id", stripNull(soapRequest.getId()))
-                        .add("date", stripNull(soapRequest.getDate()))
-                        .add("from", stripNull(soapRequest.getFrom()))
-                        .add("to", stripNull(soapRequest.getUri()))
-                        .add("validator", stripNull(soapRequest.getValidatorId()))
-                        .add("operation", stripNull(soapRequest.getOperation()))
-                        .add("resp_time", soapRequest.getBackEndResponseTime())
-                        .add("request_valid", stripNull(soapRequest.getRequestValid()))
-                        .add("request_xml_valid", stripNull(soapRequest.getRequestXmlValid()))
-                        .add("request_soap_valid", stripNull(soapRequest.getRequestSoapValid()))
-                        .add("response_valid", stripNull(soapRequest.getResponseValid()))
-                        .add("response_xml_valid", stripNull(soapRequest.getResponseXmlValid()))
-                        .add("response_soap_valid", stripNull(soapRequest.getResponseSoapValid()))
-                );
-            }
-            //oBuilder.add("exchanges", aBuilder.build());
-            jsonWriter.write(aBuilder.build());
-            jsonWriter.close();
+        } finally {
             out.close();
         }
     }

@@ -30,6 +30,10 @@ public class RequestContext {
     }
 
     public static BackendExchange getBackendExchange(HttpServletRequest request) {
+        return getBackendExchange(request, true);
+    }
+
+    public static BackendExchange getBackendExchange(HttpServletRequest request, boolean create) {
         // try to get the backend exchange from request
         BackendExchange backendExchange = (BackendExchange) request.getAttribute(BackendExchange.UID);
         // not found
@@ -41,7 +45,9 @@ public class RequestContext {
                 backendExchange = soapExchange.createBackendExchange();
             } else {
                 // create it
-                backendExchange = new BackendExchange(request);
+                if (create) {
+                    backendExchange = new BackendExchange(request);
+                }
             }
         }
         // references it

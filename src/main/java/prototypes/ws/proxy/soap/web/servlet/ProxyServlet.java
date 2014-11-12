@@ -156,7 +156,11 @@ public class ProxyServlet extends AbstractServlet {
             LOGGER.trace("BackendExchange Hashcode : {}", Integer.toHexString(backendExchange.hashCode()));
             LOGGER.debug("BackendExchange : {}", backendExchange);
             if (httpConn != null) {
-                httpConn.disconnect();
+                try {
+                    httpConn.disconnect();
+                } catch (Exception e) {
+                    LOGGER.warn("Error on disconnect {}", e.getMessage());
+                }
             }
         }
     }
@@ -182,8 +186,8 @@ public class ProxyServlet extends AbstractServlet {
         String reqContentType = (!Strings.isNullOrEmpty(request.getContentType()))
                 ? request.getContentType()
                 : (!Strings.isNullOrEmpty(request.getHeader("Content-Type"))
-                        ? request.getHeader("Content-Type")
-                        : "text/xml");
+                ? request.getHeader("Content-Type")
+                : "text/xml");
         httpConn.setRequestProperty("Content-Type", reqContentType);
 
         return httpConn;

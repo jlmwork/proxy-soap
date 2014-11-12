@@ -175,92 +175,96 @@ public class ExtendedWsdlValidator extends WsdlValidator {
     private void validateSoapFault(WsdlContext wsdlContext, BindingOperation bindingOperation, XmlObject msgXml, List errors)
             throws Exception {
         Map faults = bindingOperation.getBindingFaults();
-        Iterator<BindingFault> i = faults.values().iterator();
 
-        LOGGER.debug("Search Fault Type among WSDL Operation Fault Parts ");
+        LOGGER.debug("Search Fault Type among WSDL Operation Binding Fault Parts : {} ", faults.size());
+        if (faults.size() > 0) {
+            Iterator<BindingFault> i = faults.values().iterator();
+            while (i.hasNext()) {
+                BindingFault bindingFault = i.next();
+                String faultName = bindingFault.getName();
 
-        while (i.hasNext()) {
-            BindingFault bindingFault = i.next();
-            String faultName = bindingFault.getName();
-
-            Part[] faultParts = WsdlUtils.getFaultParts(bindingOperation, faultName);
-            if (faultParts.length == 0) {
-                LOGGER.warn("Missing fault parts in wsdl for fault [{}] in bindingOperation [{}]", faultName, bindingOperation.getName());
-                continue;
-            }
-
-            if (faultParts.length != 1) {
-                LOGGER.info("Too many fault parts in wsdl for fault [{}] in bindingOperation [{}]", faultName, bindingOperation.getName());
-                continue;
-            }
-
-            Part part = faultParts[0];
-            QName elementName = part.getElementName();
-            LOGGER.debug("Binding Fault found in WSDL : {}", elementName);
-
-            if (elementName != null) {
-                String faultXPath = "declare namespace env='"
-                        + wsdlContext.getSoapVersion().getEnvelopeNamespace() + "'; declare namespace flt='"
-                        + wsdlContext.getSoapVersion().getFaultDetailNamespace() + "';" + "declare namespace ns='"
-                        + elementName.getNamespaceURI() + "';" + "$this/flt:detail/ns:" + elementName.getLocalPart();
-                LOGGER.debug("XML : {}", msgXml);
-                LOGGER.debug("Fault XPath : {}", faultXPath);
-                XmlObject[] paths = msgXml.selectPath(faultXPath);
-                LOGGER.debug("Found Fault XPaths : ", paths.length);
-
-                if (paths.length == 1) {
-                    LOGGER.debug("Found Fault");
-                    SchemaGlobalElement elm = wsdlContext.getSchemaTypeLoader().findElement(elementName);
-                    if (elm != null) {
-                        validateMessageBody(errors, elm.getType(), paths[0]);
-                    } else {
-                        errors.add(XmlError.forMessage("Missing fault part element [" + elementName + "] for fault ["
-                                + part.getName() + "] in associated schema"));
-                    }
-
-                    return;
+                Part[] faultParts = WsdlUtils.getFaultParts(bindingOperation, faultName);
+                if (faultParts.length == 0) {
+                    LOGGER.warn("Missing fault parts in wsdl for fault [{}] in bindingOperation [{}]", faultName, bindingOperation.getName());
+                    continue;
                 }
-            } // this is not allowed by Basic Profile.. remove?
-            else if (part.getTypeName() != null) {
-                QName typeName = part.getTypeName();
 
-                XmlObject[] paths = msgXml.selectPath("declare namespace env='"
-                        + wsdlContext.getSoapVersion().getEnvelopeNamespace() + "'; declare namespace flt='"
-                        + wsdlContext.getSoapVersion().getFaultDetailNamespace() + "';" + "declare namespace ns='"
-                        + typeName.getNamespaceURI() + "';" + "$this/flt:detail/ns:" + part.getName());
+                if (faultParts.length != 1) {
+                    LOGGER.info("Too many fault parts in wsdl for fault [{}] in bindingOperation [{}]", faultName, bindingOperation.getName());
+                    continue;
+                }
 
-                if (paths.length == 1) {
-                    SchemaType type = wsdlContext.getSchemaTypeLoader().findType(typeName);
-                    if (type != null) {
-                        validateMessageBody(errors, type, paths[0]);
-                    } else {
-                        errors.add(XmlError.forMessage("Missing fault part type [" + typeName + "] for fault ["
-                                + part.getName() + "] in associated schema"));
+                Part part = faultParts[0];
+                QName elementName = part.getElementName();
+                LOGGER.debug("Binding Fault found in WSDL : {}", elementName);
+
+                if (elementName != null) {
+                    String faultXPath = "declare namespace env='"
+                            + wsdlContext.getSoapVersion().getEnvelopeNamespace() + "'; declare namespace flt='"
+                            + wsdlContext.getSoapVersion().getFaultDetailNamespace() + "';" + "declare namespace ns='"
+                            + elementName.getNamespaceURI() + "';" + "$this/flt:detail/ns:" + elementName.getLocalPart();
+                    LOGGER.debug("XML : {}", msgXml);
+                    LOGGER.debug("Fault XPath : {}", faultXPath);
+                    XmlObject[] paths = msgXml.selectPath(faultXPath);
+                    LOGGER.debug("Found Fault XPaths : ", paths.length);
+
+                    if (paths.length == 1) {
+                        LOGGER.debug("Found Fault");
+                        SchemaGlobalElement elm = wsdlContext.getSchemaTypeLoader().findElement(elementName);
+                        if (elm != null) {
+                            validateMessageBody(errors, elm.getType(), paths[0]);
+                        } else {
+                            errors.add(XmlError.forMessage("Missing fault part element [" + elementName + "] for fault ["
+                                    + part.getName() + "] in associated schema"));
+                        }
+
+                        return;
                     }
+                } // this is not allowed by Basic Profile.. remove?
+                else if (part.getTypeName() != null) {
+                    QName typeName = part.getTypeName();
 
-                    return;
+                    XmlObject[] paths = msgXml.selectPath("declare namespace env='"
+                            + wsdlContext.getSoapVersion().getEnvelopeNamespace() + "'; declare namespace flt='"
+                            + wsdlContext.getSoapVersion().getFaultDetailNamespace() + "';" + "declare namespace ns='"
+                            + typeName.getNamespaceURI() + "';" + "$this/flt:detail/ns:" + part.getName());
+
+                    if (paths.length == 1) {
+                        SchemaType type = wsdlContext.getSchemaTypeLoader().findType(typeName);
+                        if (type != null) {
+                            validateMessageBody(errors, type, paths[0]);
+                        } else {
+                            errors.add(XmlError.forMessage("Missing fault part type [" + typeName + "] for fault ["
+                                    + part.getName() + "] in associated schema"));
+                        }
+
+                        return;
+                    }
                 }
             }
-        }
 
-        // if we get here, no matching fault was found.. this is not an error but
-        // should be warned..
-        String noMatchXPath = "declare namespace env='"
-                + wsdlContext.getSoapVersion().getEnvelopeNamespace() + "'; declare namespace flt='"
-                + wsdlContext.getSoapVersion().getFaultDetailNamespace() + "';$this/flt:detail";
-        LOGGER.debug("XML : {}", msgXml);
-        LOGGER.debug("Fault XPath : {}", noMatchXPath);
-        XmlObject[] paths = msgXml.selectPath(noMatchXPath);
+            // if we get here, no matching fault was found.. this is not an error but
+            // should be warned..
+            String noMatchXPath = "declare namespace env='"
+                    + wsdlContext.getSoapVersion().getEnvelopeNamespace() + "'; declare namespace flt='"
+                    + wsdlContext.getSoapVersion().getFaultDetailNamespace() + "';$this/flt:detail";
+            LOGGER.debug("XML : {}", msgXml);
+            LOGGER.debug("Fault XPath : {}", noMatchXPath);
+            XmlObject[] paths = msgXml.selectPath(noMatchXPath);
 
-        if (paths.length == 0) {
-            LOGGER.warn("Missing matching Fault in wsdl for bindingOperation [{}]", bindingOperation.getName());
-            errors.add(XmlError.forMessage("Missing matching Fault in wsdl for bindingOperation in associated schema"));
+            if (paths.length == 0) {
+                LOGGER.warn("Missing matching Fault in wsdl for bindingOperation [{}]", bindingOperation.getName());
+                errors.add(XmlError.forMessage("Missing matching Fault in wsdl for bindingOperation in associated schema"));
+            } else {
+                String xmlText = paths[0].xmlText(new XmlOptions().setSaveOuter());
+                LOGGER.warn("Missing matching Fault in wsdl for Fault Detail element [{}] in bindingOperation [{}]",
+                        XmlUtils.removeUnneccessaryNamespaces(xmlText), bindingOperation.getName());
+                errors.add(XmlError.forMessage("Missing fault part element [" + XmlUtils.removeUnneccessaryNamespaces(xmlText) + "] for fault ["
+                        + bindingOperation.getName() + "] in associated schema"));
+            }
         } else {
-            String xmlText = paths[0].xmlText(new XmlOptions().setSaveOuter());
-            LOGGER.warn("Missing matching Fault in wsdl for Fault Detail element [{}] in bindingOperation [{}]",
-                    XmlUtils.removeUnneccessaryNamespaces(xmlText), bindingOperation.getName());
-            errors.add(XmlError.forMessage("Missing fault part element [" + XmlUtils.removeUnneccessaryNamespaces(xmlText) + "] for fault ["
-                    + bindingOperation.getName() + "] in associated schema"));
+            // no special fault has been defined on this operation.
+            // so we wont do any validation
         }
     }
 

@@ -149,24 +149,65 @@ public class Requests {
         }
     }
 
+    /**
+     * method prefered to response.sendError in order to be able to capture
+     * output via wrapped response and know exact process flow.
+     *
+     * @param request
+     * @param response
+     * @param message
+     * @throws IOException
+     * @throws ServletException
+     */
     public static void sendErrorClient(HttpServletRequest request, HttpServletResponse response, String message) throws IOException, ServletException {
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         request.setAttribute("javax.servlet.error.message", message);
         request.getRequestDispatcher("/WEB-INF/views/jsp/soap-fault-client.jsp").forward(request, response);
     }
 
+    /**
+     * method prefered to response.sendError in order to be able to capture
+     * output via wrapped response and know exact process flow.
+     *
+     * @param request
+     * @param response
+     * @param message
+     * @param returnCode
+     * @throws IOException
+     * @throws ServletException
+     */
     public static void sendErrorServer(HttpServletRequest request, HttpServletResponse response, String message, int returnCode) throws IOException, ServletException {
         response.setStatus(returnCode);
         request.setAttribute("javax.servlet.error.message", message);
         request.getRequestDispatcher("/WEB-INF/views/jsp/soap-fault-server.jsp").forward(request, response);
     }
 
+    /**
+     * method prefered to response.sendError in order to be able to capture
+     * output via wrapped response and know exact process flow.
+     *
+     * @param request
+     * @param response
+     * @param message
+     * @throws IOException
+     * @throws ServletException
+     */
     public static void sendErrorServer(HttpServletRequest request, HttpServletResponse response, String message) throws IOException, ServletException {
         response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
         request.setAttribute("javax.servlet.error.message", message);
         request.getRequestDispatcher("/WEB-INF/views/jsp/soap-fault-server.jsp").forward(request, response);
     }
 
+    /**
+     * method prefered to response.sendError in order to be able to capture
+     * output via wrapped response and know exact process flow.
+     *
+     * @param request
+     * @param response
+     * @param message
+     * @throws IOException
+     * @throws ServletException
+     */
     public static void sendInternalErrorServer(HttpServletRequest request, HttpServletResponse response, String message) throws IOException, ServletException {
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         request.setAttribute("javax.servlet.error.message", message);

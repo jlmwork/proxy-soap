@@ -53,7 +53,6 @@ public class HeadersConverter implements AttributeConverter<Map<String, List<Str
                 oBuilder.add(compatKey, aBuilder.build());
             }
             String finalColumnContent = oBuilder.build().toString();
-            // TODO : add compression
             byte[] bytes = (new CompressionConverter()).convertToDatabaseColumn(finalColumnContent);
             return bytes;
         } else {
@@ -66,7 +65,6 @@ public class HeadersConverter implements AttributeConverter<Map<String, List<Str
         LOGGER.debug("Convert headers from DB");
         Map outMap = new HashMap<String, List<String>>();
         if (dbData != null && dbData.length > 0) {
-            // TODO : add uncompression
             String dbDataString = (new CompressionConverter()).convertToEntityAttribute(dbData);
             JsonReader reader = Json.createReader(new StringReader(dbDataString));
             JsonStructure jsonst = reader.read();

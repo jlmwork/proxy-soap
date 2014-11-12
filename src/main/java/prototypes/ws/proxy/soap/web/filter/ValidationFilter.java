@@ -68,40 +68,44 @@ public class ValidationFilter extends HttpServletFilter {
     public void doFilter(HttpServletRequest request, HttpServletResponse response,
             FilterChain chain) throws IOException, ServletException {
 
+        response.addHeader("X-Filtered-Validation", "" + proxyConfig.isValidationActive());
+        response.addHeader("X-Filtered-Blocking", "" + proxyConfig.isInBlockingMode());
+
         // only validate POST request if validation is activated
         if (proxyConfig.isValidationActive() && "POST".equals(request.getMethod())) {
             // TODO : avoid to use the SoapExchange object, but better a Validation-like object
+            // in order to abstract Validation from SoapExchange system (as in ProxyServlet)
             SoapExchange soapExchange = RequestContext.getSoapExchange(request);
             logger.info("Validation is active.");
 
-            // 1] Request validation
-            boolean requestValid = validateInput(request,
-                    soapExchange);
-            //TODO : save request headers when request is blocked
-            if (!requestValid && proxyConfig.isInBlockingMode()) {
-                Requests.sendErrorClient(request, response,
-                        "Request message invalid");
-                return;
-            }
-
             MultiReadHttpServletRequest wrappedRequest = Requests.wrap(request);
             CaptureServletResponseWrapper wrappedResponse = Requests.wrap(response);
+
+            // 1] Request validation
+            Boolean requestValid = validateInput(request,
+                    soapExchange);
+            if (!requestValid && proxyConfig.isInBlockingMode()) {
+                logger.info("Proxy is in blocking mode and this request is invalid.");
+                Requests.sendErrorClient(wrappedRequest, wrappedResponse,
+                        "Request message invalid");
+                logger.debug("Invalidation response : {} ", wrappedResponse.getContent());
+                return;
+            }
 
             // 2] pass the request along the filter chain
             chain.doFilter(wrappedRequest, wrappedResponse);
 
             // 3] Response validation
-            boolean responseValid = validateOutput(wrappedRequest, wrappedResponse,
+            Boolean responseValid = validateOutput(wrappedRequest, wrappedResponse,
                     soapExchange);
-            if (!responseValid && proxyConfig.isInBlockingMode()) {
-                logger.info("Proxy is in blocking mode.");
-                Requests.sendErrorServer(request, response,
+            if (responseValid != null && !responseValid && proxyConfig.isInBlockingMode()) {
+                logger.info("Proxy is in blocking mode and this response is invalid.");
+                //wrappedResponse.resetBuffer();
+                Requests.sendErrorServer(wrappedRequest, wrappedResponse,
                         "Response message invalid");
+                logger.debug("Invalidation response : {} ", wrappedResponse.getContent());
                 return;
             }
-            // send response back to the client
-            wrappedResponse.addHeader("X-Filtered-By", "proxy-soap");
-            wrappedResponse.addHeader("X-Filtered-ID", soapExchange.getId());
         } else {
             // pass the request along the filter chain
             chain.doFilter(request, response);
@@ -161,11 +165,11 @@ public class ValidationFilter extends HttpServletFilter {
      * @param soapValidator
      * @throws IOException
      */
-    private boolean validateOutput(HttpServletRequest request,
+    private Boolean validateOutput(HttpServletRequest request,
             CaptureServletResponseWrapper response,
             SoapExchange soapExchange)
             throws IOException {
-        boolean valid = false;
+        Boolean valid = null;
         String responseBodyContent = response.getContent();
 
         // validate only responses of code or 500 for SoapFaults
@@ -201,7 +205,11 @@ public class ValidationFilter extends HttpServletFilter {
             } else {
                 soapExchange.setResponseXmlErrors(errors);
             }
+        } else if (response.getStatus() == HttpServletResponse.SC_NOT_FOUND) {
+            valid = false;
         }
+        // dont validate :
+        //  - code 400 as it is used specially for tracing bad client requests
         return valid;
     }
 
@@ -210,14 +218,15 @@ public class ValidationFilter extends HttpServletFilter {
         String wsdlPath = request.getParameter("wsdl");
 
         // create validator on-the-fly
-        if (!Strings.isNullOrEmpty(wsdlPath)) {
+        if (!Strings.isNullOrEmpty(wsdlPath) && proxyConfig.runInDevMode()) {
             logger.info("Specific Validation activated by parameter wsdl");
+            logger.warn("The use of the wsdl parameter for on-the-fly WSDL resolution is not recommended for performance of the proxy");
             logger.debug("WSDL=" + wsdlPath);
             soapValidator = SoapValidatorFactory.getInstance().createSoapValidator(wsdlPath);
         } else {
-            logger.info("Default WSDL Validation activated (as no wsdl parameter has been provided)");
-            //String service = Requests.resolveSoapServiceFromRequest(request);
-            //soapValidator = SoapValidatorFactory.createSoapValidator(service);
+            if (!Strings.isNullOrEmpty(wsdlPath)) {
+                logger.error("The use of the wsdl parameter is not authorized in production mode. The parameter has been ignored.");
+            }
             QName qname;
             try {
                 qname = SoapMessage.getOperationNameFromBody(requestBody);

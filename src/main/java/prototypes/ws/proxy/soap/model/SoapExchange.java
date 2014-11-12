@@ -50,6 +50,7 @@ public class SoapExchange {
     // response
     private String backEndResponse;
     private int backEndResponseCode;
+    private int proxyResponseCode;
     private String proxyResponse;
     private Boolean responseSoapValid;
     private Boolean responseXmlValid;
@@ -97,6 +98,7 @@ public class SoapExchange {
                 + "\n, proxyRequestHeaders=" + proxyRequestHeaders
                 + "\n, proxyResponseHeaders=" + proxyResponseHeaders
                 + "\n, proxyResponse=" + proxyResponse
+                + "\n, proxyResponseCode=" + proxyResponseCode
                 + "\n, backEndResponse=" + backEndResponse
                 + "\n, backEndResponseCode=" + backEndResponseCode
                 + "\n, backEndResponseHeaders=" + backEndResponseHeaders
@@ -200,6 +202,20 @@ public class SoapExchange {
 
     public void setProxyResponse(String proxyResponse) {
         this.proxyResponse = proxyResponse;
+    }
+
+    /**
+     * @return the response
+     */
+    public int getProxyResponseCode() {
+        return proxyResponseCode;
+    }
+
+    /**
+     * @return the response
+     */
+    public void setProxyResponseCode(int code) {
+        this.proxyResponseCode = code;
     }
 
     /**

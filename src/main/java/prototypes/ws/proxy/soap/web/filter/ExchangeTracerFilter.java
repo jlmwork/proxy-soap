@@ -22,7 +22,6 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
 import prototypes.ws.proxy.soap.io.Streams;
 import prototypes.ws.proxy.soap.model.BackendExchange;
 import prototypes.ws.proxy.soap.model.SoapExchange;
@@ -39,8 +38,6 @@ import prototypes.ws.proxy.soap.web.io.Requests;
  */
 public class ExchangeTracerFilter extends HttpServletFilter {
 
-    private ProxyConfiguration proxyConfig;
-
     private SoapExchangeRepository exchangeRepository;
 
     /**
@@ -51,7 +48,6 @@ public class ExchangeTracerFilter extends HttpServletFilter {
     @Override
     public void init(FilterConfig config) throws ServletException {
         super.init(config);
-        proxyConfig = ApplicationContext.getProxyConfiguration(this.getServletContext());
         exchangeRepository = ApplicationContext.getSoapExchangeRepository(this.getServletContext());
     }
 
@@ -74,24 +70,38 @@ public class ExchangeTracerFilter extends HttpServletFilter {
 
         chain.doFilter(wrappedRequest, wrappedResponse);
 
-        // Backend Exchange
-        BackendExchange backendExchange = RequestContext.getBackendExchange(wrappedRequest);
-        // the request
-        soapExchange.setProxyRequest(backendExchange.getRequestBody());
-        soapExchange.setProxyRequestHeaders(backendExchange.getRequestHeaders());
-        // the response
-        soapExchange.setBackEndResponseTime(backendExchange.getResponseTime());
-        soapExchange.setBackEndResponseCode(backendExchange.getResponseCode());
-        soapExchange.setBackEndResponseHeaders(backendExchange.getResponseHeaders());
-        soapExchange.setBackEndResponse(backendExchange.getResponseBody());
-
-        // final return of the proxy
-        soapExchange.setProxyResponse(wrappedResponse.getContent());
-        soapExchange.setProxyResponseHeaders(wrappedResponse.getHeaders());
+        // add custom headers response back to the client
+        wrappedResponse.addHeader("X-Filtered-By", "proxy-soap");
+        wrappedResponse.addHeader("X-Filtered-ID", soapExchange.getId());
+        wrappedResponse.addHeader("X-Filtered-Status", soapExchange.getRequestValid() + " " + soapExchange.getResponseValid());
 
         OutputStream out = response.getOutputStream();
         out.write(wrappedResponse.getBuffer());
         logger.debug("response written");
+
+        // Backend Exchange
+        BackendExchange backendExchange = RequestContext.getBackendExchange(wrappedRequest, false);
+        // check if a backend exchange occured.
+        // When validation has blocked the front end request, there will be no
+        // backend exchange available.
+        if (backendExchange != null) {
+            // the request
+            soapExchange.setProxyRequest(backendExchange.getRequestBody());
+            soapExchange.setProxyRequestHeaders(backendExchange.getRequestHeaders());
+            // the response
+            soapExchange.setBackEndResponseTime(backendExchange.getResponseTime());
+            soapExchange.setBackEndResponseCode(backendExchange.getResponseCode());
+            soapExchange.setBackEndResponseHeaders(backendExchange.getResponseHeaders());
+            soapExchange.setBackEndResponse(backendExchange.getResponseBody());
+            // extract response backend time from total proxy time
+            start = start + backendExchange.getResponseTime();
+        }
+
+        // final return of the proxy
+        soapExchange.setProxyResponse(wrappedResponse.getContent());
+        soapExchange.setProxyResponseHeaders(wrappedResponse.getHeaders());
+        soapExchange.setProxyResponseCode(wrappedResponse.getStatus());
+
         // save exchange after response has been sent back to client
         long stop = System.currentTimeMillis();
         soapExchange.setProxyInternalTime(stop - start);

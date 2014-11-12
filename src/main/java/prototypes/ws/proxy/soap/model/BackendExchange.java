@@ -33,13 +33,13 @@ public class BackendExchange {
     public static final String UID = "proxy.soap.backend-exchange";
 
     private String uri = "";
-    private Long starttime;
+    private Long starttime = -1L;
     private String requestBody = "";
     private Map<String, List<String>> requestHeaders = new HashMap<String, List<String>>();
-    private int responseCode;
+    private int responseCode = 0;
     private String responseBody = "";
     private Map<String, List<String>> responseHeaders = new HashMap<String, List<String>>();
-    private Long stoptime;
+    private Long stoptime = -1L;
 
     public BackendExchange(String uri, String body, Map<String, List<String>> requestHeaders) {
         this.uri = uri;

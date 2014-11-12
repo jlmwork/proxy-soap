@@ -19,7 +19,10 @@ import com.jayway.restassured.RestAssured;
 import static com.jayway.restassured.RestAssured.given;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.List;
 import org.hamcrest.Matchers;
+import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import prototypes.ws.proxy.soap.io.Files;
@@ -35,6 +38,8 @@ public class ProxyTestsIT {
 
     private static final String WSDL_PATH = Files.findFromClasspath("samples/definitions/SampleService.wsdl").replaceAll("^file:[/]+", "/");
 
+    private static int counterRequests = 0;
+
     @BeforeClass
     public static void init() {
         RestAssured.baseURI = "http://" + getLocalHostname() + ":8083";
@@ -49,7 +54,6 @@ public class ProxyTestsIT {
                 then().statusCode(200).
                 body("$", Matchers.empty());
 
-        // TODO : init samples
         loadSamples();
     }
 
@@ -60,6 +64,8 @@ public class ProxyTestsIT {
         createSampleResponse(200, "operation1-resp_OK");
         createSampleResponse(200, "operation2-resp_KO");
         createSampleResponse(200, "operation2-resp_OK");
+        createSampleResponse(500, "standard-resp-fault");
+        createSampleResponse(200, "badlyformed");
     }
 
     private static void createSampleResponse(int returnCode, String name) {
@@ -125,45 +131,143 @@ public class ProxyTestsIT {
     ///////////////////
     // TESTS
     ///////////////////
-    public void check(String requestName, String responseSampleName, int returnCodeExpected) {
+    public void check(String requestName, String responseSampleName, int returnCodeExpected, String contentToCheck) {
+        String content = check(requestName, responseSampleName, returnCodeExpected);
+        Assert.assertTrue(content.contains(contentToCheck));
+    }
+
+    public String check(String requestName, String responseSampleName, int returnCodeExpected) {
+        counterRequests++;
         String samplesPath = "/p/" + RestAssured.baseURI + RestAssured.basePath + "/sample";
 
-        given()
+        String content = given()
                 .body(Files.read("src/test/resources/samples/messages/requests/" + requestName + ".xml"))
                 .when()
                 .post(samplesPath + "/" + responseSampleName)
-                .then().statusCode(returnCodeExpected);
+                .then().statusCode(returnCodeExpected)
+                .extract().response().body().print();
+        return content;
+    }
+
+    public void checkWithCustomUrl(String requestName, String responseSampleName, int returnCodeExpected, String contentToCheck) {
+        String content = checkWithCustomUrl(requestName, responseSampleName, returnCodeExpected);
+        Assert.assertTrue(content.contains(contentToCheck));
+    }
+
+    public String checkWithCustomUrl(String requestName, String url, int returnCodeExpected) {
+        counterRequests++;
+        String targetUrl = "/p/" + url;
+
+        String content = given()
+                .body(Files.read("src/test/resources/samples/messages/requests/" + requestName + ".xml"))
+                .when()
+                .post(targetUrl)
+                .then().statusCode(returnCodeExpected)
+                .extract().response().body().print();
+        return content;
+    }
+
+    @Test
+    public void testDefaultMode() {
+        // not validable request (no configuration of wsdl paths)
+        configureProxyDefaultMode();
+        check("operation2-req_OK", "operation2-resp_OK", 200);
     }
 
     @Test
     public void testNonBlockingValidating() {
-        // not validable request (no configuration of wsdl paths)
-        configureProxyDefaultMode();
-        check("operation2-req_OK", "operation2-resp_OK", 200);
-
-        // configure proxy mode
+        // configure proxy mode in non blocking mode
         configureProxyMode("false", "true");
-        check("operation1-req_OK", "operation1-resp-fault_KO", 500);
-        check("operation1-req_OK", "operation1-resp-fault_OK", 500);
+        // ope 1
         check("operation1-req_OK", "operation1-resp_OK", 200);
+        check("operation1-req_OK", "operation1-resp-fault_OK", 500);
+        check("operation1-req_KO", "operation1-resp_OK", 200);
         check("operation1-req_OK", "operation1-resp_KO", 200);
+        check("operation1-req_OK", "operation1-resp-fault_KO", 500);
+        // ope 2
         check("operation2-req_OK", "operation2-resp_OK", 200);
         check("operation2-req_OK", "operation2-resp_KO", 200);
+        check("operation2-req_OK_noheaders", "operation2-resp_KO", 200);
+        check("operation2-req_OK_noheaders", "operation2-resp_KO", 200);
+        check("operation2-req_KO_body", "operation2-resp_OK", 200);
+        check("operation2-req_KO_headers", "operation2-resp_OK", 200);
+        check("operation2-req_OK", "standard-resp-fault", 500);
+
+        // special cases :
+        // 404
         check("operation1-req_OK", "unknown", 404);
+        // badly formed
+        check("badlyformed", "operation2-resp_OK", 200);
+        check("operation2-req_OK", "badlyformed", 200);
+        // read timeout
+        checkWithCustomUrl("operation1-req_OK", RestAssured.baseURI + RestAssured.basePath + "/sample-resp-longtime.jsp", 502);
+        // connect timeout
+        // no host target for loopback calls
+        checkWithCustomUrl("operation2-req_OK", RestAssured.basePath.substring(1) + "/sample/operation2-resp_OK", 200);
     }
 
     @Test
     public void testBlockingValidating() {
-        // configure proxy mode
+        // configure proxy mode in blocking mode
         configureProxyMode("true", "true");
-        check("operation1-req_OK", "operation1-resp-fault_KO", 502);
-        check("operation1-req_OK", "operation1-resp-fault_OK", 500);
+        // ope 1
         check("operation1-req_OK", "operation1-resp_OK", 200);
+        check("operation1-req_OK", "operation1-resp-fault_OK", 500);
+        check("operation1-req_KO", "operation1-resp_OK", 400);
         check("operation1-req_OK", "operation1-resp_KO", 502);
+        check("operation1-req_OK", "operation1-resp-fault_KO", 502);
+        // ope 2
         check("operation2-req_OK", "operation2-resp_OK", 200);
         check("operation2-req_OK", "operation2-resp_KO", 502);
-        check("operation2-req_OK", "unknown", 502);
+        check("operation2-req_OK_noheaders", "operation2-resp_OK", 200);
+        check("operation2-req_OK_noheaders", "operation2-resp_KO", 502);
+        check("operation2-req_KO_body", "operation2-resp_OK", 400);
+        check("operation2-req_KO_headers", "operation2-resp_OK", 400);
+        check("operation2-req_OK", "standard-resp-fault", 500);
+
+        // special cases :
+        // 404
+        check("operation1-req_OK", "unknown", 502, "faultcode");
+        // badly formed
+        check("badlyformed", "operation2-resp_OK", 400);
+        check("operation2-req_OK", "badlyformed", 502, "faultcode");
+        // read timeout
+        checkWithCustomUrl("operation1-req_OK", RestAssured.baseURI + RestAssured.basePath + "/sample-resp-longtime.jsp", 502);
+        // connect timeout
+        // no host target for loopback calls
+        checkWithCustomUrl("operation2-req_OK", RestAssured.basePath.substring(1) + "/sample/operation2-resp_OK", 200);
     }
 
-    // TODO : check authorization headers
+    @Test
+    public void otherTests() {
+        // check behavior of bad url provided
+        checkWithCustomUrl("operation1-req_OK", "http://test:test:test:port/", 400);
+        checkWithCustomUrl("operation1-req_OK", "file://local/file", 400);
+    }
+
+    @AfterClass
+    public static void end() {
+        // let some time for last requests to persist
+        try {
+            Thread.sleep(300L);
+            // POST CONTROLS
+        } catch (InterruptedException ex) {
+        }
+
+        // check nb run requests
+        List<String> ids
+                = given().
+                when()
+                .get("/exchanges?accept=application/json").
+                then()
+                .statusCode(200)
+                .extract()
+                .path("id");
+        System.out.println(ids.size());
+        Assert.assertEquals(counterRequests, ids.size());
+
+        // cleanup exchanges
+        //RestAssured.expect().statusCode(204)
+        //        .when().delete("/exchanges");
+    }
 }
