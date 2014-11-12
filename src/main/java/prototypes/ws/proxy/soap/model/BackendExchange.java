@@ -66,6 +66,10 @@ public class BackendExchange {
         return this.stoptime - this.starttime;
     }
 
+    public Long getResponseTime() {
+        return this.stoptime - this.starttime;
+    }
+
     public int getResponseCode() {
         return responseCode;
     }

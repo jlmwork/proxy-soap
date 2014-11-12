@@ -76,12 +76,11 @@ public class ExchangeTracerFilter extends HttpServletFilter {
 
         // Backend Exchange
         BackendExchange backendExchange = RequestContext.getBackendExchange(wrappedRequest);
-        logger.trace("BackendExchange Hashcode : {}", Integer.toHexString(backendExchange.hashCode()));
-        logger.debug("Backend exchange view from Filter : {}", backendExchange);
         // the request
         soapExchange.setProxyRequest(backendExchange.getRequestBody());
         soapExchange.setProxyRequestHeaders(backendExchange.getRequestHeaders());
         // the response
+        soapExchange.setBackEndResponseTime(backendExchange.getResponseTime());
         soapExchange.setBackEndResponseCode(backendExchange.getResponseCode());
         soapExchange.setBackEndResponseHeaders(backendExchange.getResponseHeaders());
         soapExchange.setBackEndResponse(backendExchange.getResponseBody());
@@ -90,13 +89,13 @@ public class ExchangeTracerFilter extends HttpServletFilter {
         soapExchange.setProxyResponse(wrappedResponse.getContent());
         soapExchange.setProxyResponseHeaders(wrappedResponse.getHeaders());
 
-        logger.debug("SoapExchange : {}", soapExchange);
         OutputStream out = response.getOutputStream();
         out.write(wrappedResponse.getBuffer());
         logger.debug("response written");
         // save exchange after response has been sent back to client
         long stop = System.currentTimeMillis();
         soapExchange.setProxyInternalTime(stop - start);
+        logger.debug("SoapExchange : {}", soapExchange);
         exchangeRepository.save(soapExchange);
         logger.debug("response saved");
     }
