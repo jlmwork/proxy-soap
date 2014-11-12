@@ -142,6 +142,7 @@ public class Requests {
         for (String headerName : headersFrom.keySet()) {
             if (headerName != null && !headersToForget.contains(headerName.toLowerCase())) {
                 for (String headerValue : headersFrom.get(headerName)) {
+                    LOGGER.trace("set Request Header {}, : {}", headerName, headerValue);
                     httpConn.setRequestProperty(headerName, headerValue);
                 }
             }
@@ -152,6 +153,12 @@ public class Requests {
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         request.setAttribute("javax.servlet.error.message", message);
         request.getRequestDispatcher("/WEB-INF/views/jsp/soap-fault-client.jsp").forward(request, response);
+    }
+
+    public static void sendErrorServer(HttpServletRequest request, HttpServletResponse response, String message, int returnCode) throws IOException, ServletException {
+        response.setStatus(returnCode);
+        request.setAttribute("javax.servlet.error.message", message);
+        request.getRequestDispatcher("/WEB-INF/views/jsp/soap-fault-server.jsp").forward(request, response);
     }
 
     public static void sendErrorServer(HttpServletRequest request, HttpServletResponse response, String message) throws IOException, ServletException {

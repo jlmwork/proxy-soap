@@ -186,6 +186,8 @@ public class ProxyConfiguration extends HashMap<String, Object> {
                 setNbMaxExchanges(value);
             } else if (ApplicationConfig.PROP_IGNORE_VALID_EXCHANGES.equals(key)) {
                 setIgnoreValidExchanges(Boolean.parseBoolean(value));
+            } else if (ApplicationConfig.PROP_RUN_MODE.equals(key)) {
+                setRunMode(value);
             } else if (ApplicationConfig.PROP_PERSIST_MODE.equals(key)) {
                 if (!Strings.isNullOrEmpty(value)) {
                     setPersistenceMode(Integer.parseInt(value));
@@ -221,6 +223,7 @@ public class ProxyConfiguration extends HashMap<String, Object> {
     public void setRunMode(String env) {
         try {
             this.runMode.set(Integer.parseInt(env));
+            LOGGER.debug("Now run in mode : {}", this.runMode.get());
         } catch (Exception e) {
             this.runMode.set(ApplicationConfig.RUN_MODE_PROD);
         }

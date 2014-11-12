@@ -64,6 +64,7 @@ public class ExchangeTracerFilter extends HttpServletFilter {
 
         // get or create the exchange
         SoapExchange soapExchange = RequestContext.getSoapExchange(wrappedRequest);
+        logger.trace("SoapExchange Hashcode : {}", Integer.toHexString(soapExchange.hashCode()));
 
         // Frontend Request : extract all data from incoming request
         soapExchange.setFrontEndRequest(Streams.getString(wrappedRequest.getInputStream()));

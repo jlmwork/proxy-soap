@@ -53,7 +53,7 @@ public class ErrorServlet extends AbstractServlet {
         if (throwable != null) {
             error = "" + throwable.getMessage();
             Throwable cause = throwable.getCause();
-            LOGGER.error("Error during Process", cause);
+            LOGGER.error("Error during Process : {}", cause);
             if ((cause != null)
                     && (cause.getMessage() != null)) {
                 error += " (Cause : " + cause.getMessage() + ")";

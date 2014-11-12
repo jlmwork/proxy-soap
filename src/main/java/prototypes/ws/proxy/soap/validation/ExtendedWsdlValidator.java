@@ -157,7 +157,7 @@ public class ExtendedWsdlValidator extends WsdlValidator {
                 LOGGER.debug("Found a fault in message so will validate it");
                 WsdlOperation operation = responseMessage.getOperation();
                 BindingOperation bindingOperation = operation.getBindingOperation();
-                validateSoapFault(wsdlContext, bindingOperation, paths[0], errsF);
+                validateSoapFault(wsdlContext, bindingOperation, paths[0], xmlErrors);
             } else {
                 errsF.add("Too many faults found in message");
             }

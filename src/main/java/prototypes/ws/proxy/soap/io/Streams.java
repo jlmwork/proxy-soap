@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.util.zip.GZIPOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,14 @@ public class Streams {
         }
 
         return os;
+    }
+
+    public static void writeStringAndClose(Writer w, String data)
+            throws IOException {
+        if (w != null) {
+            w.write(data);
+            w.close();
+        }
     }
 
     public static String getString(InputStream is, boolean zipped) {

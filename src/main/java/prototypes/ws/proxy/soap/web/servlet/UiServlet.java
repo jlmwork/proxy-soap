@@ -27,10 +27,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
-import prototypes.ws.proxy.soap.web.context.ApplicationContext;
 import prototypes.ws.proxy.soap.io.Streams;
 import prototypes.ws.proxy.soap.repository.SoapExchangeRepository;
 import prototypes.ws.proxy.soap.validation.SoapValidatorFactory;
+import prototypes.ws.proxy.soap.web.context.ApplicationContext;
 
 public class UiServlet extends AbstractServlet {
 
@@ -81,6 +81,7 @@ public class UiServlet extends AbstractServlet {
             boolean saved = false;
             for (String key : ProxyConfiguration.getKeys()) {
                 if (request.getParameter(key) != null) {
+                    LOGGER.debug("Config {}={}", key, request.getParameter(key));
                     proxyConfig.setProperty(key, request.getParameter(key));
                     saved = true;
                 }

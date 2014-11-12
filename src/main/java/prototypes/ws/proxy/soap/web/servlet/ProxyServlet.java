@@ -123,7 +123,7 @@ public class ProxyServlet extends AbstractServlet {
                     LOGGER.debug("404 returned");
                     Requests.sendErrorServer(request, response,
                             String.format(ProxyErrorConstantes.NOT_FOUND,
-                                    targetUrl.toString()));
+                                    targetUrl.toString()), 404);
                     return;
             }
 
@@ -132,7 +132,7 @@ public class ProxyServlet extends AbstractServlet {
             addResponseHeaders(response, backendExchange, respHeadersToIgnore);
             response.setStatus(backendExchange.getResponseCode());
 
-            Streams.putStringAndClose(response.getOutputStream(),
+            Streams.writeStringAndClose(response.getWriter(),
                     backendExchange.getResponseBody());
         } catch (IllegalStateException e1) {
             // bad url
@@ -155,8 +155,6 @@ public class ProxyServlet extends AbstractServlet {
         } finally {
             LOGGER.trace("BackendExchange Hashcode : {}", Integer.toHexString(backendExchange.hashCode()));
             LOGGER.debug("BackendExchange : {}", backendExchange);
-            // lost the reference to backend exchange from filters
-            RequestContext.getBackendExchange(request);
             if (httpConn != null) {
                 httpConn.disconnect();
             }
@@ -175,9 +173,9 @@ public class ProxyServlet extends AbstractServlet {
         httpConn.setRequestMethod(request.getMethod());
 
         // Headers
-        List<String> headersToIgnore = new ArrayList<String>(REQ_HEADERS_TO_IGNORE);
-        useAuth(request, headersToIgnore, httpConn);
-        Requests.setRequestHeaders(httpConn, headers, headersToIgnore);
+        List<String> originalHeadersToIgnore = new ArrayList<String>(REQ_HEADERS_TO_IGNORE);
+        useAuth(request, originalHeadersToIgnore, httpConn);
+        Requests.setRequestHeaders(httpConn, headers, originalHeadersToIgnore);
         httpConn.setRequestProperty("X-Forwarded-For", request.getRemoteAddr());
 
         // some more headers
@@ -191,13 +189,13 @@ public class ProxyServlet extends AbstractServlet {
         return httpConn;
     }
 
-    private void useAuth(HttpServletRequest request, List<String> headersToIgnore, HttpURLConnection httpConn) {
+    private void useAuth(HttpServletRequest request, List<String> originalHeadersToIgnore, HttpURLConnection httpConn) {
         if (!Strings.isNullOrEmpty(request.getParameter("username"))
                 && !Strings.isNullOrEmpty(request.getParameter("password"))) {
             LOGGER.info("Use different username/password pari for backend");
             String userpass = request.getParameter("username") + ":" + request.getParameter("password");
             String basicAuth = "Basic " + new String(new Base64().encode(userpass.getBytes()));
-            headersToIgnore.add(Requests.HEADER_AUTH.toLowerCase());
+            originalHeadersToIgnore.add(Requests.HEADER_AUTH.toLowerCase());
             httpConn.setRequestProperty(Requests.HEADER_AUTH, basicAuth);
         }
     }

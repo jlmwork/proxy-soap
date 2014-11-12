@@ -309,4 +309,21 @@ public class Files {
             LOGGER.warn("Cant delete file {} : {} ", path, ex.getMessage());
         }
     }
+
+    /**
+     *
+     *
+     * @param classpathPath relative path of a file in classpath (no leading
+     * slash)
+     * @return found system file path or empty String if not found
+     */
+    public static String findFromClasspath(String classpathPath) {
+        try {
+            URL url = Files.class.getClassLoader().getResource(classpathPath);
+            return url.toString();
+        } catch (Exception e) {
+            return "";
+        }
+
+    }
 }
