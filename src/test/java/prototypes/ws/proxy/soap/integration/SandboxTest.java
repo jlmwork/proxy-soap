@@ -15,12 +15,12 @@
  */
 package prototypes.ws.proxy.soap.integration;
 
-import com.jayway.restassured.RestAssured;
-import static com.jayway.restassured.RestAssured.given;
-import java.util.List;
-import org.junit.Assert;
+import java.util.HashMap;
+import java.util.Map;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 import org.junit.Test;
-import static prototypes.ws.proxy.soap.integration.ProxyTestsIT.getLocalHostname;
+import prototypes.ws.proxy.soap.model.SoapExchange;
 
 /**
  *
@@ -29,20 +29,33 @@ import static prototypes.ws.proxy.soap.integration.ProxyTestsIT.getLocalHostname
 public class SandboxTest {
 
     @Test
-    public void test() {
-        RestAssured.baseURI = "http://" + getLocalHostname() + ":8083";
-        RestAssured.basePath = "/proxy-soap";
-        RestAssured.urlEncodingEnabled = false;
-        List<String> ids
-                = given().
-                when()
-                .get("/exchanges?accept=application/json").
-                then()
-                .statusCode(200)
-                .extract()
-                .path("id");
-        System.out.println(ids.size());
-        Assert.assertEquals(36, ids.size());
+    public void test() throws Exception {/*
+         RestAssured.baseURI = "http://" + getLocalHostname() + ":8083";
+         RestAssured.basePath = "/proxy-soap";
+         RestAssured.urlEncodingEnabled = false;
+         List<String> ids
+         = given().
+         when()
+         .get("/exchanges?accept=application/json").
+         then()
+         .statusCode(200)
+         .extract()
+         .path("id");
+         System.out.println(ids.size());
+         Assert.assertEquals(36, ids.size());*/
+
         //body("$", Matchers.empty());
+
+        Map<String, Object> properties = new HashMap<String, Object>(2);
+        //properties.put("eclipselink-oxm-xml", "org/example/binding.json");
+        properties.put("eclipselink.media-type", "application/json");
+
+        JAXBContext context = JAXBContext.newInstance(new Class[]{SoapExchange.class}, properties);
+        Marshaller marshaller = context.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        marshaller.setProperty("eclipselink.media-type", "application/json");
+
+        SoapExchange soap = new SoapExchange();
+        marshaller.marshal(soap, System.out);
     }
 }

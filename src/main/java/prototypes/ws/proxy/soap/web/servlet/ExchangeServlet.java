@@ -101,13 +101,13 @@ public class ExchangeServlet extends AbstractServlet {
                         .add("to", stripNull(soapExchange.getUri()))
                         .add("validator", stripNull(soapExchange.getValidatorId()))
                         .add("operation", stripNull(soapExchange.getOperation()))
-                        .add("resp_time", soapExchange.getBackEndResponseTime())
                         // request
                         .add("request_content", stripNull(soapExchange.getFrontEndRequestAsXML()))
                         .add("request_headers", formatJsonMap(soapExchange.getFrontEndRequestHeaders()))
                         .add("request_errors", formatJsonList(soapExchange.getRequestErrors()))
                         .add("request_xml_errors", formatJsonList(soapExchange.getRequestXmlErrors()))
                         .add("request_soap_errors", formatJsonList(soapExchange.getRequestSoapErrors()))
+                        /// request validation
                         .add("request_valid", stripNull(soapExchange.getRequestValid()))
                         .add("request_xml_valid", stripNull(soapExchange.getRequestXmlValid()))
                         .add("request_soap_valid", stripNull(soapExchange.getRequestSoapValid()))
@@ -118,9 +118,11 @@ public class ExchangeServlet extends AbstractServlet {
                         .add("proxy_response", stripNull(soapExchange.getProxyResponse()))
                         .add("proxy_response_code", stripNull(soapExchange.getProxyResponseCode()))
                         .add("proxy_response_headers", formatJsonMap(soapExchange.getProxyResponseHeaders()))
-                        /// response
-                        .add("response_content", stripNull(soapExchange.getBackendResponseAsXML()))
-                        .add("response_headers", formatJsonMap(soapExchange.getBackendResponseHeaders()))
+                        .add("backend_response_time", soapExchange.getBackEndResponseTime())
+                        .add("backend_response_code", stripNull(soapExchange.getBackEndResponseCode()))
+                        .add("backend_response_content", stripNull(soapExchange.getBackendResponseAsXML()))
+                        .add("backend_response_headers", formatJsonMap(soapExchange.getBackendResponseHeaders()))
+                        /// response validation
                         .add("response_errors", formatJsonList(soapExchange.getResponseErrors()))
                         .add("response_xml_errors", formatJsonList(soapExchange.getResponseXmlErrors()))
                         .add("response_soap_errors", formatJsonList(soapExchange.getResponseSoapErrors()))

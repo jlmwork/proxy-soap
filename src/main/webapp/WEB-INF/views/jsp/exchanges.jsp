@@ -25,7 +25,8 @@
             <th data-field="to"><fmt:message key="exchanges.request.to"/></th>
             <th data-field="validator" data-sortable="true" data-formatter="validatorFieldFormatter"><fmt:message key="exchanges.request.validator"/></th>
             <th data-field="operation"><fmt:message key="exchanges.request.operation"/></th>
-            <th data-field="resp_time" data-sortable="true" data-formatter="responseTimeFieldFormatter"><fmt:message key="exchanges.request.response.time"/></th>
+            <th data-field="backend_response_time" data-sortable="true" data-formatter="responseTimeFieldFormatter"><fmt:message key="exchanges.request.response.time"/></th>
+            <th data-field="backend_response_code"  data-visible="false"><fmt:message key="exchanges.request.response.time"/></th>
             <th data-field="request_valid" data-visible="false"><fmt:message key="exchanges.request.request"/> Valid</th>
             <th data-field="request_xml_valid" data-visible="false"><fmt:message key="exchanges.request.request"/> XML Valid</th>
             <th data-field="request_soap_valid" data-visible="false"><fmt:message key="exchanges.request.request"/> SOAP Valid</th>
