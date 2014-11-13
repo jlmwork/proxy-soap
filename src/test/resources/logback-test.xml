@@ -11,7 +11,7 @@
     <logger name="org.eclipse.persistence" level="info"/>
     <logger name="org.eclipse.persistence.logging.sql" level="TRACE"/>
     <logger name="eclipselink.logging" level="info"/>
-    <logger name="org.apache.http.wire" level="INFO" />
+    <logger name="org.apache.http" level="INFO" />
     <root level="debug">
         <appender-ref ref="STDOUT" />
     </root>

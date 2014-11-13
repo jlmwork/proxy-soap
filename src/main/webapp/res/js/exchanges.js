@@ -159,11 +159,9 @@ function validatorFieldFormatter(value, row) {
     return '<a class="viewvalidator" href="ui#AffaireServiceWrite" onclick="viewValidator(this);">' + value + '</a>';
 }
 function responseTimeFieldFormatter(value) {
-    console.log("responseTimeFieldFormatter");
     if (value === -1) {
         return "Not available";
     }
-    console.log(value);
     return value;
 }
 function viewValidator(validatorLink) {

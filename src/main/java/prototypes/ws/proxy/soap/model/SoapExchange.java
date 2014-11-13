@@ -212,6 +212,7 @@ public class SoapExchange {
     }
 
     /**
+     * @param code
      * @return the response
      */
     public void setProxyResponseCode(int code) {
@@ -232,6 +233,7 @@ public class SoapExchange {
 
     /**
      * @param requestValid the requestValid to set
+     * @return
      */
     public SoapExchange setRequestSoapValid(Boolean requestValid) {
         this.requestSoapValid = requestValid;

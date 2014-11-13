@@ -24,13 +24,23 @@ import javax.servlet.http.HttpServletResponseWrapper;
 
 public class BufferedHttpResponseWrapper extends HttpServletResponseWrapper {
 
-    private final BufferedServletOutputStream bufferedServletOut = new BufferedServletOutputStream();
+    private BufferedServletOutputStream bufferedServletOut = new BufferedServletOutputStream();
 
     private PrintWriter printWriter = null;
     private ServletOutputStream outputStream = null;
 
     public BufferedHttpResponseWrapper(HttpServletResponse origResponse) {
         super(origResponse);
+    }
+
+    public void reinit() {
+        bufferedServletOut = new BufferedServletOutputStream();
+        if (printWriter != null) {
+            printWriter = new PrintWriter(bufferedServletOut);
+        }
+        if (outputStream != null) {
+            outputStream = this.bufferedServletOut;
+        }
     }
 
     public String getContent() {

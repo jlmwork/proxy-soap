@@ -131,9 +131,13 @@ public class ProxyTestsIT {
     ///////////////////
     // TESTS
     ///////////////////
-    public void check(String requestName, String responseSampleName, int returnCodeExpected, String contentToCheck) {
+    public void check(String requestName, String responseSampleName, int returnCodeExpected, String... contentsToCheck) {
         String content = check(requestName, responseSampleName, returnCodeExpected);
-        Assert.assertTrue(content.contains(contentToCheck));
+        if (contentsToCheck != null && contentsToCheck.length > 0) {
+            for (String contentToCheck : contentsToCheck) {
+                Assert.assertTrue("Content " + contentToCheck + " not found", content.contains(contentToCheck));
+            }
+        }
     }
 
     public String check(String requestName, String responseSampleName, int returnCodeExpected) {
@@ -149,9 +153,13 @@ public class ProxyTestsIT {
         return content;
     }
 
-    public void checkWithCustomUrl(String requestName, String responseSampleName, int returnCodeExpected, String contentToCheck) {
+    public void checkWithCustomUrl(String requestName, String responseSampleName, int returnCodeExpected, String... contentsToCheck) {
         String content = checkWithCustomUrl(requestName, responseSampleName, returnCodeExpected);
-        Assert.assertTrue(content.contains(contentToCheck));
+        if (contentsToCheck != null && contentsToCheck.length > 0) {
+            for (String contentToCheck : contentsToCheck) {
+                Assert.assertTrue("Content " + contentToCheck + " not found", content.contains(contentToCheck));
+            }
+        }
     }
 
     public String checkWithCustomUrl(String requestName, String url, int returnCodeExpected) {
@@ -200,7 +208,7 @@ public class ProxyTestsIT {
         check("badlyformed", "operation2-resp_OK", 200);
         check("operation2-req_OK", "badlyformed", 200);
         // read timeout
-        checkWithCustomUrl("operation1-req_OK", RestAssured.baseURI + RestAssured.basePath + "/sample-resp-longtime.jsp", 502);
+        checkWithCustomUrl("operation1-req_OK", RestAssured.baseURI + RestAssured.basePath + "/sample-resp-longtime.jsp", 502, "Time out");
         // connect timeout
         // no host target for loopback calls
         checkWithCustomUrl("operation2-req_OK", RestAssured.basePath.substring(1) + "/sample/operation2-resp_OK", 200);
@@ -232,7 +240,7 @@ public class ProxyTestsIT {
         check("badlyformed", "operation2-resp_OK", 400);
         check("operation2-req_OK", "badlyformed", 502, "faultcode");
         // read timeout
-        checkWithCustomUrl("operation1-req_OK", RestAssured.baseURI + RestAssured.basePath + "/sample-resp-longtime.jsp", 502);
+        checkWithCustomUrl("operation1-req_OK", RestAssured.baseURI + RestAssured.basePath + "/sample-resp-longtime.jsp", 502, "Time out");
         // connect timeout
         // no host target for loopback calls
         checkWithCustomUrl("operation2-req_OK", RestAssured.basePath.substring(1) + "/sample/operation2-resp_OK", 200);
@@ -249,7 +257,7 @@ public class ProxyTestsIT {
     public static void end() {
         // let some time for last requests to persist
         try {
-            Thread.sleep(300L);
+            Thread.sleep(2000L);
             // POST CONTROLS
         } catch (InterruptedException ex) {
         }

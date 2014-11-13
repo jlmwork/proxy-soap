@@ -22,6 +22,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
 import prototypes.ws.proxy.soap.io.Streams;
 import prototypes.ws.proxy.soap.model.BackendExchange;
 import prototypes.ws.proxy.soap.model.SoapExchange;
@@ -38,6 +39,8 @@ import prototypes.ws.proxy.soap.web.io.Requests;
  */
 public class ExchangeTracerFilter extends HttpServletFilter {
 
+    private ProxyConfiguration proxyConfig;
+
     private SoapExchangeRepository exchangeRepository;
 
     /**
@@ -48,11 +51,13 @@ public class ExchangeTracerFilter extends HttpServletFilter {
     @Override
     public void init(FilterConfig config) throws ServletException {
         super.init(config);
+        proxyConfig = ApplicationContext.getProxyConfiguration(this.getServletContext());
         exchangeRepository = ApplicationContext.getSoapExchangeRepository(this.getServletContext());
     }
 
     @Override
     protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+        // TODO : extract start in SopaExchange constructor and stop in prepersist converter (for jpa) or when saving (ofr in memory impl)
         long start = System.currentTimeMillis();
         // Prepare Objects
         MultiReadHttpServletRequest wrappedRequest = Requests.wrap(request);
@@ -71,12 +76,16 @@ public class ExchangeTracerFilter extends HttpServletFilter {
         chain.doFilter(wrappedRequest, wrappedResponse);
 
         // add custom headers response back to the client
-        wrappedResponse.addHeader("X-Filtered-By", "proxy-soap");
+        wrappedResponse.addHeader("X-Filtered-By", "proxy-soap#" + soapExchange.getValidatorId());
         wrappedResponse.addHeader("X-Filtered-ID", soapExchange.getId());
         wrappedResponse.addHeader("X-Filtered-Status", soapExchange.getRequestValid() + " " + soapExchange.getResponseValid());
+        wrappedResponse.addHeader("X-Filtered-Validation", "" + proxyConfig.isValidationActive());
+        wrappedResponse.addHeader("X-Filtered-Blocking", "" + proxyConfig.isInBlockingMode());
 
         OutputStream out = response.getOutputStream();
+        response.setContentLength(wrappedResponse.getBufferSize());
         out.write(wrappedResponse.getBuffer());
+        out.close();
         logger.debug("response written");
 
         // Backend Exchange
