@@ -21,12 +21,15 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
+import prototypes.ws.proxy.soap.reflect.Classes;
 import prototypes.ws.proxy.soap.time.Dates;
 import prototypes.ws.proxy.soap.xml.XmlStrings;
 
 public class SoapExchange {
 
     public static final transient String UID = "proxy-soap.exchange";
+
+    public static final transient String[] FIELDS = Classes.getAllFieldsName(SoapExchange.class, new String[]{"serial", "_", "UID"});
 
     private Calendar time = new GregorianCalendar();
     // give the request an unique attribute id

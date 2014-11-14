@@ -1,4 +1,5 @@
 {
+    "xml-accessor-type": "NONE",
     "package-name": "prototypes.ws.proxy.soap.model",
     "java-types": {
         "java-type": [{
@@ -7,30 +8,34 @@
                 "java-attributes": {
                     "xml-element": [
                         {
-                            "java-attribute": "firstName",
-                            "name": "first-name"
+                            "java-attribute": "id",
+                            "name": "id",
+                            "nillable": "true"
                         },
                         {
-                            "java-attribute": "lastName",
-                            "name": "last-name"
+                            "java-attribute": "date",
+                            "name": "date",
+                            "nillable": "true"
                         },
                         {
-                            "java-attribute": "phoneNumbers",
-                            "name": "phone-number"
-                        }
-                    ]
-                }
-            }, {
-                "name": "PhoneNumber",
-                "java-attributes": {
-                    "xml-attribute": [
+                            "java-attribute": "from",
+                            "name": "from",
+                            "nillable": "true"
+                        },
                         {
-                            "java-attribute": "type"
-                        }
-                    ],
-                    "xml-value": [
+                            "java-attribute": "uri",
+                            "name": "to",
+                            "nillable": "true"
+                        },
                         {
-                            "java-attribute": "number"
+                            "java-attribute": "backEndResponseTime",
+                            "name": "resp_time",
+                            "nillable": "true"
+                        },
+                        {
+                            "java-attribute": "validatorId",
+                            "name": "validatorId",
+                            "nillable": "true"
                         }
                     ]
                 }

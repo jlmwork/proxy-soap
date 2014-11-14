@@ -29,7 +29,6 @@ import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
 import prototypes.ws.proxy.soap.constantes.ApplicationConfig;
 import prototypes.ws.proxy.soap.io.Files;
 import prototypes.ws.proxy.soap.model.SoapExchange;
-import prototypes.ws.proxy.soap.reflect.Classes;
 import prototypes.ws.proxy.soap.repository.SoapExchangeRepository;
 import prototypes.ws.proxy.soap.time.Dates;
 
@@ -47,10 +46,6 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
     private final Boolean xmlInDbs;
 
     private final String persistenceUnitName;
-
-    // TODO : this is a workaround. delete it when loadgraph will work in EclipseLink
-    // view below for more details
-    String[] exchangeFields = Classes.getAllFieldsName(SoapExchange.class, new String[]{"serial", "_", "UID"});
 
     public SoapExchangeRepositoryJpa(ProxyConfiguration proxyConfig) {
         super(proxyConfig);
@@ -83,7 +78,7 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
         // EclipseLink produces 2 queries ! One for normal graph and one for added nodes. Too bad
         // So we need to use a fetch graph and to add all attributes to use a fetch graph ! So ugly !
         EntityGraph<SoapExchange> fetchGraph = em.createEntityGraph(SoapExchange.class);
-        fetchGraph.addAttributeNodes(exchangeFields);
+        fetchGraph.addAttributeNodes(SoapExchange.FIELDS);
 
         // The loadgraph if it worked
         // EntityGraph<SoapExchange> loadGraph = em.createEntityGraph(SoapExchange.class);
@@ -115,7 +110,7 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
         // So we need to use a fetch graph and to add all attributes to use a fetch graph ! So ugly !
         EntityGraph<SoapExchange> fetchGraph = em.createEntityGraph(SoapExchange.class);
         fetchGraph.addAttributeNodes("frontEndRequest", "backEndResponse", "frontEndRequestHeaders", "backEndResponseHeaders");
-        fetchGraph.addAttributeNodes(exchangeFields);
+        fetchGraph.addAttributeNodes(SoapExchange.FIELDS);
         List<SoapExchange> exchanges = em.createQuery("select s from SoapExchange s", SoapExchange.class)
                 .setHint("javax.persistence.fetchgraph", fetchGraph)
                 .getResultList();

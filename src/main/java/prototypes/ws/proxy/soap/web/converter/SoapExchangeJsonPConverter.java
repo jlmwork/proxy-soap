@@ -25,7 +25,7 @@ import prototypes.ws.proxy.soap.model.SoapExchange;
  *
  * @author JL06436S
  */
-public class SoapExchangeJsonConverter extends JsonConverter<SoapExchange> {
+public class SoapExchangeJsonPConverter extends JsonConverter<SoapExchange> {
 
     public String toJsonShort(SoapExchange soapExchange) {
         return "";

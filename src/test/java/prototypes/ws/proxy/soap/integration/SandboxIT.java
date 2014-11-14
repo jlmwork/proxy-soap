@@ -21,12 +21,13 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import org.junit.Test;
 import prototypes.ws.proxy.soap.model.SoapExchange;
+import prototypes.ws.proxy.soap.web.converter.SoapExchangeJsonPConverter;
 
 /**
  *
  * @author JL06436S
  */
-public class SandboxTest {
+public class SandboxIT {
 
     @Test
     public void test() throws Exception {/*
@@ -45,10 +46,22 @@ public class SandboxTest {
          Assert.assertEquals(36, ids.size());*/
 
         //body("$", Matchers.empty());
+        mappingJsonMoxy();
+    }
 
+    public void mappingJsonCustom() {
+        SoapExchangeJsonPConverter converter = new SoapExchangeJsonPConverter();
+        String json = converter.toJson(new SoapExchange());
+        System.out.println("json : " + json);
+        // http://stackoverflow.com/questions/8745305/how-to-handle-java-util-date-with-moxy-bindings-file
+    }
+
+    public void mappingJsonMoxy() throws Exception {
         Map<String, Object> properties = new HashMap<String, Object>(2);
         //properties.put("eclipselink-oxm-xml", "org/example/binding.json");
         properties.put("eclipselink.media-type", "application/json");
+        properties.put("eclipselink-oxm-xml", "prototypes/ws/proxy/soap/model/soapexchange-short-binding.json");
+        properties.put("eclipselink.json.include-root", false);
 
         JAXBContext context = JAXBContext.newInstance(new Class[]{SoapExchange.class}, properties);
         Marshaller marshaller = context.createMarshaller();
