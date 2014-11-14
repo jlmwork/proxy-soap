@@ -29,6 +29,7 @@ import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
 import prototypes.ws.proxy.soap.constantes.ApplicationConfig;
 import prototypes.ws.proxy.soap.io.Files;
 import prototypes.ws.proxy.soap.model.SoapExchange;
+import prototypes.ws.proxy.soap.reflect.Classes;
 import prototypes.ws.proxy.soap.repository.SoapExchangeRepository;
 import prototypes.ws.proxy.soap.time.Dates;
 
@@ -36,10 +37,10 @@ import prototypes.ws.proxy.soap.time.Dates;
  *
  * @author jlamande
  */
-public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
+public class SoapExchangeJpaRepository extends SoapExchangeRepository {
 
     private static final Logger LOGGER = LoggerFactory
-            .getLogger(SoapExchangeRepositoryJpa.class);
+            .getLogger(SoapExchangeJpaRepository.class);
 
     private final EntityManagerFactory emf;
 
@@ -47,7 +48,9 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
 
     private final String persistenceUnitName;
 
-    public SoapExchangeRepositoryJpa(ProxyConfiguration proxyConfig) {
+    private final String[] SOAP_EXCHANGE_FIELDS = Classes.getAllFieldsName(SoapExchange.class, new String[]{"serial", "_", "UID"});
+
+    public SoapExchangeJpaRepository(ProxyConfiguration proxyConfig) {
         super(proxyConfig);
         // for use of a derby db
         String derbyHome = ApplicationConfig.DEFAULT_STORAGE_PATH;
@@ -78,7 +81,7 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
         // EclipseLink produces 2 queries ! One for normal graph and one for added nodes. Too bad
         // So we need to use a fetch graph and to add all attributes to use a fetch graph ! So ugly !
         EntityGraph<SoapExchange> fetchGraph = em.createEntityGraph(SoapExchange.class);
-        fetchGraph.addAttributeNodes(SoapExchange.FIELDS);
+        fetchGraph.addAttributeNodes(SOAP_EXCHANGE_FIELDS);
 
         // The loadgraph if it worked
         // EntityGraph<SoapExchange> loadGraph = em.createEntityGraph(SoapExchange.class);
@@ -110,7 +113,7 @@ public class SoapExchangeRepositoryJpa extends SoapExchangeRepository {
         // So we need to use a fetch graph and to add all attributes to use a fetch graph ! So ugly !
         EntityGraph<SoapExchange> fetchGraph = em.createEntityGraph(SoapExchange.class);
         fetchGraph.addAttributeNodes("frontEndRequest", "backEndResponse", "frontEndRequestHeaders", "backEndResponseHeaders");
-        fetchGraph.addAttributeNodes(SoapExchange.FIELDS);
+        fetchGraph.addAttributeNodes(SOAP_EXCHANGE_FIELDS);
         List<SoapExchange> exchanges = em.createQuery("select s from SoapExchange s", SoapExchange.class)
                 .setHint("javax.persistence.fetchgraph", fetchGraph)
                 .getResultList();

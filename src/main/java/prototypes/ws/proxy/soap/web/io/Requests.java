@@ -24,6 +24,8 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,6 +40,8 @@ public class Requests {
             .getLogger(Requests.class);
 
     public static final String HEADER_AUTH = "Authorization";
+
+    private static final Pattern charsetPattern = Pattern.compile(".*charset=(.*)\\W?$");
 
     /**
      * Get complete host, e.g. <scheme>://<serverName>:<port>
@@ -249,6 +253,36 @@ public class Requests {
             wrappedResponse = (CaptureServletResponseWrapper) response;
         }
         return wrappedResponse;
+    }
+
+    public static String getCharset(Map<String, List<String>> map) {
+        String charset = null;
+        if (map != null) {
+            String contentType = null;
+            if (map.get("Content-type") != null && !map.get("Content-type").isEmpty()) {
+                contentType = map.get("Content-type").get(0);
+            }
+            if (map.get("Content-Type") != null && !map.get("Content-Type").isEmpty()) {
+                contentType = map.get("Content-type").get(0);
+            }
+            if (map.get("content-type") != null && !map.get("content-type").isEmpty()) {
+                contentType = map.get("Content-type").get(0);
+            }
+            charset = getCharset(contentType);
+        }
+        return charset;
+    }
+
+    public static String getCharset(String contentType) {
+        String charset = "UTF-8";
+        if (contentType != null) {
+            Matcher m = charsetPattern.matcher(contentType);
+            if (m.find()) {
+                charset = m.group(1);
+            }
+            return charset;
+        }
+        return charset;
     }
 
 }

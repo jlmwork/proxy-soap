@@ -17,16 +17,8 @@ package prototypes.ws.proxy.soap.web.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-import javax.json.JsonWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,6 +28,7 @@ import prototypes.ws.proxy.soap.io.Strings;
 import prototypes.ws.proxy.soap.model.SoapExchange;
 import prototypes.ws.proxy.soap.repository.SoapExchangeRepository;
 import prototypes.ws.proxy.soap.web.context.ApplicationContext;
+import prototypes.ws.proxy.soap.web.converter.json.SoapExchangeJsonPConverter;
 
 /**
  *
@@ -93,46 +86,8 @@ public class ExchangeServlet extends AbstractServlet {
                 response.setHeader("Content-Type", "application/json; charset=UTF-8");
                 // TODO : use "fields" parameter for field selection
                 PrintWriter out = response.getWriter();
-                JsonWriter jsonWriter = Json.createWriter(out);
-                JsonObjectBuilder oBuidler = Json.createObjectBuilder();
-                oBuidler.add("id", stripNull(soapExchange.getId()))
-                        .add("date", stripNull(soapExchange.getDate()))
-                        .add("from", stripNull(soapExchange.getFrom()))
-                        .add("to", stripNull(soapExchange.getUri()))
-                        .add("validator", stripNull(soapExchange.getValidatorId()))
-                        .add("operation", stripNull(soapExchange.getOperation()))
-                        // request
-                        .add("request_content", stripNull(soapExchange.getFrontEndRequestAsXML()))
-                        .add("request_headers", formatJsonMap(soapExchange.getFrontEndRequestHeaders()))
-                        .add("request_errors", formatJsonList(soapExchange.getRequestErrors()))
-                        .add("request_xml_errors", formatJsonList(soapExchange.getRequestXmlErrors()))
-                        .add("request_soap_errors", formatJsonList(soapExchange.getRequestSoapErrors()))
-                        /// request validation
-                        .add("request_valid", stripNull(soapExchange.getRequestValid()))
-                        .add("request_xml_valid", stripNull(soapExchange.getRequestXmlValid()))
-                        .add("request_soap_valid", stripNull(soapExchange.getRequestSoapValid()))
-                        // proxy request
-                        .add("proxy_request", stripNull(soapExchange.getProxyRequest()))
-                        .add("proxy_request_headers", formatJsonMap(soapExchange.getProxyRequestHeaders()))
-                        // proxy response
-                        .add("proxy_response", stripNull(soapExchange.getProxyResponse()))
-                        .add("proxy_response_code", stripNull(soapExchange.getProxyResponseCode()))
-                        .add("proxy_response_headers", formatJsonMap(soapExchange.getProxyResponseHeaders()))
-                        .add("backend_response_time", soapExchange.getBackEndResponseTime())
-                        .add("backend_response_code", stripNull(soapExchange.getBackEndResponseCode()))
-                        .add("backend_response_content", stripNull(soapExchange.getBackendResponseAsXML()))
-                        .add("backend_response_headers", formatJsonMap(soapExchange.getBackendResponseHeaders()))
-                        /// response validation
-                        .add("response_errors", formatJsonList(soapExchange.getResponseErrors()))
-                        .add("response_xml_errors", formatJsonList(soapExchange.getResponseXmlErrors()))
-                        .add("response_soap_errors", formatJsonList(soapExchange.getResponseSoapErrors()))
-                        .add("response_valid", stripNull(soapExchange.getResponseValid()))
-                        .add("response_xml_valid", stripNull(soapExchange.getResponseXmlValid()))
-                        .add("response_soap_valid", stripNull(soapExchange.getResponseSoapValid())
-                        );
-
-                jsonWriter.write(oBuidler.build());
-                jsonWriter.close();
+                String soapExchangeJsonStr = (new SoapExchangeJsonPConverter()).toJson(soapExchange);
+                out.write(soapExchangeJsonStr);
                 out.close();
             }
         } else {
@@ -148,38 +103,6 @@ public class ExchangeServlet extends AbstractServlet {
             id = m.group(1);
         }
         return id;
-    }
-
-    private static String stripNull(Object o) {
-        if (o == null) {
-            return "";
-        } else {
-            return o.toString();
-        }
-    }
-
-    private JsonObject formatJsonMap(Map<String, List<String>> map) {
-        JsonObjectBuilder oBuilder = Json.createObjectBuilder();
-        if (map != null) {
-            for (String key : map.keySet()) {
-                if (key == null) {
-                    oBuilder.add("-", map.get(key).toString());
-                } else {
-                    oBuilder.add(key, map.get(key).toString());
-                }
-            }
-        }
-        return oBuilder.build();
-    }
-
-    private JsonArray formatJsonList(List<String> list) {
-        JsonArrayBuilder aBuilder = Json.createArrayBuilder();
-        if (list != null) {
-            for (String obj : list) {
-                aBuilder.add(obj);
-            }
-        }
-        return aBuilder.build();
     }
 
 }

@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package prototypes.ws.proxy.soap.web.converter;
+package prototypes.ws.proxy.soap.web.converter.json;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import javax.json.Json;
@@ -28,11 +27,7 @@ import javax.json.JsonObjectBuilder;
  *
  * @author JL06436S
  */
-public abstract class JsonConverter<T> {
-
-    public abstract String toJson(Collection<T> t);
-
-    public abstract String toJson(T t);
+public abstract class JsonPConverter<T> extends JsonConverter<T> {
 
     protected static String stripNull(Object o) {
         if (o == null) {

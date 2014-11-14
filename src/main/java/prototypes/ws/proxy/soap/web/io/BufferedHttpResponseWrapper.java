@@ -18,11 +18,17 @@ package prototypes.ws.proxy.soap.web.io;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BufferedHttpResponseWrapper extends HttpServletResponseWrapper {
+
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(BufferedHttpResponseWrapper.class);
 
     private BufferedServletOutputStream bufferedServletOut = new BufferedServletOutputStream();
 
@@ -44,7 +50,13 @@ public class BufferedHttpResponseWrapper extends HttpServletResponseWrapper {
     }
 
     public String getContent() {
-        return new String(this.getBuffer());
+        try {
+            LOGGER.debug("Response character encoding : {}", this.getCharacterEncoding());
+            return new String(this.getBuffer(), this.getCharacterEncoding());
+        } catch (UnsupportedEncodingException ex) {
+            LOGGER.warn("Bad character Encoding : {}", this.getCharacterEncoding());
+            return new String(this.getBuffer());
+        }
     }
 
     public byte[] getBuffer() {

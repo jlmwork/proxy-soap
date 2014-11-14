@@ -30,14 +30,14 @@ import prototypes.ws.proxy.soap.repository.SoapExchangeRepository;
  *
  * @author jlamande
  */
-public class SoapExchangeRepositoryInMemory extends SoapExchangeRepository {
+public class SoapExchangeInMemoryRepository extends SoapExchangeRepository {
 
     private static final Logger LOGGER = LoggerFactory
-            .getLogger(SoapExchangeRepositoryInMemory.class);
+            .getLogger(SoapExchangeInMemoryRepository.class);
 
     private final Map<String, SoapExchange> exchangesMap;
 
-    public SoapExchangeRepositoryInMemory(ProxyConfiguration proxyConfig) {
+    public SoapExchangeInMemoryRepository(ProxyConfiguration proxyConfig) {
         super(proxyConfig);
         int capacity = proxyConfig.getNbMaxExchanges();
         exchangesMap = Collections.synchronizedMap(new FifoMap<String, SoapExchange>(capacity));

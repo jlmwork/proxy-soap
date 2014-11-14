@@ -19,8 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
 import prototypes.ws.proxy.soap.constantes.ApplicationConfig;
-import prototypes.ws.proxy.soap.repository.jpa.SoapExchangeRepositoryJpa;
-import prototypes.ws.proxy.soap.repository.memory.SoapExchangeRepositoryInMemory;
+import prototypes.ws.proxy.soap.repository.jpa.SoapExchangeJpaRepository;
+import prototypes.ws.proxy.soap.repository.memory.SoapExchangeInMemoryRepository;
 
 /**
  *
@@ -58,13 +58,13 @@ public class SoapExchangeRepositoryFactory {
     public SoapExchangeRepository createRepository(ProxyConfiguration proxyConfig) {
         if (ApplicationConfig.PERSIST_MODE_DB.equals(proxyConfig.getPersistenceMode())) {
             try {
-                return new SoapExchangeRepositoryJpa(proxyConfig);
+                return new SoapExchangeJpaRepository(proxyConfig);
             } catch (RuntimeException ex) {
                 // fall back to a in-memory implementation
-                return new SoapExchangeRepositoryInMemory(proxyConfig);
+                return new SoapExchangeInMemoryRepository(proxyConfig);
             }
         } else {
-            return new SoapExchangeRepositoryInMemory(proxyConfig);
+            return new SoapExchangeInMemoryRepository(proxyConfig);
         }
     }
 

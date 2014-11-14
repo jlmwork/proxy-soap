@@ -19,10 +19,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.List;
-import javax.json.Json;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonObjectBuilder;
-import javax.json.JsonWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +32,7 @@ import prototypes.ws.proxy.soap.model.SoapExchange;
 import prototypes.ws.proxy.soap.repository.SoapExchangeRepository;
 import prototypes.ws.proxy.soap.time.Dates;
 import prototypes.ws.proxy.soap.web.context.ApplicationContext;
+import prototypes.ws.proxy.soap.web.converter.json.SoapExchangeJsonPConverter;
 
 /**
  *
@@ -118,30 +115,7 @@ public class ExchangesServlet extends AbstractServlet {
         Collection<SoapExchange> soapExchanges = exchangeRepository.listWithoutContent();
         // TODO : use "fields" parameter for field selection
         PrintWriter out = response.getWriter();
-        JsonWriter jsonWriter = Json.createWriter(out);
-        LOGGER.debug("Export " + soapExchanges.size() + " soapExchanges");
-        JsonObjectBuilder oBuilder = Json.createObjectBuilder();
-        JsonArrayBuilder aBuilder = Json.createArrayBuilder();
-        for (SoapExchange soapRequest : soapExchanges) {
-            aBuilder.add(Json.createObjectBuilder()
-                    .add("id", stripNull(soapRequest.getId()))
-                    .add("date", stripNull(soapRequest.getDate()))
-                    .add("from", stripNull(soapRequest.getFrom()))
-                    .add("to", stripNull(soapRequest.getUri()))
-                    .add("validator", stripNull(soapRequest.getValidatorId()))
-                    .add("operation", stripNull(soapRequest.getOperation()))
-                    .add("resp_time", soapRequest.getBackEndResponseTime())
-                    .add("request_valid", stripNull(soapRequest.getRequestValid()))
-                    .add("request_xml_valid", stripNull(soapRequest.getRequestXmlValid()))
-                    .add("request_soap_valid", stripNull(soapRequest.getRequestSoapValid()))
-                    .add("response_valid", stripNull(soapRequest.getResponseValid()))
-                    .add("response_xml_valid", stripNull(soapRequest.getResponseXmlValid()))
-                    .add("response_soap_valid", stripNull(soapRequest.getResponseSoapValid()))
-            );
-        }
-        //oBuilder.add("exchanges", aBuilder.build());
-        jsonWriter.write(aBuilder.build());
-        jsonWriter.close();
+        out.write((new SoapExchangeJsonPConverter()).toJsonSummary(soapExchanges));
         out.close();
     }
 
@@ -168,14 +142,6 @@ public class ExchangesServlet extends AbstractServlet {
             }
         } finally {
             out.close();
-        }
-    }
-
-    private static String stripNull(Object o) {
-        if (o == null) {
-            return "";
-        } else {
-            return o.toString();
         }
     }
 

@@ -29,7 +29,7 @@ public class SoapExchangeRepositoryJpaTest {
     @Test
     public void test() {
         ProxyConfiguration proxyConfig = new ProxyConfiguration();
-        SoapExchangeRepositoryJpa repo = new SoapExchangeRepositoryJpa(proxyConfig);
+        SoapExchangeJpaRepository repo = new SoapExchangeJpaRepository(proxyConfig);
         //repo.get("7648eb10-664e-11e4-ac26-fa35fcf7a2be");
         List<SoapExchange> exchanges = repo.listWithoutContent();
         if (exchanges != null && exchanges.size() > 0) {
@@ -40,7 +40,7 @@ public class SoapExchangeRepositoryJpaTest {
     @Test
     public void testList() {
         ProxyConfiguration proxyConfig = new ProxyConfiguration();
-        SoapExchangeRepositoryJpa repo = new SoapExchangeRepositoryJpa(proxyConfig);
+        SoapExchangeJpaRepository repo = new SoapExchangeJpaRepository(proxyConfig);
         repo.list();
     }
 }

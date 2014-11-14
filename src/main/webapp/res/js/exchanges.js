@@ -180,12 +180,14 @@ function formatList(list) {
 
 function formatMap(map) {
     var str = "";
-    jQuery.each(map, function(i, val) {
-        if (i !== '-') {
-            str += i + "=";
-        }
-        str += val + String.fromCharCode(13);
-    });
+    if (map) {
+        jQuery.each(map, function(i, val) {
+            if (i !== '-') {
+                str += i + "=";
+            }
+            str += val + String.fromCharCode(13);
+        });
+    }
     return str;
 }
 
@@ -200,8 +202,8 @@ function displayExchange(exchange) {
     $('#exchangeId').html(exchange.id);
 
     // request
-    $('#reqheaders pre code').text(formatMap(exchange.request_headers));
-    $('#reqcontent pre code').text(exchange.request_content);
+    $('#reqheaders pre code').text(formatMap(exchange.front_end_request_headers));
+    $('#reqcontent pre code').text(exchange.front_end_request);
     if (exchange.request_valid === "true") {
         $details.find('.nav li:has(a[href="#reqerrors"])').hide();
         $('#reqerrors pre code').text('');
@@ -212,8 +214,8 @@ function displayExchange(exchange) {
     }
 
     // response
-    $('#respheaders pre code').text(formatMap(exchange.response_headers));
-    $('#respcontent pre code').text(exchange.response_content);
+    $('#respheaders pre code').text(formatMap(exchange.back_end_response_headers));
+    $('#respcontent pre code').text(exchange.back_end_response);
     console.log(exchange.response_errors);
     if (exchange.response_valid === "true"
             || (exchange.response_errors && exchange.response_errors.length < 1)) {
@@ -224,6 +226,9 @@ function displayExchange(exchange) {
         $details.find('.nav li:has(a[href="#resperrors"])').show();
         $('#resperrors pre code').text(formatList(exchange.response_errors));
     }
+
+    // proxy details
+    $('#proxyresponse pre code').text(exchange.proxy_response);
 
     // syntax highlighting
     console.log('syntax hl');

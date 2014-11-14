@@ -29,14 +29,14 @@ import prototypes.ws.proxy.soap.time.Dates;
  *
  * @author jlamande
  */
-public class ExternalStorageConverter implements AttributeConverter<String, String> {
+public class ExternalStorageConverter implements AttributeConverter<byte[], String> {
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(ExternalStorageConverter.class);
 
     @Override
-    public String convertToDatabaseColumn(String x) {
-        if (!Strings.isNullOrEmpty(x)) {
+    public String convertToDatabaseColumn(byte[] x) {
+        if (x != null && x.length > 0) {
             // dir to store contents
             String storagePath = createStorageDir();
             String id = new UUID().toString();
@@ -49,13 +49,13 @@ public class ExternalStorageConverter implements AttributeConverter<String, Stri
     }
 
     @Override
-    public String convertToEntityAttribute(String y) {
+    public byte[] convertToEntityAttribute(String y) {
         if (!Strings.isNullOrEmpty(y)) {
             String requestStoragePath = y;
             LOGGER.debug("Column loaded from : {}", requestStoragePath);
-            return Files.readCompressed(requestStoragePath);
+            return Files.readBytesCompressed(requestStoragePath);
         }
-        return "";
+        return new byte[0];
     }
 
     private String createStorageDir() {

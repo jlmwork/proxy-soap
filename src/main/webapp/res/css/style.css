@@ -63,7 +63,5 @@ body .modal-dialog {
     cursor: pointer;
 }
 .selected {
-    font-weight: bold;
-    font-size: 11px;
     text-decoration: underline;
 }

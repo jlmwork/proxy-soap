@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<xml-bindings
+    xmlns="http://www.eclipse.org/eclipselink/xsds/persistence/oxm"
+    package-name="blog.bindingfile"
+    xsi:schemaLocation="http://www.eclipse.org/eclipselink/xsds/persistence/oxm http://www.eclipse.org/eclipselink/xsds/eclipselink_oxm_2_4.xsd">
+    <xml-schema
+        namespace="http://www.example.com/customer"
+        element-form-default="QUALIFIED"
+    />
+    <java-types>
+        <java-type name="Customer">
+            <xml-root-element/>
+            <xml-type prop-order="firstName lastName address phoneNumbers"/>
+            <java-attributes>
+                <xml-element java-attribute="firstName" name="first-name"/>
+                <xml-element java-attribute="lastName" name="last-name"/>
+                <xml-element java-attribute="phoneNumbers" name="phone-number"/>
+            </java-attributes>
+        </java-type>
+        <java-type name="PhoneNumber">
+            <java-attributes>
+                <xml-attribute java-attribute="type"/>
+                <xml-value java-attribute="number"/>
+            </java-attributes>
+        </java-type>
+    </java-types>
+</xml-bindings>

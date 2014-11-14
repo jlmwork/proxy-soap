@@ -47,7 +47,7 @@ public class ProxyServlet extends AbstractServlet {
     // following headers must not go back unchanged to the client
     private static final List<String> RESP_HEADERS_TO_IGNORE = Arrays
             .asList(new String[]{"transfer-encoding", "content-encoding",
-                "set-cookie", "x-powered-by"});
+                "set-cookie", "x-powered-by", "Date"});
 
     // following headers must not go back unchanged to the client
     private static final List<String> REQ_HEADERS_TO_IGNORE = Arrays
@@ -84,7 +84,8 @@ public class ProxyServlet extends AbstractServlet {
             backendExchange.setRequestHeaders(httpConn.getRequestProperties());
 
             // Send request
-            byte[] body = backendExchange.getRequestBody().getBytes();
+            byte[] body = backendExchange.getRequestBody();
+
             backendExchange.start();
             if (body.length > 0) {
                 httpConn.getOutputStream().write(body);
@@ -95,13 +96,12 @@ public class ProxyServlet extends AbstractServlet {
             boolean gzipped = "gzip".equals(httpConn.getContentEncoding());
             // Get response. If response is gzipped, uncompress it
             try {
-                backendExchange.setResponseBody(Streams.getString(
-                        httpConn.getInputStream(), gzipped));
+                backendExchange.setResponseBody(Streams.getBytes(httpConn.getInputStream(), gzipped));
             } catch (java.net.SocketTimeoutException ex) {
                 throw new IOException("Time out");
             } catch (IOException e) {
                 LOGGER.warn("Failed to read target response body {}", e.getMessage());
-                backendExchange.setResponseBody(Streams.getString(httpConn.getErrorStream(), gzipped));
+                backendExchange.setResponseBody(Streams.getBytes(httpConn.getErrorStream(), gzipped));
             } finally {
                 backendExchange.stop();
             }
@@ -132,7 +132,7 @@ public class ProxyServlet extends AbstractServlet {
             addResponseHeaders(response, backendExchange, respHeadersToIgnore);
             response.setStatus(backendExchange.getResponseCode());
 
-            Streams.writeStringAndClose(response.getWriter(),
+            Streams.writeAndClose(response.getWriter(),
                     backendExchange.getResponseBody());
         } catch (IllegalStateException e1) {
             // bad url

@@ -242,6 +242,10 @@ public class Files {
         return read(svgPath, true);
     }
 
+    public static byte[] readBytesCompressed(String svgPath) {
+        return readBytes(svgPath, true);
+    }
+
     public static String read(String svgPath) {
         return read(svgPath, false);
     }
@@ -260,15 +264,37 @@ public class Files {
         return content;
     }
 
+    public static byte[] readBytes(String svgPath, boolean compressed) {
+        byte[] content = new byte[0];
+        try {
+            InputStream is = new FileInputStream(svgPath);
+            if (compressed) {
+                is = new GZIPInputStream(is);
+            }
+            content = Streams.getBytes(is);
+        } catch (IOException ex) {
+            LOGGER.warn("Error reading {}, {}", svgPath, ex.getMessage());
+        }
+        return content;
+    }
+
     public static String writeCompressed(String svgPath, String content) {
-        return write(svgPath, content, true);
+        return write(svgPath, content.getBytes(), true);
+    }
+
+    public static String writeCompressed(String svgPath, byte[] contentBytes) {
+        return write(svgPath, contentBytes, true);
     }
 
     public static String write(String svgPath, String content) {
-        return write(svgPath, content, false);
+        return write(svgPath, content.getBytes(), false);
     }
 
-    public static String write(String svgPath, String content, boolean compressed) {
+    public static String write(String svgPath, byte[] contentBytes) {
+        return write(svgPath, contentBytes, false);
+    }
+
+    public static String write(String svgPath, byte[] content, boolean compressed) {
         OutputStream os = null;
         String finalFileName = svgPath;
         try {
@@ -276,7 +302,7 @@ public class Files {
             if (compressed) {
                 os = new GZIPOutputStream(os);
             }
-            os.write(content.getBytes());
+            os.write(content);
         } catch (IOException ex) {
             finalFileName = "-1";
             LOGGER.error(ex.getMessage(), ex);

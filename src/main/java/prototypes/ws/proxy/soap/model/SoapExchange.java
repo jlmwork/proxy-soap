@@ -21,15 +21,12 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
-import prototypes.ws.proxy.soap.reflect.Classes;
 import prototypes.ws.proxy.soap.time.Dates;
 import prototypes.ws.proxy.soap.xml.XmlStrings;
 
 public class SoapExchange {
 
     public static final transient String UID = "proxy-soap.exchange";
-
-    public static final transient String[] FIELDS = Classes.getAllFieldsName(SoapExchange.class, new String[]{"serial", "_", "UID"});
 
     private Calendar time = new GregorianCalendar();
     // give the request an unique attribute id
@@ -42,8 +39,8 @@ public class SoapExchange {
     private long proxyInternalTime = -1L;
 
     // request
-    private String frontEndRequest;
-    private String proxyRequest;
+    private byte[] frontEndRequest;
+    private byte[] proxyRequest;
     private Map<String, List<String>> frontEndRequestHeaders;
     private Map<String, List<String>> proxyRequestHeaders;
     private Boolean requestSoapValid;
@@ -51,10 +48,10 @@ public class SoapExchange {
     private List<String> requestSoapErrors;
     private List<String> responseSoapErrors;
     // response
-    private String backEndResponse;
+    private byte[] backEndResponse;
     private int backEndResponseCode;
     private int proxyResponseCode;
-    private String proxyResponse;
+    private byte[] proxyResponse;
     private Boolean responseSoapValid;
     private Boolean responseXmlValid;
     private Map<String, List<String>> backEndResponseHeaders;
@@ -125,7 +122,7 @@ public class SoapExchange {
     /**
      * @return the request
      */
-    public String getFrontEndRequest() {
+    public byte[] getFrontEndRequest() {
         return frontEndRequest;
     }
 
@@ -134,14 +131,14 @@ public class SoapExchange {
      *
      * @return
      */
-    public String getFrontEndRequestAsXML() {
+    public byte[] getFrontEndRequestAsXML() {
         return XmlStrings.format(frontEndRequest);
     }
 
     /**
      * @param request the request to set
      */
-    public SoapExchange setFrontEndRequest(String request) {
+    public SoapExchange setFrontEndRequest(byte[] request) {
         this.frontEndRequest = request;
         return this;
     }
@@ -149,14 +146,14 @@ public class SoapExchange {
     /**
      * @return the response
      */
-    public void setBackEndResponse(String response) {
+    public void setBackEndResponse(byte[] response) {
         this.backEndResponse = response;
     }
 
     /**
      * @return the response
      */
-    public String getBackEndResponse() {
+    public byte[] getBackEndResponse() {
         return backEndResponse;
     }
 
@@ -179,31 +176,31 @@ public class SoapExchange {
      *
      * @return
      */
-    public String getBackendResponseAsXML() {
+    public byte[] getBackendResponseAsXML() {
         return XmlStrings.format(backEndResponse);
     }
 
     /**
      * @param response the response to set
      */
-    public SoapExchange setResponse(String response) {
+    public SoapExchange setResponse(byte[] response) {
         this.backEndResponse = response;
         return this;
     }
 
-    public String getProxyRequest() {
+    public byte[] getProxyRequest() {
         return proxyRequest;
     }
 
-    public void setProxyRequest(String proxyRequest) {
+    public void setProxyRequest(byte[] proxyRequest) {
         this.proxyRequest = proxyRequest;
     }
 
-    public String getProxyResponse() {
+    public byte[] getProxyResponse() {
         return proxyResponse;
     }
 
-    public void setProxyResponse(String proxyResponse) {
+    public void setProxyResponse(byte[] proxyResponse) {
         this.proxyResponse = proxyResponse;
     }
 

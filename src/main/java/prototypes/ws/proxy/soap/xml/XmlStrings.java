@@ -19,6 +19,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
@@ -183,12 +184,21 @@ public class XmlStrings {
      * @return
      */
     public static String format(String xml) {
-        if (xml == null) {
+        try {
+            return new String(format(xml.getBytes("UTF-8")), "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            LOGGER.debug("XmlUtils.format Error : " + ex.getMessage());
+        }
+        return xml;
+    }
+
+    public static byte[] format(byte[] xml) {
+        if (xml == null || xml.length == 0) {
             return null;
         }
 
         try {
-            xml = cleanXmlRequest(xml);
+            //xml = cleanXmlRequest(xml);
             LOGGER.trace("create sax transformer");
             Transformer serializer = SAXTransformerFactory.newInstance()
                     .newTransformer();
@@ -223,20 +233,19 @@ public class XmlStrings {
 
             LOGGER.trace("create sax source");
             Source xmlSource = new SAXSource(new InputSource(
-                    new ByteArrayInputStream(xml.getBytes())));
+                    new ByteArrayInputStream(xml)));
             StreamResult res = new StreamResult(new ByteArrayOutputStream());
 
             LOGGER.trace("sax transform");
             serializer.transform(xmlSource, res);
 
             LOGGER.trace("get res");
-            return new String(
-                    ((ByteArrayOutputStream) res.getOutputStream())
-                    .toByteArray());
-        } catch (IllegalArgumentException e) {
-            LOGGER.debug("XmlUtils.format Error : " + e.getMessage());
-        } catch (TransformerException e) {
-            LOGGER.debug("XmlUtils.format Error : " + e.getMessage());
+            return ((ByteArrayOutputStream) res.getOutputStream())
+                    .toByteArray();
+        } catch (IllegalArgumentException ex) {
+            LOGGER.debug("XmlUtils.format Error : " + ex.getMessage());
+        } catch (TransformerException ex) {
+            LOGGER.debug("XmlUtils.format Error : " + ex.getMessage());
             LOGGER.debug("XML Message was : " + xml);
         }
         return xml;

@@ -25,8 +25,8 @@
             <th data-field="to"><fmt:message key="exchanges.request.to"/></th>
             <th data-field="validator" data-sortable="true" data-formatter="validatorFieldFormatter"><fmt:message key="exchanges.request.validator"/></th>
             <th data-field="operation"><fmt:message key="exchanges.request.operation"/></th>
-            <th data-field="backend_response_time" data-sortable="true" data-formatter="responseTimeFieldFormatter"><fmt:message key="exchanges.request.response.time"/></th>
-            <th data-field="backend_response_code"  data-visible="false"><fmt:message key="exchanges.request.response.time"/></th>
+            <th data-field="back_end_response_time" data-sortable="true" data-formatter="responseTimeFieldFormatter"><fmt:message key="exchanges.request.response.time"/></th>
+            <th data-field="back_end_response_code"  data-visible="false"><fmt:message key="exchanges.request.response.code"/></th>
             <th data-field="request_valid" data-visible="false"><fmt:message key="exchanges.request.request"/> Valid</th>
             <th data-field="request_xml_valid" data-visible="false"><fmt:message key="exchanges.request.request"/> XML Valid</th>
             <th data-field="request_soap_valid" data-visible="false"><fmt:message key="exchanges.request.request"/> SOAP Valid</th>
@@ -47,9 +47,10 @@
             <li role="presentation" class="active"><a href="#reqheaders" role="tab" data-toggle="tab">Request Headers</a></li>
             <li role="presentation"><a href="#reqcontent" role="tab" data-toggle="tab">Request Content</a></li>
             <li role="presentation"><a href="#reqerrors" role="tab" data-toggle="tab">Request Errors</a></li>
-            <li role="presentation"><a href="#respheaders" role="tab" data-toggle="tab">Response Headers</a></li>
-            <li role="presentation"><a href="#respcontent" role="tab" data-toggle="tab">Response Content</a></li>
-            <li role="presentation"><a href="#resperrors" role="tab" data-toggle="tab">Response Errors</a></li>
+            <li role="presentation"><a href="#respheaders" role="tab" data-toggle="tab">BackEnd Response Headers</a></li>
+            <li role="presentation"><a href="#respcontent" role="tab" data-toggle="tab">BackEnd Response Content</a></li>
+            <li role="presentation"><a href="#resperrors" role="tab" data-toggle="tab">BackEnd Response Errors</a></li>
+            <li role="presentation"><a href="#proxyresponse" role="tab" data-toggle="tab">Proxy Response</a></li>
         </ul>
 
         <!-- Exchange Tab panes -->
@@ -60,6 +61,7 @@
             <div role="tabpanel" class="tab-pane" id="respheaders"><pre><code class="xml"></code></pre></div>
             <div role="tabpanel" class="tab-pane content" id="respcontent"><pre><code class="xml"></code></pre></div>
             <div role="tabpanel" class="tab-pane" id="resperrors"><pre><code class="xml"></code></pre></div>
+            <div role="tabpanel" class="tab-pane" id="proxyresponse"><pre><code class="xml"></code></pre></div>
         </div>
     </div>
 </div>

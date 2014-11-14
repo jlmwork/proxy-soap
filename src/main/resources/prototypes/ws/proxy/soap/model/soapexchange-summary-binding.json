@@ -1,4 +1,5 @@
 {
+    "xml-name-transformer": "prototypes.ws.proxy.soap.integration.NameGenerator",
     "xml-accessor-type": "NONE",
     "package-name": "prototypes.ws.proxy.soap.model",
     "java-types": {
@@ -9,32 +10,26 @@
                     "xml-element": [
                         {
                             "java-attribute": "id",
-                            "name": "id",
                             "nillable": "true"
                         },
                         {
                             "java-attribute": "date",
-                            "name": "date",
                             "nillable": "true"
                         },
                         {
                             "java-attribute": "from",
-                            "name": "from",
                             "nillable": "true"
                         },
                         {
                             "java-attribute": "uri",
-                            "name": "to",
                             "nillable": "true"
                         },
                         {
                             "java-attribute": "backEndResponseTime",
-                            "name": "resp_time",
                             "nillable": "true"
                         },
                         {
                             "java-attribute": "validatorId",
-                            "name": "validatorId",
                             "nillable": "true"
                         }
                     ]

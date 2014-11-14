@@ -122,7 +122,7 @@ public class ValidationFilter extends HttpServletFilter {
     private boolean validateInput(HttpServletRequest request,
             SoapExchange soapExchange)
             throws IOException {
-        String requestBodyContent = soapExchange.getFrontEndRequest();
+        String requestBodyContent = new String(soapExchange.getFrontEndRequest());
 
         // 1] XML Well formed ?
         List<String> errors = XmlStrings.validateXml(requestBodyContent);
@@ -152,7 +152,6 @@ public class ValidationFilter extends HttpServletFilter {
             soapExchange.setRequestXmlErrors(errors);
             logger.debug("XML Errors : " + errors);
         }
-        soapExchange.setFrontEndRequest(requestBodyContent);
         return valid;
     }
 

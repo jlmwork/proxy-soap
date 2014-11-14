@@ -68,7 +68,7 @@ public class ExchangeTracerFilter extends HttpServletFilter {
         logger.trace("SoapExchange Hashcode : {}", Integer.toHexString(soapExchange.hashCode()));
 
         // Frontend Request : extract all data from incoming request
-        soapExchange.setFrontEndRequest(Streams.getString(wrappedRequest.getInputStream()));
+        soapExchange.setFrontEndRequest(Streams.getBytes(wrappedRequest.getInputStream()));
         soapExchange.setFrontEndRequestHeaders(Requests.getRequestHeaders(request));
         soapExchange.setFrom(request.getRemoteAddr());
         soapExchange.setUri(Requests.getTarget(request));
@@ -107,7 +107,7 @@ public class ExchangeTracerFilter extends HttpServletFilter {
         }
 
         // final return of the proxy
-        soapExchange.setProxyResponse(wrappedResponse.getContent());
+        soapExchange.setProxyResponse(wrappedResponse.getBuffer());
         soapExchange.setProxyResponseHeaders(wrappedResponse.getHeaders());
         soapExchange.setProxyResponseCode(wrappedResponse.getStatus());
 

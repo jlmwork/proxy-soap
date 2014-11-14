@@ -22,6 +22,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.zip.GZIPOutputStream;
+import org.mozilla.universalchardet.UniversalDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +66,18 @@ public class Streams {
         }
     }
 
+    public static void writeAndClose(Writer w, byte[] data) throws IOException {
+        if (w != null) {
+            String encoding = detectCharset(data);
+            if (encoding != null) {
+                w.write(new String(data, encoding));
+                w.close();
+            } else {
+                w.write(new String(data, "UTF-8"));
+            }
+        }
+    }
+
     public static String getString(InputStream is, boolean zipped) {
         InputStream finalIS = is;
         if (zipped) {
@@ -99,26 +112,58 @@ public class Streams {
 
     public static String getString(InputStream is) {
         try {
-            return new String(getBytes(is), "UTF-8");
+            LOGGER.debug("Read from InputStream");
+            byte[] bytes = getBytes(is);
+            String encoding = detectCharset(bytes);
+            LOGGER.trace("Size and Charset of bytes read from InputStream : {}", bytes.length, encoding);
+            if (encoding != null) {
+                return new String(bytes, encoding);
+            }
+            // use a default encoding (if no parameter, platform encoding would be used, Charset.defaultCharset())
+            return new String(bytes, "UTF-8");
         } catch (UnsupportedEncodingException ex) {
             LOGGER.warn("Error converting string : " + ex.getMessage());
             return "";
         }
+    }
 
+    private static String detectCharset(byte[] bytes) {
+        UniversalDetector detector = new UniversalDetector(null);
+        detector.handleData(bytes, 0, bytes.length);
+        detector.dataEnd();
+        LOGGER.debug("Charset detected : " + detector.getDetectedCharset());
+        return detector.getDetectedCharset();
+    }
+
+    public static byte[] getBytes(InputStream is, boolean zipped) {
+        InputStream finalIS = is;
+        if (zipped) {
+            try {
+                finalIS = new java.util.zip.GZIPInputStream(is);
+            } catch (IOException e) {
+            }
+        }
+        return getBytes(finalIS);
     }
 
     public static byte[] getBytes(InputStream iS) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        getBytes(iS, baos);
+        LOGGER.debug("Size of bytes read from InputStream : {}", baos.size());
+        return baos.toByteArray();
+    }
+
+    public static void getBytes(InputStream iS, OutputStream oS) {
         int readed;
         try {
             while ((readed = iS.read()) != -1) {
-                baos.write(readed);
+                oS.write(readed);
             }
         } catch (IOException e) {
             // e.printStackTrace();
         } finally {
             try {
-                baos.close();
+                oS.close();
             } catch (IOException e) {
                 // e.printStackTrace();
             }
@@ -130,7 +175,6 @@ public class Streams {
                 }
             }
         }
-        return baos.toByteArray();
     }
 
     public static int copy(InputStream input, OutputStream output)

@@ -34,14 +34,14 @@ public class BackendExchange {
 
     private String uri = "";
     private Long starttime = -1L;
-    private String requestBody = "";
+    private byte[] requestBody;
     private Map<String, List<String>> requestHeaders = new HashMap<String, List<String>>();
     private int responseCode = 0;
-    private String responseBody = "";
+    private byte[] responseBody;
     private Map<String, List<String>> responseHeaders = new HashMap<String, List<String>>();
     private Long stoptime = -1L;
 
-    public BackendExchange(String uri, String body, Map<String, List<String>> requestHeaders) {
+    public BackendExchange(String uri, byte[] body, Map<String, List<String>> requestHeaders) {
         this.uri = uri;
         this.requestBody = body;
         this.requestHeaders = requestHeaders;
@@ -50,7 +50,7 @@ public class BackendExchange {
     public BackendExchange(HttpServletRequest request) {
         this.uri = Requests.getTarget(request);
         try {
-            this.requestBody = new String(Streams.getBytes(request.getInputStream()));
+            this.requestBody = Streams.getBytes(request.getInputStream());
         } catch (IOException ex) {
             LoggerFactory.getLogger(BackendExchange.class.getName()).warn("Init Backend Failed on reading request input", ex);
         }
@@ -78,6 +78,13 @@ public class BackendExchange {
         this.responseCode = responseCode;
     }
 
+    public String getResponseCharsetEncoding() {
+        if (this.responseHeaders.get("Content-type") != null) {
+            return Requests.getCharset(this.responseHeaders.get("Content-type").get(0));
+        }
+        return "";
+    }
+
     public String getUri() {
         return uri;
     }
@@ -86,11 +93,11 @@ public class BackendExchange {
         this.uri = uri;
     }
 
-    public String getRequestBody() {
+    public byte[] getRequestBody() {
         return requestBody;
     }
 
-    public void setRequestBody(String requestBody) {
+    public void setRequestBody(byte[] requestBody) {
         this.requestBody = requestBody;
     }
 
@@ -102,11 +109,11 @@ public class BackendExchange {
         this.requestHeaders = requestHeaders;
     }
 
-    public String getResponseBody() {
+    public byte[] getResponseBody() {
         return responseBody;
     }
 
-    public void setResponseBody(String responseBody) {
+    public void setResponseBody(byte[] responseBody) {
         this.responseBody = responseBody;
     }
 

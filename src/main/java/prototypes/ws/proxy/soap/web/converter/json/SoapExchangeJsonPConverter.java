@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package prototypes.ws.proxy.soap.web.converter;
+package prototypes.ws.proxy.soap.web.converter.json;
 
 import java.util.Collection;
 import javax.json.Json;
@@ -22,39 +22,68 @@ import javax.json.JsonObjectBuilder;
 import prototypes.ws.proxy.soap.model.SoapExchange;
 
 /**
+ * JSON Processing Converter impl
+ *
+ * JSON Processing impl is bit too verbose on attribute names.
  *
  * @author JL06436S
  */
-public class SoapExchangeJsonPConverter extends JsonConverter<SoapExchange> {
+public class SoapExchangeJsonPConverter extends JsonPConverter<SoapExchange> {
 
-    public String toJsonShort(SoapExchange soapExchange) {
+    @Override
+    public String toJsonSummary(SoapExchange soapExchange) {
+        if (soapExchange != null) {
+            return toJsonSummaryBuilder(soapExchange).build().toString();
+        }
         return "";
     }
 
-    public String toJson(Collection<SoapExchange> soapExchanges) {
-        if (soapExchanges != null) {
-            JsonObjectBuilder oBuilder = Json.createObjectBuilder();
-            JsonArrayBuilder aBuilder = Json.createArrayBuilder();
-            for (SoapExchange soapExchange : soapExchanges) {
-                aBuilder.add(Json.createObjectBuilder()
-                        .add("id", stripNull(soapExchange.getId()))
-                        .add("date", stripNull(soapExchange.getDate()))
-                        .add("from", stripNull(soapExchange.getFrom()))
-                        .add("to", stripNull(soapExchange.getUri()))
-                        .add("validator", stripNull(soapExchange.getValidatorId()))
-                        .add("operation", stripNull(soapExchange.getOperation()))
-                        .add("resp_time", soapExchange.getBackEndResponseTime())
-                        .add("request_valid", stripNull(soapExchange.getRequestValid()))
-                        .add("request_xml_valid", stripNull(soapExchange.getRequestXmlValid()))
-                        .add("request_soap_valid", stripNull(soapExchange.getRequestSoapValid()))
-                        .add("response_valid", stripNull(soapExchange.getResponseValid()))
-                        .add("response_xml_valid", stripNull(soapExchange.getResponseXmlValid()))
-                        .add("response_soap_valid", stripNull(soapExchange.getResponseSoapValid()))
-                );
-            }
-            return aBuilder.build().toString();
+    public JsonObjectBuilder toJsonSummaryBuilder(SoapExchange soapExchange) {
+        if (soapExchange != null) {
+            JsonObjectBuilder oBuilder = Json.createObjectBuilder()
+                    .add("id", stripNull(soapExchange.getId()))
+                    .add("date", stripNull(soapExchange.getDate()))
+                    .add("from", stripNull(soapExchange.getFrom()))
+                    .add("to", stripNull(soapExchange.getUri()))
+                    .add("validator", stripNull(soapExchange.getValidatorId()))
+                    .add("operation", stripNull(soapExchange.getOperation()))
+                    .add("back_end_response_time", soapExchange.getBackEndResponseTime())
+                    .add("back_end_response_code", soapExchange.getBackEndResponseCode())
+                    .add("request_valid", stripNull(soapExchange.getRequestValid()))
+                    .add("request_xml_valid", stripNull(soapExchange.getRequestXmlValid()))
+                    .add("request_soap_valid", stripNull(soapExchange.getRequestSoapValid()))
+                    .add("response_valid", stripNull(soapExchange.getResponseValid()))
+                    .add("response_xml_valid", stripNull(soapExchange.getResponseXmlValid()))
+                    .add("response_soap_valid", stripNull(soapExchange.getResponseSoapValid()));
+            return oBuilder;
         }
-        return "";
+
+        return null;
+    }
+
+    @Override
+    public String toJsonSummary(Collection<SoapExchange> soapExchanges) {
+        String summaries = "[]";
+        if (soapExchanges != null && !soapExchanges.isEmpty()) {
+            JsonArrayBuilder aBuilder = Json.createArrayBuilder();
+            for (SoapExchange soapRequest : soapExchanges) {
+                aBuilder.add(toJsonSummaryBuilder(soapRequest));
+            }
+            summaries = aBuilder.build().toString();
+        }
+        return summaries;
+    }
+
+    public String toJson(Collection<SoapExchange> soapExchanges) {
+        String exchanges = "[]";
+        if (soapExchanges != null && !soapExchanges.isEmpty()) {
+            JsonArrayBuilder aBuilder = Json.createArrayBuilder();
+            for (SoapExchange soapRequest : soapExchanges) {
+                aBuilder.add(toJson(soapRequest));
+            }
+            exchanges = aBuilder.build().toString();
+        }
+        return exchanges;
     }
 
     public String toJson(SoapExchange soapExchange) {
@@ -67,9 +96,10 @@ public class SoapExchangeJsonPConverter extends JsonConverter<SoapExchange> {
                     .add("to", stripNull(soapExchange.getUri()))
                     .add("validator", stripNull(soapExchange.getValidatorId()))
                     .add("operation", stripNull(soapExchange.getOperation()))
+                    .add("proxy_internal_time", stripNull(soapExchange.getProxyInternalTime()))
                     // request
-                    .add("request_content", stripNull(soapExchange.getFrontEndRequestAsXML()))
-                    .add("request_headers", formatJsonMap(soapExchange.getFrontEndRequestHeaders()))
+                    .add("front_end_request", stripNull(soapExchange.getFrontEndRequestAsXML()))
+                    .add("front_end_request_headers", formatJsonMap(soapExchange.getFrontEndRequestHeaders()))
                     .add("request_errors", formatJsonList(soapExchange.getRequestErrors()))
                     .add("request_xml_errors", formatJsonList(soapExchange.getRequestXmlErrors()))
                     .add("request_soap_errors", formatJsonList(soapExchange.getRequestSoapErrors()))
@@ -84,11 +114,10 @@ public class SoapExchangeJsonPConverter extends JsonConverter<SoapExchange> {
                     .add("proxy_response", stripNull(soapExchange.getProxyResponse()))
                     .add("proxy_response_code", stripNull(soapExchange.getProxyResponseCode()))
                     .add("proxy_response_headers", formatJsonMap(soapExchange.getProxyResponseHeaders()))
-                    .add("backend_response_time", soapExchange.getBackEndResponseTime())
-                    .add("backend_response_code", stripNull(soapExchange.getBackEndResponseCode()))
-                    .add("backend_response_content", stripNull(soapExchange.getBackendResponseAsXML()))
-                    .add("backend_response_headers", formatJsonMap(soapExchange.getBackendResponseHeaders()))
-                    /// response validation
+                    .add("back_end_response_time", soapExchange.getBackEndResponseTime())
+                    .add("back_end_response_code", stripNull(soapExchange.getBackEndResponseCode()))
+                    .add("back_end_response", stripNull(soapExchange.getBackendResponseAsXML()))
+                    .add("back_end_response_headers", formatJsonMap(soapExchange.getBackendResponseHeaders()))
                     .add("response_errors", formatJsonList(soapExchange.getResponseErrors()))
                     .add("response_xml_errors", formatJsonList(soapExchange.getResponseXmlErrors()))
                     .add("response_soap_errors", formatJsonList(soapExchange.getResponseSoapErrors()))
