@@ -41,12 +41,8 @@ public class BufferedHttpResponseWrapper extends HttpServletResponseWrapper {
 
     public void reinit() {
         bufferedServletOut = new BufferedServletOutputStream();
-        if (printWriter != null) {
-            printWriter = new PrintWriter(bufferedServletOut);
-        }
-        if (outputStream != null) {
-            outputStream = this.bufferedServletOut;
-        }
+        printWriter = null;
+        outputStream = null;
     }
 
     public String getContent() {

@@ -15,23 +15,14 @@
  */
 package prototypes.ws.proxy.soap.integration;
 
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
-import org.apache.commons.codec.binary.Base64;
 import org.eclipse.persistence.jaxb.JAXBContextProperties;
 import org.junit.Test;
-import org.mozilla.universalchardet.UniversalDetector;
-import prototypes.ws.proxy.soap.io.Streams;
 import prototypes.ws.proxy.soap.model.SoapExchange;
 import prototypes.ws.proxy.soap.web.converter.json.SoapExchangeJsonPConverter;
-import prototypes.ws.proxy.soap.web.io.Requests;
 
 /**
  *
@@ -83,78 +74,4 @@ public class SandboxIT {
         marshaller.marshal(soap, System.out);
     }
 
-    @Test
-    public void callSoap() throws Exception {
-        URL targetUrl = new URL("http://zed337j3:6101/sgel/services/MesureServiceRead/MesureServiceRead");
-        HttpURLConnection httpConn = null;
-        httpConn = (HttpURLConnection) targetUrl.openConnection();
-        // type of connection
-        httpConn.setDoOutput(true);
-        httpConn.setRequestMethod("POST");
-        httpConn.setRequestProperty("SOAPAction", "");
-        httpConn.setRequestProperty("Content-Type", "text/xml;charset=UTF-8");
-        String basicAuth = "Basic " + new String(new Base64().encode("sgel-portail:sgel-portail".getBytes()));
-        httpConn.setRequestProperty(Requests.HEADER_AUTH, basicAuth);
-        httpConn.getOutputStream().write(bodySoap.getBytes());
-        String deEncoding = "" + Charset.defaultCharset();
-        String locale = "" + Locale.getDefault();
-        System.out.println("Default Charset : " + deEncoding);
-        System.out.println("Default Locale : " + locale);
-        String responseContent = Streams.getString(
-                httpConn.getInputStream(), false);
-
-        System.out.println(responseContent);
-        //System.out.println(XmlStrings.format(responseContent));
-    }
-
-    private String bodySoap = "<?xml version='1.0' encoding='UTF-8'?>\n"
-            + "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:v2=\"http://nsge.erdf.fr/sgel/mesure/echange/service/v2\">\n"
-            + "   <soapenv:Header/>\n"
-            + "   <soapenv:Body>\n"
-            + "      <v2:recupererHistoriqueMesuresBMPoint>\n"
-            + "         <contexte>\n"
-            + "            <!--Optional:-->\n"
-            + "            <ucuName>?</ucuName>\n"
-            + "            <!--Optional:-->\n"
-            + "            <tId>éé</tId>\n"
-            + "            <systemeId>?</systemeId>\n"
-            + "            <!--Optional:-->\n"
-            + "            <login>test@erdf.fr</login>\n"
-            + "         </contexte>\n"
-            + "         <point>50095768285080</point>\n"
-            + "         <acteurDemandeurs>ACM_139</acteurDemandeurs>\n"
-            + "      </v2:recupererHistoriqueMesuresBMPoint>\n"
-            + "   </soapenv:Body>\n"
-            + "</soapenv:Envelope>";
-
-    public void findCharset(String body) throws Exception {
-        findCharset(new java.io.ByteArrayInputStream(body.getBytes()));
-    }
-
-    public String findCharset(InputStream is) throws Exception {
-
-        byte[] buf = new byte[4096];
-        // (1)
-        UniversalDetector detector = new UniversalDetector(null);
-
-        // (2)
-        int nread;
-        while ((nread = is.read(buf)) > 0 && !detector.isDone()) {
-            detector.handleData(buf, 0, nread);
-        }
-        // (3)
-        detector.dataEnd();
-
-        // (4)
-        String encoding = detector.getDetectedCharset();
-        if (encoding != null) {
-            System.out.println("Detected encoding = " + encoding);
-        } else {
-            System.out.println("No encoding detected.");
-        }
-
-        // (5)
-        detector.reset();
-        return encoding;
-    }
 }

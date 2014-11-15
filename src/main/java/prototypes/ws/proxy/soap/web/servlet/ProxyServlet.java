@@ -132,8 +132,7 @@ public class ProxyServlet extends AbstractServlet {
             addResponseHeaders(response, backendExchange, respHeadersToIgnore);
             response.setStatus(backendExchange.getResponseCode());
 
-            Streams.writeAndClose(response.getWriter(),
-                    backendExchange.getResponseBody());
+            response.getOutputStream().write(backendExchange.getResponseBody());
         } catch (IllegalStateException e1) {
             // bad url
             Requests.sendErrorClient(request, response,
@@ -186,8 +185,8 @@ public class ProxyServlet extends AbstractServlet {
         String reqContentType = (!Strings.isNullOrEmpty(request.getContentType()))
                 ? request.getContentType()
                 : (!Strings.isNullOrEmpty(request.getHeader("Content-Type"))
-                ? request.getHeader("Content-Type")
-                : "text/xml");
+                        ? request.getHeader("Content-Type")
+                        : "text/xml");
         httpConn.setRequestProperty("Content-Type", reqContentType);
 
         return httpConn;

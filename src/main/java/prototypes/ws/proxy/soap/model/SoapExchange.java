@@ -31,7 +31,7 @@ public class SoapExchange {
     private Calendar time = new GregorianCalendar();
     // give the request an unique attribute id
     private final String id = new UUID().toString();
-    private String uri;
+    private String to;
     private String from;
     private String operation;
     private String validatorId;
@@ -60,7 +60,7 @@ public class SoapExchange {
     private List<String> responseXmlErrors;
 
     public BackendExchange createBackendExchange() {
-        return new BackendExchange(uri, frontEndRequest, frontEndRequestHeaders);
+        return new BackendExchange(to, frontEndRequest, frontEndRequestHeaders);
     }
 
     public String getValidatorId() {
@@ -89,7 +89,7 @@ public class SoapExchange {
 
     @Override
     public String toString() {
-        return "SoapExchange{" + "time=" + time + ", id=" + id + ", uri=" + uri + ", from=" + from + ", "
+        return "SoapExchange{" + "time=" + time + ", id=" + id + ", uri=" + to + ", from=" + from + ", "
                 + "operation=" + operation + ", validatorId=" + validatorId
                 + ", backEndResponseTime=" + backEndResponseTime + ", proxyInternalTime=" + proxyInternalTime
                 + "\n, frontEndRequest=" + frontEndRequest
@@ -304,15 +304,15 @@ public class SoapExchange {
     /**
      * @return the uri
      */
-    public String getUri() {
-        return uri;
+    public String getTo() {
+        return to;
     }
 
     /**
      * @param uri the uri to set
      */
-    public void setUri(String uri) {
-        this.uri = uri;
+    public void setTo(String to) {
+        this.to = to;
     }
 
     /**

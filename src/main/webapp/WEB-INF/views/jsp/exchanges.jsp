@@ -20,19 +20,28 @@
     <thead>
         <tr class="text-center">
             <th data-field="id" data-visible="false">ID</th>
-            <th data-field="date" data-sortable="true"><fmt:message key="exchanges.request.date"/></th>
-            <th data-field="from"><fmt:message key="exchanges.request.from"/></th>
-            <th data-field="to"><fmt:message key="exchanges.request.to"/></th>
-            <th data-field="validator" data-sortable="true" data-formatter="validatorFieldFormatter"><fmt:message key="exchanges.request.validator"/></th>
-            <th data-field="operation"><fmt:message key="exchanges.request.operation"/></th>
-            <th data-field="back_end_response_time" data-sortable="true" data-formatter="responseTimeFieldFormatter"><fmt:message key="exchanges.request.response.time"/></th>
-            <th data-field="back_end_response_code"  data-visible="false"><fmt:message key="exchanges.request.response.code"/></th>
-            <th data-field="request_valid" data-visible="false"><fmt:message key="exchanges.request.request"/> Valid</th>
-            <th data-field="request_xml_valid" data-visible="false"><fmt:message key="exchanges.request.request"/> XML Valid</th>
-            <th data-field="request_soap_valid" data-visible="false"><fmt:message key="exchanges.request.request"/> SOAP Valid</th>
-            <th data-field="response_valid" data-visible="false"><fmt:message key="exchanges.request.response"/> Valid</th>
-            <th data-field="response_xml_valid" data-visible="false"><fmt:message key="exchanges.request.response"/> XML Valid</th>
-            <th data-field="response_soap_valid" data-visible="false"><fmt:message key="exchanges.request.response"/> SOAP Valid</th>
+            <th data-field="date" data-sortable="true"><fmt:message key="exchanges.exchange.date"/></th>
+            <th data-field="from"><fmt:message key="exchanges.exchange.from"/></th>
+            <th data-field="to"><fmt:message key="exchanges.exchange.to"/></th>
+            <th data-field="validator" data-sortable="true" data-formatter="validatorFieldFormatter">
+                <fmt:message key="exchanges.exchange.validator"/>
+            </th>
+            <th data-field="operation">
+                <fmt:message key="exchanges.exchange.operation"/>
+            </th>
+            <th data-field="back_end_response_time" data-sortable="true" data-formatter="responseTimeFieldFormatter">
+                <fmt:message key="exchanges.exchange.back_end_response_time"/>
+            </th>
+            <th data-field="proxy_internal_time" data-sortable="true"  data-visible="false" data-formatter="responseTimeFieldFormatter">
+                <fmt:message key="exchanges.exchange.proxy_internal_time"/>
+            </th>
+            <th data-field="back_end_response_code"  data-visible="false"><fmt:message key="exchanges.exchange.response.code"/></th>
+            <th data-field="request_valid" data-visible="false"><fmt:message key="exchanges.exchange.request"/> Valid</th>
+            <th data-field="request_xml_valid" data-visible="false"><fmt:message key="exchanges.exchange.request"/> XML Valid</th>
+            <th data-field="request_soap_valid" data-visible="false"><fmt:message key="exchanges.exchange.request"/> SOAP Valid</th>
+            <th data-field="response_valid" data-visible="false"><fmt:message key="exchanges.exchange.response"/> Valid</th>
+            <th data-field="response_xml_valid" data-visible="false"><fmt:message key="exchanges.exchange.response"/> XML Valid</th>
+            <th data-field="response_soap_valid" data-visible="false"><fmt:message key="exchanges.exchange.response"/> SOAP Valid</th>
         </tr>
     </thead>
 </table>
@@ -44,13 +53,48 @@
     <div class="panel-body panel-collapse collapse">
         <!-- Exchange Nav tabs -->
         <ul class="nav navbar-default nav-tabs" role="tablist">
-            <li role="presentation" class="active"><a href="#reqheaders" role="tab" data-toggle="tab">Request Headers</a></li>
-            <li role="presentation"><a href="#reqcontent" role="tab" data-toggle="tab">Request Content</a></li>
-            <li role="presentation"><a href="#reqerrors" role="tab" data-toggle="tab">Request Errors</a></li>
-            <li role="presentation"><a href="#respheaders" role="tab" data-toggle="tab">BackEnd Response Headers</a></li>
-            <li role="presentation"><a href="#respcontent" role="tab" data-toggle="tab">BackEnd Response Content</a></li>
-            <li role="presentation"><a href="#resperrors" role="tab" data-toggle="tab">BackEnd Response Errors</a></li>
-            <li role="presentation"><a href="#proxyresponse" role="tab" data-toggle="tab">Proxy Response</a></li>
+            <li role="presentation" class="active">
+                <a href="#reqheaders" role="tab" data-toggle="tab">
+                    <fmt:message key="exchanges.exchange.headers_of"/>
+                    <fmt:message key="exchanges.exchange.request"/>
+                </a>
+            </li>
+            <li role="presentation">
+                <a href="#reqcontent" role="tab" data-toggle="tab">
+                    <fmt:message key="exchanges.exchange.content_of"/>
+                    <fmt:message key="exchanges.exchange.request"/>
+                </a>
+            </li>
+            <li role="presentation">
+                <a href="#reqerrors" role="tab" data-toggle="tab">
+                    <fmt:message key="exchanges.exchange.errors_of"/>
+                    <fmt:message key="exchanges.exchange.request"/>
+                </a>
+            </li>
+            <li role="presentation">
+                <a href="#respheaders" role="tab" data-toggle="tab">
+                    <fmt:message key="exchanges.exchange.headers_of"/>
+                    <fmt:message key="exchanges.exchange.response"/>
+                </a>
+            </li>
+            <li role="presentation">
+                <a href="#respcontent" role="tab" data-toggle="tab">
+                    <fmt:message key="exchanges.exchange.content_of"/>
+                    <fmt:message key="exchanges.exchange.response"/>
+                </a>
+            </li>
+            <li role="presentation">
+                <a href="#resperrors" role="tab" data-toggle="tab">
+                    <fmt:message key="exchanges.exchange.errors_of"/>
+                    <fmt:message key="exchanges.exchange.response"/>
+                </a>
+            </li>
+            <li role="presentation">
+                <a href="#proxyresponse" role="tab" data-toggle="tab">
+                    Proxy - <fmt:message key="exchanges.exchange.content_of"/>
+                    <fmt:message key="exchanges.exchange.response"/>
+                </a>
+            </li>
         </ul>
 
         <!-- Exchange Tab panes -->

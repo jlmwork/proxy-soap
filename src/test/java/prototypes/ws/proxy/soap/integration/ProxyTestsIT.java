@@ -140,6 +140,35 @@ public class ProxyTestsIT {
         }
     }
 
+    public String checkProxyMode(String requestName, String responseSampleName, int returnCodeExpected, String block, String validation) {
+        counterRequests++;
+        String samplesPath = "/p/" + RestAssured.baseURI + RestAssured.basePath + "/sample";
+
+        String content = given()
+                .body(Files.read("src/test/resources/samples/messages/requests/" + requestName + ".xml"))
+                .when()
+                .post(samplesPath + "/" + responseSampleName)
+                .then().statusCode(returnCodeExpected)
+                .header("X-Filtered-Blocking", block)
+                .header("X-Filtered-Validation", validation)
+                .extract().response().body().print();
+        return content;
+    }
+
+    public String checkWithProxyStatus(String requestName, String responseSampleName, String proxyStatus, int returnCodeExpected) {
+        counterRequests++;
+        String samplesPath = "/p/" + RestAssured.baseURI + RestAssured.basePath + "/sample";
+
+        String content = given()
+                .body(Files.read("src/test/resources/samples/messages/requests/" + requestName + ".xml"))
+                .when()
+                .post(samplesPath + "/" + responseSampleName)
+                .then().statusCode(returnCodeExpected)
+                .header("X-Filtered-Status", proxyStatus)
+                .extract().response().body().print();
+        return content;
+    }
+
     public String check(String requestName, String responseSampleName, int returnCodeExpected) {
         counterRequests++;
         String samplesPath = "/p/" + RestAssured.baseURI + RestAssured.basePath + "/sample";
@@ -186,9 +215,10 @@ public class ProxyTestsIT {
     public void testNonBlockingValidating() {
         // configure proxy mode in non blocking mode
         configureProxyMode("false", "true");
+        checkProxyMode("operation1-req_OK", "operation1-resp_OK", 200, "false", "true");
         // ope 1
-        check("operation1-req_OK", "operation1-resp_OK", 200);
-        check("operation1-req_OK", "operation1-resp-fault_OK", 500);
+        checkWithProxyStatus("operation1-req_OK", "operation1-resp_OK", "true true", 200);
+        checkWithProxyStatus("operation1-req_OK", "operation1-resp-fault_OK", "true true", 500);
         check("operation1-req_KO", "operation1-resp_OK", 200);
         check("operation1-req_OK", "operation1-resp_KO", 200);
         check("operation1-req_OK", "operation1-resp-fault_KO", 500);
@@ -218,6 +248,7 @@ public class ProxyTestsIT {
     public void testBlockingValidating() {
         // configure proxy mode in blocking mode
         configureProxyMode("true", "true");
+        checkProxyMode("operation1-req_OK", "operation1-resp_OK", 200, "true", "true");
         // ope 1
         check("operation1-req_OK", "operation1-resp_OK", 200);
         check("operation1-req_OK", "operation1-resp-fault_OK", 500);

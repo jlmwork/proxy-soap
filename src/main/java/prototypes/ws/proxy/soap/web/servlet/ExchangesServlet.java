@@ -181,7 +181,7 @@ public class ExchangesServlet extends AbstractServlet {
         }
 
         public CsvWriter append(SoapExchange s) {
-            this.append(s.getId()).append(s.getDate()).append(s.getFrom()).append(s.getUri());
+            this.append(s.getId()).append(s.getDate()).append(s.getFrom()).append(s.getTo());
             this.append(s.getRequestXmlErrors());
             this.append(s.getRequestSoapErrors());
             this.append(s.getResponseXmlErrors());

@@ -71,7 +71,7 @@ public class ExchangeTracerFilter extends HttpServletFilter {
         soapExchange.setFrontEndRequest(Streams.getBytes(wrappedRequest.getInputStream()));
         soapExchange.setFrontEndRequestHeaders(Requests.getRequestHeaders(request));
         soapExchange.setFrom(request.getRemoteAddr());
-        soapExchange.setUri(Requests.getTarget(request));
+        soapExchange.setTo(Requests.getTarget(request));
 
         chain.doFilter(wrappedRequest, wrappedResponse);
 

@@ -112,7 +112,7 @@ public class Streams {
 
     public static String getString(InputStream is) {
         try {
-            LOGGER.debug("Read from InputStream");
+            LOGGER.trace("Read from InputStream");
             byte[] bytes = getBytes(is);
             String encoding = detectCharset(bytes);
             LOGGER.trace("Size and Charset of bytes read from InputStream : {}", bytes.length, encoding);
@@ -131,7 +131,7 @@ public class Streams {
         UniversalDetector detector = new UniversalDetector(null);
         detector.handleData(bytes, 0, bytes.length);
         detector.dataEnd();
-        LOGGER.debug("Charset detected : " + detector.getDetectedCharset());
+        LOGGER.trace("Charset detected : {} ", detector.getDetectedCharset());
         return detector.getDetectedCharset();
     }
 
@@ -149,7 +149,7 @@ public class Streams {
     public static byte[] getBytes(InputStream iS) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         getBytes(iS, baos);
-        LOGGER.debug("Size of bytes read from InputStream : {}", baos.size());
+        LOGGER.trace("Size of bytes read from InputStream : {}", baos.size());
         return baos.toByteArray();
     }
 

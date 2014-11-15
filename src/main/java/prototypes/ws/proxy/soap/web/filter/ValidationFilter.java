@@ -85,7 +85,6 @@ public class ValidationFilter extends HttpServletFilter {
                 logger.info("Proxy is in blocking mode and this request is invalid.");
                 Requests.sendErrorClient(wrappedRequest, wrappedResponse,
                         "Request message invalid");
-                logger.debug("Invalidation response : {} ", wrappedResponse.getContent());
                 return;
             }
 
@@ -169,6 +168,7 @@ public class ValidationFilter extends HttpServletFilter {
             throws IOException {
         Boolean valid = null;
         String responseBodyContent = response.getContent();
+        logger.debug("Response body Content to validate : {}", responseBodyContent);
 
         // validate only responses of code or 500 for SoapFaults
         if (!Strings.isNullOrEmpty(responseBodyContent) && (response.getStatus() == HttpServletResponse.SC_OK
@@ -206,8 +206,9 @@ public class ValidationFilter extends HttpServletFilter {
         } else if (response.getStatus() == HttpServletResponse.SC_NOT_FOUND) {
             valid = false;
         }
-        // dont validate :
-        //  - code 400 as it is used specially for tracing bad client requests
+        // dont validate some HTTP codes :
+        //  - code 400 : it is returned by proxy specially for tracing bad client requests
+        // so proxy dont validate its own response
         return valid;
     }
 

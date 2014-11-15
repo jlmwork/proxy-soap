@@ -32,6 +32,8 @@ public abstract class JsonPConverter<T> extends JsonConverter<T> {
     protected static String stripNull(Object o) {
         if (o == null) {
             return "";
+        } else if (o instanceof byte[]) {
+            return new String((byte[]) o);
         } else {
             return o.toString();
         }
