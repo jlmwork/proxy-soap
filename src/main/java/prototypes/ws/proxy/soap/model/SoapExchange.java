@@ -37,6 +37,8 @@ public class SoapExchange {
     private String validatorId;
     private long backEndResponseTime = -1L;
     private long proxyInternalTime = -1L;
+    private boolean proxyValidating = false;
+    private boolean proxyBlocking = false;
 
     // request
     private byte[] frontEndRequest;
@@ -85,6 +87,22 @@ public class SoapExchange {
 
     public void setOperation(String operation) {
         this.operation = operation;
+    }
+
+    public boolean isProxyValidating() {
+        return proxyValidating;
+    }
+
+    public void setProxyValidation(boolean proxyValidation) {
+        this.proxyValidating = proxyValidation;
+    }
+
+    public boolean isProxyBlocking() {
+        return proxyBlocking;
+    }
+
+    public void setProxyBlocking(boolean proxyBlocking) {
+        this.proxyBlocking = proxyBlocking;
     }
 
     @Override

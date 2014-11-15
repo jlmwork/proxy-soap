@@ -1,63 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+for eclipselink custom oxm : http://www.eclipse.org/eclipselink/documentation/2.5/jpa/extensions/schema.htm
+-->
 <persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
-  <persistence-unit name="ProxyPU" transaction-type="RESOURCE_LOCAL">
-    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-    <!-- unactivate L2 cache-->
-    <shared-cache-mode>NONE</shared-cache-mode>
-    <!--<class>prototypes.ws.proxy.soap.repository.jpa.HeadersConverter</class>-->
-    <!--<class>prototypes.ws.proxy.soap.monitor.SoapRequestMonitor</class>-->
-    <mapping-file>META-INF/mapping.xml</mapping-file>
-    <exclude-unlisted-classes>true</exclude-unlisted-classes>
-    <properties>
-      <!--<jta-data-source>jdbc/proxyDS</jta-data-source>-->
-      <!-- Configure default connection pool. -->
-      <property name="eclipselink.connection-pool.default.initial" value="1"/>
-      <property name="eclipselink.connection-pool.default.min" value="1"/>
-      <property name="eclipselink.connection-pool.default.max" value="5"/>
-      <!-- derby local -->
-      <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver"/>
-      <!--
+    <persistence-unit name="ProxyPU" transaction-type="RESOURCE_LOCAL">
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <!-- unactivate L2 cache-->
+        <shared-cache-mode>NONE</shared-cache-mode>
+        <!--<class>prototypes.ws.proxy.soap.repository.jpa.HeadersConverter</class>-->
+        <!--<class>prototypes.ws.proxy.soap.monitor.SoapRequestMonitor</class>-->
+        <mapping-file>META-INF/mapping.xml</mapping-file>
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+        <properties>
+            <!--<jta-data-source>jdbc/proxyDS</jta-data-source>-->
+            <!-- Configure default connection pool. -->
+            <property name="eclipselink.connection-pool.default.initial" value="1"/>
+            <property name="eclipselink.connection-pool.default.min" value="1"/>
+            <property name="eclipselink.connection-pool.default.max" value="5"/>
+            <!-- derby local -->
+            <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver"/>
+            <!--
             <property name="javax.persistence.jdbc.url" value="jdbc:derby:proxy-soap_derby.db;create=true"/>
             <property name="javax.persistence.jdbc.user" value="proxy"/>
             <property name="javax.persistence.jdbc.password" value="soap"/> -->
-      <!--<property name="showSql" value="true"/>-->
-      <property name="eclipselink.logging.logger" value="prototypes.ws.proxy.soap.logging.Slf4jEclipseLinkSessionLogger"/>
-      <property name="eclipselink.logging.level" value="FINEST"/>
-      <property name="eclipselink.logging.level.sql" value="FINE"/>
-      <property name="eclipselink.logging.parameters" value="true"/>
-      <property name="eclipselink.deploy-on-startup" value="false"/>
-      <property name="eclipselink.weaving" value="static"/>
-      <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
-    </properties>
-  </persistence-unit>
-  <persistence-unit name="ProxyPULobs" transaction-type="RESOURCE_LOCAL">
-    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-    <!-- unactivate L2 cache-->
-    <shared-cache-mode>NONE</shared-cache-mode>
-    <!--<class>prototypes.ws.proxy.soap.monitor.SoapRequestMonitor</class>-->
-    <mapping-file>META-INF/mapping_lobs.xml</mapping-file>
-    <class>prototypes.ws.proxy.soap.repository.jpa.converter.HeadersConverter</class>
-    <exclude-unlisted-classes>true</exclude-unlisted-classes>
-    <properties>
-      <!--<jta-data-source>jdbc/proxyDS</jta-data-source>-->
-      <!-- Configure default connection pool. -->
-      <property name="eclipselink.connection-pool.default.initial" value="1"/>
-      <property name="eclipselink.connection-pool.default.min" value="1"/>
-      <property name="eclipselink.connection-pool.default.max" value="5"/>
-      <!-- derby local -->
-      <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver"/>
-      <!--
+            <!--<property name="showSql" value="true"/>-->
+            <property name="eclipselink.logging.logger" value="prototypes.ws.proxy.soap.logging.Slf4jEclipseLinkSessionLogger"/>
+            <property name="eclipselink.logging.level" value="FINEST"/>
+            <property name="eclipselink.logging.level.sql" value="FINE"/>
+            <property name="eclipselink.logging.parameters" value="true"/>
+            <property name="eclipselink.deploy-on-startup" value="false"/>
+            <property name="eclipselink.weaving" value="static"/>
+            <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
+        </properties>
+    </persistence-unit>
+    <persistence-unit name="ProxyPULobs" transaction-type="RESOURCE_LOCAL">
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <!-- unactivate L2 cache-->
+        <shared-cache-mode>NONE</shared-cache-mode>
+        <!--<class>prototypes.ws.proxy.soap.monitor.SoapRequestMonitor</class>-->
+        <mapping-file>META-INF/mapping_lobs.xml</mapping-file>
+        <class>prototypes.ws.proxy.soap.repository.jpa.converter.HeadersConverter</class>
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+        <properties>
+            <!--<jta-data-source>jdbc/proxyDS</jta-data-source>-->
+            <!-- Configure default connection pool. -->
+            <property name="eclipselink.connection-pool.default.initial" value="1"/>
+            <property name="eclipselink.connection-pool.default.min" value="1"/>
+            <property name="eclipselink.connection-pool.default.max" value="5"/>
+            <!-- derby local -->
+            <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver"/>
+            <!--
             <property name="javax.persistence.jdbc.url" value="jdbc:derby:proxy-soap_derby.db;create=true"/>
             <property name="javax.persistence.jdbc.user" value="proxy"/>
             <property name="javax.persistence.jdbc.password" value="soap"/> -->
-      <!--<property name="showSql" value="true"/>-->
-      <property name="eclipselink.logging.logger" value="prototypes.ws.proxy.soap.logging.Slf4jEclipseLinkSessionLogger"/>
-      <property name="eclipselink.logging.level" value="FINEST"/>
-      <property name="eclipselink.logging.level.sql" value="FINE"/>
-      <property name="eclipselink.logging.parameters" value="true"/>
-      <property name="eclipselink.deploy-on-startup" value="false"/>
-      <property name="eclipselink.weaving" value="static"/>
-      <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
-    </properties>
-  </persistence-unit>
+            <!--<property name="showSql" value="true"/>-->
+            <property name="eclipselink.logging.logger" value="prototypes.ws.proxy.soap.logging.Slf4jEclipseLinkSessionLogger"/>
+            <property name="eclipselink.logging.level" value="FINEST"/>
+            <property name="eclipselink.logging.level.sql" value="FINE"/>
+            <property name="eclipselink.logging.parameters" value="true"/>
+            <property name="eclipselink.deploy-on-startup" value="false"/>
+            <property name="eclipselink.weaving" value="static"/>
+            <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
+        </properties>
+    </persistence-unit>
 </persistence>

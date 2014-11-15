@@ -67,12 +67,12 @@ public class ValidationFilter extends HttpServletFilter {
     @Override
     public void doFilter(HttpServletRequest request, HttpServletResponse response,
             FilterChain chain) throws IOException, ServletException {
+        // TODO : avoid to use the SoapExchange object, but better a Validation-like object
+        // in order to abstract Validation from SoapExchange system (as in ProxyServlet)
+        SoapExchange soapExchange = RequestContext.getSoapExchange(request);
 
         // only validate POST request if validation is activated
-        if (proxyConfig.isValidationActive() && "POST".equals(request.getMethod())) {
-            // TODO : avoid to use the SoapExchange object, but better a Validation-like object
-            // in order to abstract Validation from SoapExchange system (as in ProxyServlet)
-            SoapExchange soapExchange = RequestContext.getSoapExchange(request);
+        if (soapExchange.isProxyValidating() && "POST".equals(request.getMethod())) {
             logger.info("Validation is active.");
 
             MultiReadHttpServletRequest wrappedRequest = Requests.wrap(request);
@@ -81,7 +81,7 @@ public class ValidationFilter extends HttpServletFilter {
             // 1] Request validation
             Boolean requestValid = validateInput(request,
                     soapExchange);
-            if (!requestValid && proxyConfig.isInBlockingMode()) {
+            if (!requestValid && soapExchange.isProxyBlocking()) {
                 logger.info("Proxy is in blocking mode and this request is invalid.");
                 Requests.sendErrorClient(wrappedRequest, wrappedResponse,
                         "Request message invalid");
@@ -94,7 +94,7 @@ public class ValidationFilter extends HttpServletFilter {
             // 3] Response validation
             Boolean responseValid = validateOutput(wrappedRequest, wrappedResponse,
                     soapExchange);
-            if (responseValid != null && !responseValid && proxyConfig.isInBlockingMode()) {
+            if (responseValid != null && !responseValid && soapExchange.isProxyBlocking()) {
                 logger.info("Proxy is in blocking mode and this response is invalid.");
                 // must reinit response wrapper to be able to write another response
                 // and forget previous one
@@ -129,6 +129,8 @@ public class ValidationFilter extends HttpServletFilter {
         soapExchange.setRequestXmlValid(valid);
         logger.info("Is Request XML valid ? " + errors.isEmpty());
         // get the SoapValidator
+        // TODO : take care on the validator object as a configuration
+        // request could destroy it during process of this exchange
         SoapValidator soapValidator = findSoapValidator(request, requestBodyContent);
         request.setAttribute("soapValidator", soapValidator);
 

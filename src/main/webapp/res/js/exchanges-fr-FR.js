@@ -4,3 +4,13 @@ function responseTimeFieldFormatter(value, row) {
     }
     return value;
 }
+function statusFormatter(value) {
+    if (value === "") {
+        return "inconnu";
+    } else if (value === "true") {
+        return "valide";
+    } else if (value === "false") {
+        return "invalide";
+    }
+    return value;
+}

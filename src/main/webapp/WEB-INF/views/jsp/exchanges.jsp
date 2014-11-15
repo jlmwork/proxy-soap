@@ -35,13 +35,27 @@
             <th data-field="proxy_internal_time" data-sortable="true"  data-visible="false" data-formatter="responseTimeFieldFormatter">
                 <fmt:message key="exchanges.exchange.proxy_internal_time"/>
             </th>
-            <th data-field="back_end_response_code"  data-visible="false"><fmt:message key="exchanges.exchange.response.code"/></th>
-            <th data-field="request_valid" data-visible="false"><fmt:message key="exchanges.exchange.request"/> Valid</th>
-            <th data-field="request_xml_valid" data-visible="false"><fmt:message key="exchanges.exchange.request"/> XML Valid</th>
-            <th data-field="request_soap_valid" data-visible="false"><fmt:message key="exchanges.exchange.request"/> SOAP Valid</th>
-            <th data-field="response_valid" data-visible="false"><fmt:message key="exchanges.exchange.response"/> Valid</th>
-            <th data-field="response_xml_valid" data-visible="false"><fmt:message key="exchanges.exchange.response"/> XML Valid</th>
-            <th data-field="response_soap_valid" data-visible="false"><fmt:message key="exchanges.exchange.response"/> SOAP Valid</th>
+            <th data-field="back_end_response_code"  data-visible="false">
+                <fmt:message key="exchanges.exchange.response.code"/>
+            </th>
+            <th data-field="request_valid" data-visible="false" data-formatter="statusFormatter">
+                <fmt:message key="exchanges.exchange.request"/> Status
+            </th>
+            <th data-field="request_xml_valid" data-visible="false" data-formatter="statusFormatter">
+                <fmt:message key="exchanges.exchange.request"/> XML
+            </th>
+            <th data-field="request_soap_valid" data-visible="false" data-formatter="statusFormatter">
+                <fmt:message key="exchanges.exchange.request"/> SOAP
+            </th>
+            <th data-field="response_valid" data-visible="false" data-formatter="statusFormatter">
+                <fmt:message key="exchanges.exchange.response"/> Status
+            </th>
+            <th data-field="response_xml_valid" data-visible="false" data-formatter="statusFormatter">
+                <fmt:message key="exchanges.exchange.response"/> XML
+            </th>
+            <th data-field="response_soap_valid" data-visible="false" data-formatter="statusFormatter">
+                <fmt:message key="exchanges.exchange.response"/> SOAP
+            </th>
         </tr>
     </thead>
 </table>
@@ -49,6 +63,9 @@
 <div id="exchangedetails" class="hidden panel panel-default">
     <div class="panel-heading" data-toggle="collapse" data-target="#exchangedetails .panel-body">
         <h5 class="panel-title"><fmt:message key="exchanges.exchange.details.label"/><span id="exchangeId"></span></h5>
+        Proxy mode : validation active, blocking mode active
+        <fmt:message key="exchanges.exchange.request"/> :
+        <fmt:message key="exchanges.exchange.response"/> :
     </div>
     <div class="panel-body panel-collapse collapse">
         <!-- Exchange Nav tabs -->
@@ -61,7 +78,6 @@
             </li>
             <li role="presentation">
                 <a href="#reqcontent" role="tab" data-toggle="tab">
-                    <fmt:message key="exchanges.exchange.content_of"/>
                     <fmt:message key="exchanges.exchange.request"/>
                 </a>
             </li>
@@ -79,7 +95,6 @@
             </li>
             <li role="presentation">
                 <a href="#respcontent" role="tab" data-toggle="tab">
-                    <fmt:message key="exchanges.exchange.content_of"/>
                     <fmt:message key="exchanges.exchange.response"/>
                 </a>
             </li>
@@ -91,7 +106,7 @@
             </li>
             <li role="presentation">
                 <a href="#proxyresponse" role="tab" data-toggle="tab">
-                    Proxy - <fmt:message key="exchanges.exchange.content_of"/>
+                    Proxy -
                     <fmt:message key="exchanges.exchange.response"/>
                 </a>
             </li>

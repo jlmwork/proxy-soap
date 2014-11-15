@@ -2,10 +2,10 @@
  * COOKIE MANAGEMENT
  *********************************************/
 var Cookie = {
-    set: function(name, value) {
+    set: function (name, value) {
         document.cookie = name + "=" + value + "; max-age=" + (60 * 60 * 24 * 10);
     },
-    get: function(name) {
+    get: function (name) {
         var cookies = document.cookie.split(';');
 
         for (var i in cookies) {
@@ -23,7 +23,7 @@ var Cookie = {
  *********************************************/
 
 // create fully selectable areas
-jQuery.fn.selectText = function() {
+jQuery.fn.selectText = function () {
     var doc = document;
     var element = this[0];
     // add blur / click behavior
@@ -41,7 +41,7 @@ jQuery.fn.selectText = function() {
     }
 };
 
-$(function() {
+$(function () {
     var timer = 0;
     /*$table = $('.fixed-table-container');
      $table.addClass('panel-collapse collapse in');
@@ -49,14 +49,14 @@ $(function() {
      $table.attr('aria-labelledby', 'headingOne');*/
 
 
-    $(window).resize(function() {
+    $(window).resize(function () {
         $('#exchangestable').bootstrapTable('resetView');
     });
 
-    $("#exchangedetails pre code").click(function() {
+    $("#exchangedetails pre code").click(function () {
         $(this).selectText();
     });
-    $('#exchangestable').on('column-switch.bs.table', function(e, field, checked) {
+    $('#exchangestable').on('column-switch.bs.table', function (e, field, checked) {
         // read
         var fields = $.cookie('fields')
         if (fields === undefined) {
@@ -84,7 +84,7 @@ $(function() {
     }
 
     var exchangesCache = {};
-    $('#exchangestable').on('click-row.bs.table', function(e, rowData, elem) {
+    $('#exchangestable').on('click-row.bs.table', function (e, rowData, elem) {
         if (rowData.id) {
             $('#exchangestable tr.selected').removeClass('selected');
             elem.addClass('selected');
@@ -97,18 +97,18 @@ $(function() {
                     url: 'exchange/' + rowData.id + '?accept=application/json',
                     dataType: 'json'
                 })
-                        .done(function(exchange) {
+                        .done(function (exchange) {
                             exchangesCache[exchange.id] = exchange;
                             displayExchange(exchange);
                         })
-                        .fail(function() {
+                        .fail(function () {
                             console.log("error on loading exchange");
                         });
             }
         }
     });
 
-    $('#menutabs a[href="#validators"]').on('shown.bs.tab', function(e) {
+    $('#menutabs a[href="#validators"]').on('shown.bs.tab', function (e) {
         validator = window.location.hash;
         console.log(validator);
         if (validator) {
@@ -117,14 +117,14 @@ $(function() {
     })
 
     $('.autorefresh')
-            .click(function() {
+            .click(function () {
                 console.log($(this));
                 if ($(this).data('enabled')) {
                     clearTimeout(timer);
                     $(this).data('enabled', false);
                     $('span', this).text('off');
                 } else {
-                    timer = setTimeout(function() {
+                    timer = setTimeout(function () {
                         window.location.reload();
                     }, 4000);
                     $(this).data('enabled', true);
@@ -136,8 +136,8 @@ $(function() {
             .data('enabled', Cookie.get('autorefresh') != "true")
             .click();
 
-    $('[accesskey]').each(function() {
-        $(document).on('keyup', null, $(this).attr('accesskey'), function(e) {
+    $('[accesskey]').each(function () {
+        $(document).on('keyup', null, $(this).attr('accesskey'), function (e) {
             $('[accesskey=' + e.key + ']').click();
         });
     });
@@ -164,6 +164,17 @@ function responseTimeFieldFormatter(value) {
     }
     return value;
 }
+function statusFormatter(value) {
+    if (value === "") {
+        return "unknown";
+    } else if (value === "true") {
+        return "valid";
+    } else if (value === "false") {
+        return "invalid";
+    }
+    return value;
+}
+
 function viewValidator(validatorLink) {
     $('#menutabs a[href="#validators"]').tab('show');
     var validator = validatorLink.href.split('#')[1];
@@ -172,7 +183,7 @@ function viewValidator(validatorLink) {
 }
 function formatList(list) {
     var str = "";
-    jQuery.each(list, function(i, val) {
+    jQuery.each(list, function (i, val) {
         str += val + String.fromCharCode(13);
     });
     return str;
@@ -181,7 +192,7 @@ function formatList(list) {
 function formatMap(map) {
     var str = "";
     if (map) {
-        jQuery.each(map, function(i, val) {
+        jQuery.each(map, function (i, val) {
             if (i !== '-') {
                 str += i + "=";
             }
@@ -232,7 +243,7 @@ function displayExchange(exchange) {
 
     // syntax highlighting
     console.log('syntax hl');
-    $('#exchangedetails pre code').each(function(i, block) {
+    $('#exchangedetails pre code').each(function (i, block) {
         hljs.highlightBlock(block);
     });
 }

@@ -65,6 +65,8 @@ public class ExchangeTracerFilter extends HttpServletFilter {
 
         // get or create the exchange
         SoapExchange soapExchange = RequestContext.getSoapExchange(wrappedRequest);
+        soapExchange.setProxyValidation(proxyConfig.isValidationActive());
+        soapExchange.setProxyBlocking(proxyConfig.isInBlockingMode());
         logger.trace("SoapExchange Hashcode : {}", Integer.toHexString(soapExchange.hashCode()));
 
         // Frontend Request : extract all data from incoming request
@@ -76,11 +78,15 @@ public class ExchangeTracerFilter extends HttpServletFilter {
         chain.doFilter(wrappedRequest, wrappedResponse);
 
         // add custom headers response back to the client
-        wrappedResponse.addHeader("X-Filtered-By", "proxy-soap#" + soapExchange.getValidatorId());
+        wrappedResponse.addHeader("X-Filtered-By", "proxy-soap");
         wrappedResponse.addHeader("X-Filtered-ID", soapExchange.getId());
+        wrappedResponse.addHeader("X-Filtering-Validation", "" + soapExchange.isProxyValidating());
+        wrappedResponse.addHeader("X-Filtering-Blocking", "" + soapExchange.isProxyBlocking());
         wrappedResponse.addHeader("X-Filtered-Status", soapExchange.getRequestValid() + " " + soapExchange.getResponseValid());
-        wrappedResponse.addHeader("X-Filtered-Validation", "" + proxyConfig.isValidationActive());
-        wrappedResponse.addHeader("X-Filtered-Blocking", "" + proxyConfig.isInBlockingMode());
+        // validation
+        if (soapExchange.getValidatorId() != null) {
+            wrappedResponse.addHeader("X-Validated-By", soapExchange.getValidatorId());
+        }
 
         OutputStream out = response.getOutputStream();
         response.setContentLength(wrappedResponse.getBufferSize());

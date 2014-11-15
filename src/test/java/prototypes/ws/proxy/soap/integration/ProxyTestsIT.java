@@ -149,8 +149,8 @@ public class ProxyTestsIT {
                 .when()
                 .post(samplesPath + "/" + responseSampleName)
                 .then().statusCode(returnCodeExpected)
-                .header("X-Filtered-Blocking", block)
-                .header("X-Filtered-Validation", validation)
+                .header("X-Filtering-Blocking", block)
+                .header("X-Filtering-Validation", validation)
                 .extract().response().body().print();
         return content;
     }

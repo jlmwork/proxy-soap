@@ -47,6 +47,8 @@ public class SoapExchangeJsonPConverter extends JsonPConverter<SoapExchange> {
                     .add("to", stripNull(soapExchange.getTo()))
                     .add("validator", stripNull(soapExchange.getValidatorId()))
                     .add("operation", stripNull(soapExchange.getOperation()))
+                    .add("proxy_blocking", soapExchange.isProxyBlocking())
+                    .add("proxy_validating", soapExchange.isProxyValidating())
                     .add("proxy_internal_time", soapExchange.getProxyInternalTime())
                     .add("back_end_response_time", soapExchange.getBackEndResponseTime())
                     .add("back_end_response_code", soapExchange.getBackEndResponseCode())
