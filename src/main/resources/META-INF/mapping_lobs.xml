@@ -19,6 +19,9 @@
             <basic name="from">
                 <column name="ipFrom" />
             </basic>
+            <basic name="to">
+                <column name="uri" />
+            </basic>
             <basic name="frontEndRequestHeaders" fetch="LAZY">
                 <lob />
                 <column name="FE_REQUEST_HEADERS" length="2048"/>
