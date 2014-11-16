@@ -182,7 +182,7 @@ public class Files {
                 File newFile = new File(folder.getAbsolutePath()
                         + File.separator + fileName);
 
-                LOGGER.debug("file unzip : " + newFile.getAbsoluteFile());
+                LOGGER.debug("file unzip : {}", newFile.getAbsoluteFile());
 
                 // create all non exists folders
                 // else you will hit FileNotFoundException for compressed folder
@@ -211,7 +211,7 @@ public class Files {
 
     public static String download(String httpPath) {
         String localPath = "";
-        LOGGER.debug("Remote file to download : " + httpPath);
+        LOGGER.debug("Remote file to download : {}", httpPath);
         try {
             File folder = createTempDirectory();
             if (!folder.exists()) {
@@ -227,7 +227,7 @@ public class Files {
                 }
             }
             localPath = folder.getAbsolutePath() + File.separator + distantFile;
-            LOGGER.debug("Local path to save to : " + localPath);
+            LOGGER.debug("Local path to save to : {}", localPath);
             ReadableByteChannel rbc = Channels.newChannel(url.openStream());
             FileOutputStream fos = new FileOutputStream(localPath);
             fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);

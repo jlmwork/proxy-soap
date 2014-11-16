@@ -187,7 +187,7 @@ public class XmlStrings {
         try {
             return new String(format(xml.getBytes("UTF-8")), "UTF-8");
         } catch (UnsupportedEncodingException ex) {
-            LOGGER.debug("XmlUtils.format Error : " + ex.getMessage());
+            LOGGER.debug("XmlUtils.format Error : {}", ex.getMessage());
         }
         return xml;
     }
@@ -243,10 +243,10 @@ public class XmlStrings {
             return ((ByteArrayOutputStream) res.getOutputStream())
                     .toByteArray();
         } catch (IllegalArgumentException ex) {
-            LOGGER.debug("XmlUtils.format Error : " + ex.getMessage());
+            LOGGER.debug("XmlUtils.format Error : {}", ex.getMessage());
         } catch (TransformerException ex) {
             LOGGER.debug("XmlUtils.format Error : " + ex.getMessage());
-            LOGGER.debug("XML Message was : " + xml);
+            LOGGER.debug("XML Message was : {}", xml);
         }
         return xml;
     }
@@ -268,7 +268,7 @@ public class XmlStrings {
             XmlStrings.parseXml(xml, xmlOptions);
         } catch (XmlException e) {
             if (e.getErrors() != null) {
-                LOGGER.debug("XML errors found : " + e.getErrors());
+                LOGGER.debug("XML errors found : {}", e.getErrors());
                 for (Object error : e.getErrors()) {
                     errs.add(error.toString());
                 }

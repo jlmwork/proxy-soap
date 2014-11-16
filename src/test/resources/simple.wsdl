@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                  xmlns:tns="http://localhost/webservices/simpleservice2"
+                  name="SimpleService2"
+                  targetNamespace="http://localhost/webservices/simpleservice2">
+    <wsdl:types>
+        <xs:schema targetNamespace="http://localhost/webservices/simpleservice2">
+            <xs:simpleType name="MyOperationType">
+                <xs:restriction base="xs:string"/>
+            </xs:simpleType>
+            <xs:simpleType name="MyOperationResponseType">
+                <xs:restriction base="xs:string"/>
+            </xs:simpleType>
+            <xs:simpleType name="MyOperationFaultType">
+                <xs:restriction base="xs:string"/>
+            </xs:simpleType>
+            <xs:element name="myOperation" type="tns:MyOperationType" />
+            <xs:element name="myOperationResponse" type="tns:MyOperationResponseType" />
+            <xs:element name="myOperationFault" type="tns:MyOperationFaultType" />
+        </xs:schema>
+    </wsdl:types>
+
+
+    <!-- Messages -->
+    <wsdl:message name="myOperationInput">
+        <wsdl:part name="myOperation" element="tns:myOperation" />
+    </wsdl:message>
+    <wsdl:message name="myOperationOutput">
+        <wsdl:part name="myOperationResponse" element="tns:myOperationResponse" />
+    </wsdl:message>
+    <!-- Fault -->
+    <wsdl:message name="myOperationFault">
+        <wsdl:part name="error" element="tns:myOperationFault"></wsdl:part>
+    </wsdl:message>
+
+    <!-- portType -->
+    <wsdl:portType name="SimpleService2Port">
+        <!-- obtenirPrestationsPoint -->
+        <wsdl:operation name="myOperation">
+            <wsdl:input message="tns:myOperationInput" />
+            <wsdl:output message="tns:myOperationOutput" />
+            <wsdl:fault name="fault" message="tns:myOperationFault"></wsdl:fault>
+        </wsdl:operation>
+    </wsdl:portType>
+
+    <!-- binding -->
+    <wsdl:binding name="SimpleService2Binding" type="tns:SimpleService2Port">
+        <soap:binding style="document"
+                      transport="http://schemas.xmlsoap.org/soap/http" />
+        <!-- obtenirPrestationsPoint -->
+        <wsdl:operation name="myOperation">
+            <soap:operation />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="fault">
+                <soap:fault name="fault" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+
+    <!-- service -->
+    <wsdl:service name="SimpleService2">
+        <wsdl:port name="SimpleService2Binding" binding="tns:SimpleService2Binding">
+            <soap:address
+                location="http://localhost:8001/webservices/SimpleService2" />
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

@@ -100,7 +100,7 @@ public class SoapExchangeInMemoryRepository extends SoapExchangeRepository {
         @Override
         protected boolean removeEldestEntry(Map.Entry<K, V> entry) {
             if (LOGGER.isDebugEnabled() && size() > capacity) {
-                LOGGER.debug("Max capacity [" + capacity + "] reached");
+                LOGGER.debug("Max capacity [{}] reached", capacity);
             }
             return size() > capacity;
         }

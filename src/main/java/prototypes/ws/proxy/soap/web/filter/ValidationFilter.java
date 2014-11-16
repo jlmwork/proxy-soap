@@ -222,7 +222,7 @@ public class ValidationFilter extends HttpServletFilter {
         if (!Strings.isNullOrEmpty(wsdlPath) && proxyConfig.runInDevMode()) {
             logger.info("Specific Validation activated by parameter wsdl");
             logger.warn("The use of the wsdl parameter for on-the-fly WSDL resolution is not recommended for performance of the proxy");
-            logger.debug("WSDL=" + wsdlPath);
+            logger.debug("WSDL={}", wsdlPath);
             soapValidator = SoapValidatorFactory.getInstance().createSoapValidator(wsdlPath);
         } else {
             if (!Strings.isNullOrEmpty(wsdlPath)) {

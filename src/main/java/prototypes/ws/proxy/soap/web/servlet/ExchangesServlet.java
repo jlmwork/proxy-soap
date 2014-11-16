@@ -72,7 +72,7 @@ public class ExchangesServlet extends AbstractServlet {
         String hAccept = request.getHeader("Accept");
         String askedFormat = (!Strings.isNullOrEmpty(pAccept))
                 ? pAccept : ((!Strings.isNullOrEmpty(hAccept)) ? hAccept : "");
-        LOGGER.debug("Asked format : " + askedFormat);
+        LOGGER.debug("Asked format : {}", askedFormat);
 
         if ("text/csv".equals(askedFormat.toLowerCase())) {
             respondInCsv(response);
@@ -101,7 +101,7 @@ public class ExchangesServlet extends AbstractServlet {
         ZipOut zipOut = new ZipOut(response.getOutputStream());
         PrintWriter writer = zipOut.getFileWriter(generateFilename("csv"));
         CsvWriter csvBuilder = new CsvWriter(writer);
-        LOGGER.debug("Export " + soapExchanges.size() + " soapExchanges");
+        LOGGER.debug("Export {} soapExchanges", soapExchanges.size());
         for (SoapExchange soapRequest : soapExchanges) {
             csvBuilder.append(soapRequest).flush();
         }
@@ -136,7 +136,7 @@ public class ExchangesServlet extends AbstractServlet {
         PrintWriter out = response.getWriter();
         try {
             CsvWriter csvBuilder = new CsvWriter(out);
-            LOGGER.debug("Export " + soapExchanges.size() + " soapExchanges");
+            LOGGER.debug("Export {} soapExchanges ", soapExchanges.size());
             for (SoapExchange soapRequest : soapExchanges) {
                 csvBuilder.append(soapRequest).flush();
             }

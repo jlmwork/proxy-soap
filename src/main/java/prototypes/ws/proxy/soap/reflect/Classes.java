@@ -64,7 +64,7 @@ public class Classes {
 
     public static void setField(Class<? extends Object> clazz,
             Object targetObj, String fieldName, Object newValue) {
-        LOGGER.debug("Set field " + fieldName);
+        LOGGER.debug("Set field {}", fieldName);
         try {
             Field field = clazz.getDeclaredField(fieldName);
 
@@ -80,9 +80,9 @@ public class Classes {
             LOGGER.error(e.getMessage(), e);
             if (LOGGER.isDebugEnabled()) {
                 Field[] fields = clazz.getDeclaredFields();
-                LOGGER.debug("Fields of class : " + clazz);
+                LOGGER.debug("Fields of class : {}", clazz);
                 for (Field field : fields) {
-                    LOGGER.debug("" + field);
+                    LOGGER.debug("{}", field);
                 }
             }
         }
@@ -90,7 +90,7 @@ public class Classes {
 
     public static void setStaticField(Class<? extends Object> clazz,
             String fieldName, Object newValue) {
-        LOGGER.debug("Set field " + fieldName);
+        LOGGER.debug("Set field {}", fieldName);
         try {
             Field field = clazz.getDeclaredField(fieldName);
 
@@ -106,9 +106,9 @@ public class Classes {
             LOGGER.error(e.getMessage(), e);
             if (LOGGER.isDebugEnabled()) {
                 Field[] fields = clazz.getDeclaredFields();
-                LOGGER.debug("Fields of class : " + clazz);
+                LOGGER.debug("Fields of class : {}", clazz);
                 for (Field field : fields) {
-                    LOGGER.debug("" + field);
+                    LOGGER.debug("{}", field);
                 }
             }
         }

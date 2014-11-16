@@ -54,6 +54,8 @@ public class SoapValidatorFactory {
 
     /**
      * Access to the unique instance
+     *
+     * @return
      */
     public static SoapValidatorFactory getInstance() {
         return SingletonHolder.instance;
@@ -84,13 +86,14 @@ public class SoapValidatorFactory {
                     .entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry<String, SoapValidator> pairs = it.next();
-                LOGGER.debug(pairs.getKey() + " = " + pairs.getValue());
+                LOGGER.debug("{}={}", pairs.getKey(), pairs.getValue());
             }
         }
     }
 
     /**
      *
+     * @return
      */
     public Map<String, SoapValidator> getValidators() {
         return validatorsByPath;
@@ -98,6 +101,8 @@ public class SoapValidatorFactory {
 
     /**
      *
+     * @param qname
+     * @return
      */
     public SoapValidator getValidator(QName qname) {
         return validatorsByQname.get(qname);
@@ -114,7 +119,7 @@ public class SoapValidatorFactory {
         SoapValidator validator = getValidator(key);
         boolean createNew = false;
         if (validator == null) {
-            LOGGER.debug("No existing WSDL Validator for key : '" + key + "'");
+            LOGGER.debug("No existing WSDL Validator for key : '{}'", key);
             createNew = true;
         } else {
             // validator already exists
@@ -127,14 +132,12 @@ public class SoapValidatorFactory {
                 // dont create a new validator if file does not exist
                 createNew = (newFile.exists() && (newFile.lastModified() > validator
                         .getCreationTime()));
-                LOGGER.debug("Existing WSDL Validator for path : " + wsdlPath
-                        + ", creation time : " + newFile.lastModified()
-                        + ", file modified time : " + newFile.lastModified());
+                LOGGER.debug("Existing WSDL Validator for path : {}, creation time : {}, file modified time : {} ", wsdlPath, validator.getCreationTime(), newFile.lastModified());
             }
         }
 
         if (createNew) {
-            LOGGER.debug("Create new WSDL Validator for path : " + wsdlPath);
+            LOGGER.debug("Create new WSDL Validator for path : {}", wsdlPath);
             try {
                 validator = new SoapValidatorSoapUI(wsdlPath, key, from);
                 validatorsByPath.put(key, validator);
@@ -142,7 +145,7 @@ public class SoapValidatorFactory {
                 for (QName qName : validator.getOperationsQName()) {
                     validatorsByQname.put(qName, validator);
                 }
-                LOGGER.debug("Saves the new WSDL Validator under key : " + key);
+                LOGGER.debug("Saves the new WSDL Validator under key : {}", key);
             } catch (NotFoundSoapException e) {
                 return null;
             }
@@ -153,7 +156,6 @@ public class SoapValidatorFactory {
     /**
      *
      * @param multiplePaths
-     * @return
      */
     public void createSoapValidators(String multiplePaths) {
         LOGGER.info("create soap validators");
@@ -168,7 +170,7 @@ public class SoapValidatorFactory {
             // Direct access to a WSDL
             if (path.toUpperCase().endsWith(".WSDL")
                     || path.toUpperCase().endsWith("?WSDL")) {
-                LOGGER.debug("Create validator for wsdl : " + path);
+                LOGGER.debug("Create validator for wsdl : {}", path);
                 createSoapValidator(path,
                         Requests.resolveSoapServiceFromURL(path), path);
             } // JARS or DIRS
@@ -182,7 +184,7 @@ public class SoapValidatorFactory {
                 String dirPath = path;
                 if (path.toUpperCase().endsWith(".JAR")
                         || path.toUpperCase().endsWith(".ZIP")) {
-                    LOGGER.debug("Archive : " + path);
+                    LOGGER.debug("Archive : {}", path);
                     String localPath = path;
                     if (Requests.isHttpPath(path)) {
                         // download remote jar
@@ -191,18 +193,18 @@ public class SoapValidatorFactory {
                     }
                     LOGGER.debug("Unzipping Archive");
                     String unzippedPath = Files.unzip(localPath);
-                    LOGGER.debug("Archive unzipped to : " + unzippedPath);
+                    LOGGER.debug("Archive unzipped to : {}", unzippedPath);
                     // createSoapValidator(path,
                     // Requests.resolveSoapServiceFromURL(path));
                     dirPath = unzippedPath;
                 }
 
                 // must be scanned to find all WSDL
-                LOGGER.debug("Scan dir for wsdl : " + dirPath);
+                LOGGER.debug("Scan dir for wsdl : {}", dirPath);
                 // dirs must be in local filesystem
                 String[] wsdlPaths = Files.findFilesInDirByExt(dirPath, "wsdl");
                 for (String filepath : wsdlPaths) {
-                    LOGGER.debug("Create validator for wsdl : " + filepath);
+                    LOGGER.debug("Create validator for wsdl : {}", filepath);
                     createSoapValidator(filepath,
                             Requests.resolveSoapServiceFromURL(filepath), path);
                 }

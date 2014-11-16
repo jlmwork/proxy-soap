@@ -375,13 +375,13 @@ public class ProxyConfiguration extends HashMap<String, Object> {
     }
 
     public String persistConf() {
-        LOGGER.debug("Persist configuration to " + this.persistedConfPath);
+        LOGGER.debug("Persist configuration to {}", this.persistedConfPath);
         Files.write(this.persistedConfPath, toProperties());
         return persistedConfPath;
     }
 
     private void loadPersistedConf() {
-        LOGGER.debug("Load persisted configuration from " + this.persistedConfPath);
+        LOGGER.debug("Load persisted configuration from {}", this.persistedConfPath);
         Properties props = new Properties();
         try {
             props.load(new FileInputStream(new File(persistedConfPath)));

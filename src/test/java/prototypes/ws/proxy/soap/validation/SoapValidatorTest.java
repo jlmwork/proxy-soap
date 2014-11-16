@@ -43,7 +43,8 @@ public class SoapValidatorTest {
 
     @Test(expected = SoapException.class)
     public void loadDefinition() {
-        new SoapValidatorSoapUI("");
+        SoapValidator val = new SoapValidatorSoapUI("");
+        fail("The default constructor should fail");
     }
 
     @Test

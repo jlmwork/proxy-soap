@@ -36,7 +36,7 @@ public class Keystores {
         if (key == null) {
             throw new IllegalArgumentException("Key not found in keystore");
         }
-        LOGGER.debug("Key : " + key);
+        LOGGER.debug("Key : {}", key);
         return key;
     }
 

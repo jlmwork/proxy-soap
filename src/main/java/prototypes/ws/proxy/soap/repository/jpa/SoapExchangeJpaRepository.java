@@ -158,14 +158,14 @@ public class SoapExchangeJpaRepository extends SoapExchangeRepository {
 
     private String getRequestFilePath(SoapExchange exchange) {
         String dirPath = ApplicationConfig.EXCHANGES_STORAGE_PATH + Dates.getFormattedDate(exchange.getTime(), Dates.YYYYMMDD_HH) + File.separator;
-        LOGGER.debug("Requests files path : " + dirPath);
+        LOGGER.debug("Requests files path : {}", dirPath);
         (new File(dirPath)).mkdirs();
         return dirPath + exchange.getId() + "-request.xml";
     }
 
     private String getResponseFilePath(SoapExchange exchange) {
         String dirPath = ApplicationConfig.EXCHANGES_STORAGE_PATH + Dates.getFormattedDate(exchange.getTime(), Dates.YYYYMMDD_HH) + File.separator;
-        LOGGER.debug("Response files path : " + dirPath);
+        LOGGER.debug("Response files path : {}", dirPath);
         (new File(dirPath)).mkdirs();
         return dirPath + exchange.getId() + "-response.xml";
     }

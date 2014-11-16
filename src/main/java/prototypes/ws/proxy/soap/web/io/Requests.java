@@ -60,9 +60,9 @@ public class Requests {
                 .append("/");
         String target = request.getRequestURI().replaceFirst(sbToExtract.toString(), "");
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Find Target - RequestURI=" + request.getRequestURI());
-            LOGGER.debug("Find Target - Extracted=" + sbToExtract.toString());
-            LOGGER.debug("Find Target - Target=" + target);
+            LOGGER.debug("Find Target - RequestURI={}", request.getRequestURI());
+            LOGGER.debug("Find Target - Extracted={}", sbToExtract.toString());
+            LOGGER.debug("Find Target - Target={}", target);
         }
         return target;
     }
@@ -77,7 +77,7 @@ public class Requests {
             uri = Requests.getHost(request) + "/" + uri;
         }
 
-        LOGGER.debug("Target uri : " + uri);
+        LOGGER.debug("Target uri : {}", uri);
         URL targetUrl;
         try {
             targetUrl = new URL(uri);
@@ -94,7 +94,7 @@ public class Requests {
 
     public static String resolveSoapServiceFromURL(String url) {
         String service = "";
-        LOGGER.debug("Resolve service in URL : " + url);
+        LOGGER.debug("Resolve service in URL : {}", url);
         if (!Strings.isNullOrEmpty(url)) {
             int pos = url.lastIndexOf("/");
             if (pos == -1) {
@@ -107,7 +107,7 @@ public class Requests {
                 service = service.substring(0, service.length() - 5);
             }
         }
-        LOGGER.debug("Resolved : '" + service + "'");
+        LOGGER.debug("Resolved : '{}'", service);
         return service;
     }
 

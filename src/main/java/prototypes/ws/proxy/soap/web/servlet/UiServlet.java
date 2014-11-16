@@ -119,11 +119,11 @@ public class UiServlet extends AbstractServlet {
                 String urlStr = SoapValidatorFactory.getInstance().getValidators()
                         .get(validator).getUrl();
                 URL url = new URL(urlStr);
-                LOGGER.debug("WSDL Url : " + url);
+                LOGGER.debug("WSDL Url : {}", url);
                 response.setContentType("text/xml;charset=UTF-8");
                 PrintWriter out = response.getWriter();
                 File wsdlFile = new File(url.toURI());
-                LOGGER.debug("WSDL File URI : " + wsdlFile.getAbsolutePath());
+                LOGGER.debug("WSDL File URI : {}", wsdlFile.getAbsolutePath());
                 if (wsdlFile.exists()) {
                     out.println(Streams
                             .getString(new FileInputStream(wsdlFile)));

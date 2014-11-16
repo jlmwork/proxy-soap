@@ -24,7 +24,7 @@ public class SoapValidatorFactoryTest {
 
     private final String schemaPath1 = "src/test/resources/samples/definitions/SampleService.wsdl";
 
-    private final String schemaPath2 = "src/test/resources/simple2.wsdl";
+    private final String schemaPath2 = "src/test/resources/simple.wsdl";
 
     @Test
     public void newSoapValidatorReuse() {
@@ -49,7 +49,7 @@ public class SoapValidatorFactoryTest {
         (new File(schemaPath1)).setLastModified(Calendar.getInstance()
                 .getTimeInMillis());
         SoapValidator val2 = SoapValidatorFactory.getInstance().createSoapValidator(schemaPath1);
-        // check that val and val2 are the same object
+        // check that val and val2 are not the same object
         Assert.assertNotSame(val, val2);
     }
 

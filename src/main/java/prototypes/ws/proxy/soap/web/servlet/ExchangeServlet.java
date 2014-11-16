@@ -70,10 +70,10 @@ public class ExchangeServlet extends AbstractServlet {
         String hAccept = request.getHeader("Accept");
         String askedFormat = (!Strings.isNullOrEmpty(pAccept))
                 ? pAccept : ((!Strings.isNullOrEmpty(hAccept)) ? hAccept : "");
-        LOGGER.debug("Asked format : " + askedFormat);
+        LOGGER.debug("Asked format : {}", askedFormat);
 
         String exchangeId = getExchangeId(request.getRequestURI());
-        LOGGER.debug("Asked exchange : " + exchangeId);
+        LOGGER.debug("Asked exchange : {}", exchangeId);
         if (!Strings.isNullOrEmpty(exchangeId)) {
             String fieldsParam = request.getParameter("fields");
             String[] fields = new String[]{};

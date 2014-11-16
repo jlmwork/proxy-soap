@@ -87,20 +87,13 @@ public class SoapValidatorSoapUI implements SoapValidator {
         // Check file exists if it is not a remote resource
         if (!Requests.isHttpPath(schemaPath)) {
             if (!new File(schemaPath).exists()) {
-                LOGGER.debug("File does not exists : " + schemaPath);
+                LOGGER.debug("File does not exists : {}", schemaPath);
                 throw new NotFoundSoapException(String.format(
                         SoapErrorConstantes.WSDL_NOT_FOUND, schemaPath));
             }
         }
 
         try {
-            /*
-             * // Load definition from wsdl file WsdlContext wsdlContext = new
-             * WsdlContext(schemaPath); LOGGER.debug("DefintionCache : " +
-             * wsdlContext.getDefinitionCache().getClass().getName());
-             * LOGGER.debug("DefintionCache : " +
-             * wsdlContext.getDefinitionCache()); wsdlContext.load();
-             */
             // Import wsdl interface from definition
             WsdlProject project = new WsdlProject();
             project.setCacheDefinitions(false);

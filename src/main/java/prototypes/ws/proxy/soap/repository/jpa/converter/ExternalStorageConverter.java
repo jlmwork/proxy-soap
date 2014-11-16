@@ -60,7 +60,7 @@ public class ExternalStorageConverter implements AttributeConverter<byte[], Stri
 
     private String createStorageDir() {
         String dirPath = ApplicationConfig.EXCHANGES_STORAGE_PATH + Dates.getFormattedDate(Dates.YYYYMMDD_HH) + File.separator;
-        LOGGER.debug("Requests files path : " + dirPath);
+        LOGGER.debug("External Storage files path : {}", dirPath);
         (new File(dirPath)).mkdirs();
         return dirPath;
     }
