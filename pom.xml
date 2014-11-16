@@ -14,19 +14,13 @@
         <servlet.version>2.5</servlet.version>
         <eclipselink.version>2.5.2</eclipselink.version>
     </properties>
-    <distributionManagement>
+    <repositories>
         <repository>
-            <id>sgel-releases</id>
-            <name>pcyy33sge.pcy.edfgdf.fr-releases</name>
-            <url>http://pcyy33sge.pcy.edfgdf.fr:8082/artifactory/sgel-releases</url>
+            <id>eviware</id>
+            <name>eviware</name>
+            <url>http://www.soapui.org/repository/maven2/</url>
         </repository>
-        <snapshotRepository>
-            <id>sgel-snapshots</id>
-            <name>pcyy33sge.pcy.edfgdf.fr-snapshots</name>
-            <url>http://pcyy33sge.pcy.edfgdf.fr:8082/artifactory/sgel-snapshots/</url>
-            <uniqueVersion>true</uniqueVersion>
-        </snapshotRepository>
-    </distributionManagement>
+    </repositories>
     <dependencies>
         <dependency>
             <groupId>ch.qos.logback</groupId>
