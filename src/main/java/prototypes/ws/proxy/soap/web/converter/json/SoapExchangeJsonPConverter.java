@@ -100,6 +100,8 @@ public class SoapExchangeJsonPConverter extends JsonPConverter<SoapExchange> {
                     .add("validator", stripNull(soapExchange.getValidatorId()))
                     .add("operation", stripNull(soapExchange.getOperation()))
                     .add("proxy_internal_time", stripNull(soapExchange.getProxyInternalTime()))
+                    .add("proxy_blocking", soapExchange.isProxyBlocking())
+                    .add("proxy_validating", soapExchange.isProxyValidating())
                     // request
                     .add("front_end_request", stripNull(soapExchange.getFrontEndRequestAsXML()))
                     .add("front_end_request_headers", formatJsonMap(soapExchange.getFrontEndRequestHeaders()))

@@ -174,6 +174,32 @@ function statusFormatter(value) {
     }
     return value;
 }
+function validationStatusFormatter(value) {
+    if (value === "") {
+        return "unknown";
+    } else if (value === "true") {
+        return "valid";
+    } else if (value === "false") {
+        return "invalid";
+    }
+    return value;
+}
+
+function validationFormatter(validating) {
+    if (validating) {
+        return "Validation active ";
+    } else {
+        return "Validation inactive ";
+    }
+}
+function blockingFormatter(blocking) {
+    if (blocking) {
+        return "Blocking Mode";
+    } else {
+        return "Not Blocking Mode";
+    }
+    return status;
+}
 
 function viewValidator(validatorLink) {
     $('#menutabs a[href="#validators"]').tab('show');
@@ -211,6 +237,10 @@ function displayExchange(exchange) {
     });
 
     $('#exchangeId').html(exchange.id);
+    $('#request_status').html(statusFormatter(exchange.request_valid));
+    $('#response_status').html(statusFormatter(exchange.response_valid));
+    $('#proxy_validation_status').html(validationFormatter(exchange.proxy_validating));
+    $('#proxy_blocking_status').html(blockingFormatter(exchange.proxy_blocking));
 
     // request
     $('#reqheaders pre code').text(formatMap(exchange.front_end_request_headers));

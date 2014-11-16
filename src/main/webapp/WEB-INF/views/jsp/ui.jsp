@@ -40,7 +40,7 @@
         <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
             <div class="container-fluid">
                 <div class="navbar-header">
-                    <a class="navbar-brand" href="ui">Proxy SOAP</a></a>
+                    <a class="navbar-brand" href="ui">Proxy SOAP</a>
                 </div>
                 <div class="collapse navbar-collapse ">
                     <ul id="menutabs" class="nav navbar-nav nav-pills navbar-right" role="tablist">
@@ -85,8 +85,7 @@
         <script src="res/js/jquery.base64.js"></script>
         <script src="res/js/bootstrap-table-export.js"></script>
         <script src="res/js/bootstrap-table-clear.js"></script>
-        <%
-            String userLocale = request.getHeader("Accept-Language");
+        <%            String userLocale = request.getHeader("Accept-Language");
             if (userLocale != null && userLocale.startsWith("fr")) {
         %><script src="res/js/bootstrap-table-fr-FR.min.js"></script><%
             }

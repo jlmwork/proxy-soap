@@ -28,8 +28,7 @@
 <br/>
 
 <h3><fmt:message key="help.section.config.title"/></h3>
-<p>
-
+<div>
     <fmt:message key="help.section.config.intro" />
     <fmt:message key="help.section.config.cases" />
     <span class="glyphicon glyphicon-info-sign"></span>
@@ -38,7 +37,7 @@
     </fmt:message>
     <br /><fmt:message key="Example" /> :<code>-D${propWsdl}=path1<%=java.io.File.pathSeparator%>path2</code>
     <br/>
-</p>
+</div>
 
 <h4><fmt:message key="help.section.load.title" /></h4>
 <p>
@@ -47,14 +46,14 @@
         <fmt:param value="${propBlocking}"/>
         <fmt:param value="${propMax}"/>
     </fmt:message>
+</p>
 <p>
-
     <fmt:message key="Examples" /> :<br/>
     <code><%=request.getContextPath()%>/ui/config?wsdls=http://remotehost/wsdl.jar</code><br/>
     <code><%=request.getContextPath()%>/ui/config?wsdls=E:/tmp/wsdl.jar</code>
 </p>
 
 <h4><fmt:message key="help.section.resolution.title" /></h4>
-<fmt:message key="help.section.resolution.txt" />
-
+<p>
+    <fmt:message key="help.section.resolution.txt" />
 </p>

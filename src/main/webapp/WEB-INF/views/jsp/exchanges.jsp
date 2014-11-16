@@ -10,7 +10,7 @@
        data-height="500"
        data-toolbar="#custom-toolbar"
        data-show-refresh="true"
-       data-show-toggle=true"
+       data-show-toggle="true"
        data-show-export="true"
        data-show-clear="true"
        data-pagination="true"
@@ -38,22 +38,22 @@
             <th data-field="back_end_response_code"  data-visible="false">
                 <fmt:message key="exchanges.exchange.response.code"/>
             </th>
-            <th data-field="request_valid" data-visible="false" data-formatter="statusFormatter">
+            <th data-field="request_valid" data-visible="false" data-formatter="validationStatusFormatter">
                 <fmt:message key="exchanges.exchange.request"/> Status
             </th>
-            <th data-field="request_xml_valid" data-visible="false" data-formatter="statusFormatter">
+            <th data-field="request_xml_valid" data-visible="false" data-formatter="validationStatusFormatter">
                 <fmt:message key="exchanges.exchange.request"/> XML
             </th>
-            <th data-field="request_soap_valid" data-visible="false" data-formatter="statusFormatter">
+            <th data-field="request_soap_valid" data-visible="false" data-formatter="validationStatusFormatter">
                 <fmt:message key="exchanges.exchange.request"/> SOAP
             </th>
-            <th data-field="response_valid" data-visible="false" data-formatter="statusFormatter">
+            <th data-field="response_valid" data-visible="false" data-formatter="validationStatusFormatter">
                 <fmt:message key="exchanges.exchange.response"/> Status
             </th>
-            <th data-field="response_xml_valid" data-visible="false" data-formatter="statusFormatter">
+            <th data-field="response_xml_valid" data-visible="false" data-formatter="validationStatusFormatter">
                 <fmt:message key="exchanges.exchange.response"/> XML
             </th>
-            <th data-field="response_soap_valid" data-visible="false" data-formatter="statusFormatter">
+            <th data-field="response_soap_valid" data-visible="false" data-formatter="validationStatusFormatter">
                 <fmt:message key="exchanges.exchange.response"/> SOAP
             </th>
         </tr>
@@ -63,9 +63,10 @@
 <div id="exchangedetails" class="hidden panel panel-default">
     <div class="panel-heading" data-toggle="collapse" data-target="#exchangedetails .panel-body">
         <h5 class="panel-title"><fmt:message key="exchanges.exchange.details.label"/><span id="exchangeId"></span></h5>
-        Proxy mode : validation active, blocking mode active
-        <fmt:message key="exchanges.exchange.request"/> :
-        <fmt:message key="exchanges.exchange.response"/> :
+        <span id="proxy_validation_status" class="label label-info"></span>&nbsp;
+        <span id="proxy_blocking_status" class="label label-info"></span>
+        <fmt:message key="exchanges.exchange.request"/> : <span id="request_status"></span>
+        <fmt:message key="exchanges.exchange.response"/> : <span id="response_status"></span>
     </div>
     <div class="panel-body panel-collapse collapse">
         <!-- Exchange Nav tabs -->

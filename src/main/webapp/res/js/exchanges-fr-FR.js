@@ -14,3 +14,18 @@ function statusFormatter(value) {
     }
     return value;
 }
+function validationFormatter(validating) {
+    if (validating) {
+        return "Validation active ";
+    } else {
+        return "Validation inactive ";
+    }
+}
+
+function blockingFormatter(blocking) {
+    if (blocking) {
+        return "Mode bloquant";
+    } else {
+        return "Mode Non bloquant";
+    }
+}
