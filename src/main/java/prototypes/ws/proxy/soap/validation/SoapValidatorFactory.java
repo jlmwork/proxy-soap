@@ -133,6 +133,9 @@ public class SoapValidatorFactory {
                 createNew = (newFile.exists() && (newFile.lastModified() > validator
                         .getCreationTime()));
                 LOGGER.debug("Existing WSDL Validator for path : {}, creation time : {}, file modified time : {} ", wsdlPath, validator.getCreationTime(), newFile.lastModified());
+                if (createNew) {
+                    LOGGER.debug("WSDL file exists and previous validator is obsolete.");
+                }
             }
         }
 
