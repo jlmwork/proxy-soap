@@ -301,13 +301,15 @@
                 <version>1.0.4</version>
                 <executions>
                     <execution>
-                        <goals>
-                            <goal>weave</goal>
-                        </goals>
+                        <id>weave</id>
                         <phase>process-classes</phase>
                         <configuration>
                             <logLevel>ALL</logLevel>
+                            <persistenceXMLLocation>META-INF/persistence_default.xml</persistenceXMLLocation>
                         </configuration>
+                        <goals>
+                            <goal>weave</goal>
+                        </goals>
                     </execution>
                 </executions>
                 <dependencies>

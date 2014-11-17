@@ -66,10 +66,12 @@ public class SoapExchangeJpaRepository extends SoapExchangeRepository {
         connectionProps.setProperty("javax.persistence.jdbc.password", proxyConfig.getPersistenceDbPassword());
         xmlInDbs = proxyConfig.persistXmlInDb();
         LOGGER.debug(" XML stored in DB : {}", xmlInDbs);
+        // needs to use a different name for persistence.xml file to allow deployment on WebLogic 10.3.3+ (override JPA libs)
+        connectionProps.put("eclipselink.persistencexml", "META-INF/persistence_default.xml");
         persistenceUnitName = (xmlInDbs) ? "ProxyPULobs" : "ProxyPU";
         emf = (EntityManagerFactory) Persistence.createEntityManagerFactory(persistenceUnitName, connectionProps);
         //try to start
-        emf.createEntityManager().close();
+        //emf.createEntityManager().close();
     }
 
     @Override
