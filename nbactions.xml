@@ -98,10 +98,21 @@
         </goals>
     </action>
     <action>
-            <actionName>CUSTOM-Package</actionName>
-            <displayName>Package</displayName>
-            <goals>
-                <goal>package</goal>
-            </goals>
-        </action>
+        <actionName>CUSTOM-Package</actionName>
+        <displayName>Package</displayName>
+        <goals>
+            <goal>package</goal>
+        </goals>
+    </action>
+    <action>
+        <actionName>CUSTOM-Run via Server deploy</actionName>
+        <displayName>Run via Server deploy</displayName>
+        <goals>
+            <goal>package</goal>
+        </goals>
+        <properties>
+            <netbeans.deploy>true</netbeans.deploy>
+
+        </properties>
+    </action>
 </actions>

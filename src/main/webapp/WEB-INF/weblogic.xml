@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<weblogic-web-app xmlns="http://xmlns.oracle.com/weblogic/weblogic-web-app" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd http://xmlns.oracle.com/weblogic/weblogic-web-app http://xmlns.oracle.com/weblogic/weblogic-web-app/1.0/weblogic-web-app.xsd">
-    <session-descriptor>
-        <cookie-name>proxy.soap</cookie-name>
-    </session-descriptor>
-    <context-root>/proxy-soap</context-root>
-    <container-descriptor>
-        <prefer-application-packages>
-            <package-name>javax.persistence.*</package-name>
-            <package-name>org.eclipse.persistence.*</package-name>
-        </prefer-application-packages>
-    </container-descriptor>
-</weblogic-web-app>
+<!--
+<wls:weblogic-web-app xmlns:wls="http://xmlns.oracle.com/weblogic/weblogic-web-app"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd
+http://xmlns.oracle.com/weblogic/weblogic-web-app
+http://xmlns.oracle.com/weblogic/weblogic-web-app/1.2/weblogic-web-app.xsd">-->
+<wls:weblogic-web-app xmlns:wls="http://xmlns.oracle.com/weblogic/weblogic-web-app">
+    <wls:session-descriptor>
+        <wls:cookie-name>proxy.soap</wls:cookie-name>
+    </wls:session-descriptor>
+    <wls:context-root>/proxy-soap</wls:context-root>
+    <wls:container-descriptor>
+        <wls:prefer-application-packages>
+            <wls:package-name>javax.persistence.*</wls:package-name>
+            <wls:package-name>org.eclipse.persistence.*</wls:package-name>
+        </wls:prefer-application-packages>
+        <wls:prefer-web-inf-classes>false</wls:prefer-web-inf-classes>
+    </wls:container-descriptor>
+</wls:weblogic-web-app>
