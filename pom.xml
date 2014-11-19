@@ -21,6 +21,11 @@
             <name>eviware</name>
             <url>http://www.soapui.org/repository/maven2/</url>
         </repository>
+        <repository>
+            <id>JBoss</id>
+            <name>JBoss Repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+        </repository>
     </repositories>
     <dependencies>
         <dependency>
@@ -289,6 +294,23 @@
                         <exclude>**/*IT.java</exclude>
                     </excludes>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>integration-test</id>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <phase>integration-test</phase>
+                        <configuration>
+                            <excludes>
+                                <exclude>none</exclude>
+                            </excludes>
+                            <includes>
+                                <include>**/*IT.java</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -387,16 +409,75 @@
             </build>
         </profile>
         <profile>
-            <id>all-tests</id>
+            <id>weblogic</id>
+            <!-- arquillian
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss.arquillian.container</groupId>
+                    <artifactId>arquillian-wls-remote-10.3</artifactId>
+                    <version>1.0.0.Alpha2</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.arquillian.junit</groupId>
+                    <artifactId>arquillian-junit-container</artifactId>
+                    <version>1.1.5.Final</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.spec</groupId>
+                    <artifactId>jboss-javaee-5.0</artifactId>
+                    <version>1.0.0.GA</version>
+                    <type>pom</type>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.jboss.arquillian</groupId>
+                        <artifactId>arquillian-bom</artifactId>
+                        <version>1.0.0.Final-SNAPSHOT</version>
+                        <scope>import</scope>
+                        <type>pom</type>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
+            -->
+            <properties>
+                <!-- default webogic connection to override with system properties
+                    e.g. : mvn ..... -Dwlhost=my_host
+                -->
+                <wlhost>localhost</wlhost>
+                <wlport>8001</wlport>
+                <wluser>weblogic</wluser>
+                <wlpwd>weblogic</wlpwd>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
+                        <groupId>com.oracle.weblogic</groupId>
+                        <artifactId>weblogic-maven-plugin</artifactId>
+                        <version>10.3.6.0</version>
                         <configuration>
-                            <excludes>
-                            </excludes>
+                            <adminurl>t3://${wlhost}:${wlport}</adminurl>
+                            <user>${wluser}</user>
+                            <password>${wlpwd}</password>
+                            <upload>true</upload>
+                            <action>deploy</action>
+                            <remote>false</remote>
+                            <verbose>true</verbose>
+                            <source>${project.build.directory}/${project.build.finalName}.${project.packaging}</source>
+                            <name>${project.build.finalName}</name>
                         </configuration>
+                        <executions>
+                            <execution>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>deploy</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
