@@ -12,4 +12,7 @@ script: mvn clean verify
 #    secure: K4XI4xYhlqdPu2OotSIsd05el//MOThe2s0uFlhfXSjBDDoQEKPP5PpD+239dxiiTkm1ngnuelNgRXC/J77zZOD9CnxY08xEt3yJQ4wFfa3zXswkW+ky8EwbOqD0VtQa30Vk3FZJ+lcypSVd2gLwznjD5Qv9xriyg6XMB7gP7p4=
 #  file: target/proxy-soap-2.0-SNAPSHOT.war
 #  on:
-#    repo: jlmwork/proxy-soap
+#    tags: true
+#    all_branches: true
+#    repo: jlmwork/proxy-soapon:
+
