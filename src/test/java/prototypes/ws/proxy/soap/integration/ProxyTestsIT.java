@@ -25,6 +25,8 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.io.Files;
 import prototypes.ws.proxy.soap.web.servlet.SamplesServlet;
 
@@ -36,13 +38,16 @@ import prototypes.ws.proxy.soap.web.servlet.SamplesServlet;
  */
 public class ProxyTestsIT {
 
+    private static final Logger logger = LoggerFactory.getLogger(ProxyTestsIT.class);
+
     private static final String WSDL_PATH = Files.findFromClasspath("samples/definitions/SampleService.wsdl").replaceAll("^file:[/]+", "/");
 
     private static int counterRequests = 0;
 
     @BeforeClass
     public static void init() {
-        RestAssured.baseURI = "http://" + getLocalHostname() + ":8083";
+        RestAssured.baseURI = "http://" + System.getProperty("it.host", getLocalHostname()) + ":" + System.getProperty("it.port", "8083");
+        logger.info("Test Target URL : ", RestAssured.baseURI);
         RestAssured.basePath = "/proxy-soap";
         RestAssured.urlEncodingEnabled = false;
         // cleanup exchanges
