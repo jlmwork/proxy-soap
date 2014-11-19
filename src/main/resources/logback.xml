@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration scan="true" scanPeriod="30 seconds">
+<configuration>
+    <if condition='isDefined(property("proxysoap.log.outputfile"))'>
+        <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+            <file>${proxysoap.log.outputfile}/conditional.log</file>
+            <encoder>
+                <pattern>%d %-5level %logger{35} - %msg %n</pattern>
+            </encoder>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <!-- daily rollover -->
+                <fileNamePattern>logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
+                <!-- keep 5 days worth of history -->
+                <maxHistory>5</maxHistory>
+            </rollingPolicy>
+        </appender>
+        <root>
+            <appender-ref ref="FILE" />
+        </root>
+    </if>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>

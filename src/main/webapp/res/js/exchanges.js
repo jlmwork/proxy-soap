@@ -1,6 +1,7 @@
 /*********************************************
  * COOKIE MANAGEMENT
  *********************************************/
+// TODO : delete
 var Cookie = {
     set: function (name, value) {
         document.cookie = name + "=" + value + "; max-age=" + (60 * 60 * 24 * 10);
@@ -57,6 +58,7 @@ $(function () {
         $(this).selectText();
     });
     $('#exchangestable').on('column-switch.bs.table', function (e, field, checked) {
+        // TODO : set httpOnly on the cookie to avoid sending it to server via ajax
         // read
         var fields = $.cookie('fields')
         if (fields === undefined) {

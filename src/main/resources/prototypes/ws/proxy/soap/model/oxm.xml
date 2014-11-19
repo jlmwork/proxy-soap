@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<xml-bindings
+    xmlns="http://www.eclipse.org/eclipselink/xsds/persistence/oxm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema"
+    xsi:schemaLocation="http://www.eclipse.org/eclipselink/xsds/persistence/oxm
+            http://www.eclipse.org/eclipselink/xsds/eclipselink_oxm_2_4.xsd"
+    package-name="prototypes.ws.proxy.soap.model"
+    xml-name-transformer="prototypes.ws.proxy.soap.web.rest.NameGenerator"
+    >
+    <!--
+    About variables names conventions and the name generator
+
+    For JSON
+     as Google JSON guidelines are :
+    https://google-styleguide.googlecode.com/svn/trunk/jsoncstyleguide.xml#Property_Name_Format
+        Property names must conform to the following guidelines:
+
+        Property names should be meaningful names with defined semantics.
+        Property names must be camel-cased, ascii strings.
+        The first character must be a letter, an underscore (_) or a dollar sign ($).
+        Subsequent characters can be a letter, a digit, an underscore, or a dollar sign.
+        Reserved JavaScript keywords should be avoided (A list of reserved JavaScript keywords can be found below).
+
+        as JQuery ones : http://contribute.jquery.org/style-guide/js/#naming-conventions
+        or JSLint : http://javascript.crockford.com/code.html
+        https://blog.apigee.com/detail/restful_api_design_what_about_attribute_names
+
+    For REST APIs
+        But in REST apis, fields for query are almost expressed in lower case with "_"
+        separating words.
+        Like in
+        https://dev.twitter.com/rest/reference/get/statuses/user_timeline
+        https://developers.facebook.com/docs/graph-api/reference/v2.2/video/
+
+        or with "-" for separating words :
+        https://developer.linkedin.com/apis
+
+        Amazon S3 is more camelCase but xml-driven, and some part absolutely not rest oriented
+
+    Some variables appear in URL as fields selection parameter.
+    A shared convention is to not use upper Case letters in URLs.
+    Google has applied consistency between URLs and JSON formats. The naming convention is respected
+    but Google is
+
+    -->
+    <java-types>
+        <java-type name="SoapExchange">
+            <xml-root-element/>
+            <!--<xml-type prop-order="str nb anotherAttribute"/>-->
+            <java-attributes>
+                <xml-element java-attribute="id" nillable="true" />
+                <!--                <xml-element java-attribute="lastName" name="last-name"/>
+                <xml-element java-attribute="phoneNumbers" name="phone-number"/>-->
+            </java-attributes>
+        </java-type>
+    </java-types>
+</xml-bindings>
