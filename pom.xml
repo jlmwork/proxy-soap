@@ -360,6 +360,20 @@
                         <configuration>
                             <scanIntervalSeconds>0</scanIntervalSeconds>
                             <daemon>true</daemon>
+                            <systemProperties>
+                                <systemProperty>
+                                    <name>jetty.port</name>
+                                    <value>${it.port}</value>
+                                </systemProperty>
+                                <systemProperty>
+                                    <name>logback.configurationFile</name>
+                                    <value>${basedir}/src/test/resources/logback-test.xml</value>
+                                </systemProperty>
+                                <systemProperty>
+                                    <name>proxy.soap.run.mode</name>
+                                    <value>1</value>
+                                </systemProperty>
+                            </systemProperties>
                         </configuration>
                     </execution>
                     <execution>
