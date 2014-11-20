@@ -122,7 +122,7 @@ public class SoapExchangeJsonPConverter extends JsonPConverter<SoapExchange> {
                     .add("back_end_response_time", soapExchange.getBackEndResponseTime())
                     .add("back_end_response_code", stripNull(soapExchange.getBackEndResponseCode()))
                     .add("back_end_response", stripNull(soapExchange.getBackendResponseAsXML()))
-                    .add("back_end_response_headers", formatJsonMap(soapExchange.getBackendResponseHeaders()))
+                    .add("back_end_response_headers", formatJsonMap(soapExchange.getBackEndResponseHeaders()))
                     .add("response_errors", formatJsonList(soapExchange.getResponseErrors()))
                     .add("response_xml_errors", formatJsonList(soapExchange.getResponseXmlErrors()))
                     .add("response_soap_errors", formatJsonList(soapExchange.getResponseSoapErrors()))

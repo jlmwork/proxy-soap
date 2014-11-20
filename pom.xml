@@ -251,11 +251,11 @@
             <version>4.11</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
+        <!--        <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
             <version>${aspectj.version}</version>
-        </dependency>
+        </dependency>-->
     </dependencies>
     <dependencyManagement>
         <dependencies>
@@ -423,7 +423,10 @@
                     </dependency>
                 </dependencies>
             </plugin>
-            <plugin>
+            <!-- aspectj and eclipselink weave doesnt work very well together
+            got EL error on "fetch group manager must be declared in descriptor"
+            -->
+            <!--            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>aspectj-maven-plugin</artifactId>
                 <version>1.7</version>
@@ -433,15 +436,13 @@
                     <verbose>true</verbose>
                     <deprecation>true</deprecation>
                     <warn>true</warn>
-                    <weaveDirectories>
-                        <weaveDirectory>${project.build.directory}/classes</weaveDirectory>
-                    </weaveDirectories>
+                    <outxml>true</outxml>
                 </configuration>
                 <executions>
                     <execution>
                         <phase>process-classes</phase>
                         <goals>
-                            <goal>compile</goal>       <!-- use this goal to weave all your main classes -->
+                            <goal>compile</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -452,7 +453,7 @@
                         <version>${aspectj.version}</version>
                     </dependency>
                 </dependencies>
-            </plugin>
+            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -602,6 +603,47 @@
             <activation>
                 <jdk>1.7</jdk>
             </activation>
+        </profile>
+        <profile>
+            <!-- activate special plugins for Eclipse IDE -->
+            <id>eclipse</id>
+            <activation>
+                <file>
+                    <exists>.project</exists>
+                </file>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.eclipse.m2e</groupId>
+                            <artifactId>lifecycle-mapping</artifactId>
+                            <version>1.0.0</version>
+                            <configuration>
+                                <lifecycleMappingMetadata>
+                                    <pluginExecutions>
+                                        <pluginExecution>
+                                            <pluginExecutionFilter>
+                                                <groupId>au.com.alderaan</groupId>
+                                                <artifactId>eclipselink-staticweave-maven-plugin</artifactId>
+                                                <versionRange>[1.0.0,)</versionRange>
+                                                <goals>
+                                                    <goal>weave</goal>
+                                                </goals>
+                                            </pluginExecutionFilter>
+                                            <action>
+                                                <execute>
+                                                    <runOnIncremental>true</runOnIncremental>
+                                                </execute>
+                                            </action>
+                                        </pluginExecution>
+                                    </pluginExecutions>
+                                </lifecycleMappingMetadata>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
         </profile>
     </profiles>
 </project>

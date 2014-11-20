@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
 import prototypes.ws.proxy.soap.model.Sample;
 import prototypes.ws.proxy.soap.web.context.ApplicationContext;
-import prototypes.ws.proxy.soap.web.servlet.SamplesServlet;
 
 /**
  *
@@ -47,7 +46,7 @@ public class SampleResource {
     private final ProxyConfiguration proxyConfig;
 
     private static final Logger LOGGER = LoggerFactory
-            .getLogger(SamplesServlet.class);
+            .getLogger(SampleResource.class);
 
     // put map in static scope because on each request, SampleResource is a new instance
     // as Singleton doesnt work, see above
@@ -63,14 +62,16 @@ public class SampleResource {
 
     public void controlAccess() {
         if (!proxyConfig.runInDevMode()) {
-            throw new WebApplicationException("This servlet can only be used in development mode.");
+            String msg = "This servlet can only be used in development mode.";
+            LOGGER.warn("SampleResource access ERROR : {}", msg);
+            throw new WebApplicationException(msg, 403);
         }
     }
 
     @GET
-    @Path("/{code: [a-zA-Z][a-zA-Z_\\-0-9]*}")
+    @Path("/{name: [a-zA-Z][a-zA-Z_\\-0-9]*}")
     @Produces({MediaType.APPLICATION_JSON + ";charset=utf-8"})
-    public Sample getSample(@PathParam("code") String sampleName) {
+    public Sample getSample(@PathParam("name") String sampleName) {
         LOGGER.debug("Hash {}", this.hashCode());
         controlAccess();
         LOGGER.debug("Ask for Sample [{}]", sampleName);
@@ -83,9 +84,9 @@ public class SampleResource {
     }
 
     @GET
-    @Path("/{code: [a-zA-Z][a-zA-Z_\\-0-9]*}/content")
+    @Path("/{name: [a-zA-Z][a-zA-Z_\\-0-9]*}/content")
     @Produces({MediaType.APPLICATION_XML})
-    public String getRawSampleContent(@PathParam("code") String sampleName) {
+    public String getRawSampleContent(@PathParam("name") String sampleName) {
         controlAccess();
         LOGGER.debug("Get raw sample");
         Sample sample = this.getSample(sampleName);
@@ -99,11 +100,12 @@ public class SampleResource {
     }
 
     @POST
-    @Path("/{code: [a-zA-Z][a-zA-Z_\\-0-9]*}/content")
+    @Path("/{name: [a-zA-Z][a-zA-Z_\\-0-9]*}/content")
     @Produces({MediaType.APPLICATION_XML})
-    public Response postRawSampleContent(@PathParam("code") String sampleName) {
+    public Response postRawSampleContent(@PathParam("name") String sampleName) {
         LOGGER.debug("Act as a get raw sample");
         Sample sample = this.getSample(sampleName);
+        // mimic the response code
         Response response = Response.status(sample.getCode())
                 .entity(sample.getContent()).build();
         return response;

@@ -7,20 +7,26 @@ package prototypes.ws.proxy.soap.web.rest;
 
 import java.util.HashMap;
 import java.util.Map;
+import javax.ws.rs.Produces;
 import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import org.eclipse.persistence.jaxb.JAXBContextProperties;
+import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.model.SoapExchange;
 
-//@Provider
-//@Produces({"application/xml", "application/json"})
+@Provider
+@Produces({"application/xml", "application/json"})
 public class CustomContextResolver implements ContextResolver<JAXBContext> {
+
+    private static final org.slf4j.Logger LOGGER = LoggerFactory
+            .getLogger(NameGenerator.class);
 
     private JAXBContext jc;
 
     public CustomContextResolver() {
-        System.out.println("CUSTOM RESOLVER LOADED");
+        LOGGER.debug("CUSTOM RESOLVER LOADED");
         try {
             Map<String, Object> props = new HashMap<String, Object>(1);
             props.put(JAXBContextProperties.OXM_METADATA_SOURCE, SoapExchange.class.getPackage().getName().replace(".", "/") + "/oxm.xml");
@@ -34,6 +40,11 @@ public class CustomContextResolver implements ContextResolver<JAXBContext> {
     public JAXBContext getContext(Class<?> clazz) {
         if (SoapExchange.class == clazz) {
             return jc;
+        }
+        try {
+            return JAXBContext.newInstance(clazz);
+        } catch (JAXBException ex) {
+            LOGGER.warn("JAXBContext instantiation failed : {}", ex.getMessage());
         }
         return null;
     }

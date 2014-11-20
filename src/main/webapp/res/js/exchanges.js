@@ -3,10 +3,10 @@
  *********************************************/
 // TODO : delete
 var Cookie = {
-    set: function (name, value) {
+    set: function(name, value) {
         document.cookie = name + "=" + value + "; max-age=" + (60 * 60 * 24 * 10);
     },
-    get: function (name) {
+    get: function(name) {
         var cookies = document.cookie.split(';');
 
         for (var i in cookies) {
@@ -24,7 +24,7 @@ var Cookie = {
  *********************************************/
 
 // create fully selectable areas
-jQuery.fn.selectText = function () {
+jQuery.fn.selectText = function() {
     var doc = document;
     var element = this[0];
     // add blur / click behavior
@@ -42,7 +42,7 @@ jQuery.fn.selectText = function () {
     }
 };
 
-$(function () {
+$(function() {
     var timer = 0;
     /*$table = $('.fixed-table-container');
      $table.addClass('panel-collapse collapse in');
@@ -50,14 +50,14 @@ $(function () {
      $table.attr('aria-labelledby', 'headingOne');*/
 
 
-    $(window).resize(function () {
+    $(window).resize(function() {
         $('#exchangestable').bootstrapTable('resetView');
     });
 
-    $("#exchangedetails pre code").click(function () {
+    $("#exchangedetails pre code").click(function() {
         $(this).selectText();
     });
-    $('#exchangestable').on('column-switch.bs.table', function (e, field, checked) {
+    $('#exchangestable').on('column-switch.bs.table', function(e, field, checked) {
         // TODO : set httpOnly on the cookie to avoid sending it to server via ajax
         // read
         var fields = $.cookie('fields')
@@ -86,7 +86,7 @@ $(function () {
     }
 
     var exchangesCache = {};
-    $('#exchangestable').on('click-row.bs.table', function (e, rowData, elem) {
+    $('#exchangestable').on('click-row.bs.table', function(e, rowData, elem) {
         if (rowData.id) {
             $('#exchangestable tr.selected').removeClass('selected');
             elem.addClass('selected');
@@ -96,21 +96,21 @@ $(function () {
             } else {
                 $.ajax({
                     type: 'GET',
-                    url: 'exchange/' + rowData.id + '?accept=application/json',
+                    url: 'resources/exchange/' + rowData.id + '?accept=application/json',
                     dataType: 'json'
                 })
-                        .done(function (exchange) {
+                        .done(function(exchange) {
                             exchangesCache[exchange.id] = exchange;
                             displayExchange(exchange);
                         })
-                        .fail(function () {
+                        .fail(function() {
                             console.log("error on loading exchange");
                         });
             }
         }
     });
 
-    $('#menutabs a[href="#validators"]').on('shown.bs.tab', function (e) {
+    $('#menutabs a[href="#validators"]').on('shown.bs.tab', function(e) {
         validator = window.location.hash;
         console.log(validator);
         if (validator) {
@@ -119,14 +119,14 @@ $(function () {
     })
 
     $('.autorefresh')
-            .click(function () {
+            .click(function() {
                 console.log($(this));
                 if ($(this).data('enabled')) {
                     clearTimeout(timer);
                     $(this).data('enabled', false);
                     $('span', this).text('off');
                 } else {
-                    timer = setTimeout(function () {
+                    timer = setTimeout(function() {
                         window.location.reload();
                     }, 4000);
                     $(this).data('enabled', true);
@@ -138,8 +138,8 @@ $(function () {
             .data('enabled', Cookie.get('autorefresh') != "true")
             .click();
 
-    $('[accesskey]').each(function () {
-        $(document).on('keyup', null, $(this).attr('accesskey'), function (e) {
+    $('[accesskey]').each(function() {
+        $(document).on('keyup', null, $(this).attr('accesskey'), function(e) {
             $('[accesskey=' + e.key + ']').click();
         });
     });
@@ -158,7 +158,10 @@ function rowStyle(row, index) {
 }
 
 function validatorFieldFormatter(value, row) {
-    return '<a class="viewvalidator" href="ui#AffaireServiceWrite" onclick="viewValidator(this);">' + value + '</a>';
+    if (value)
+        return '<a class="viewvalidator" href="ui#AffaireServiceWrite" onclick="viewValidator(this);">' + value + '</a>';
+    else
+        return '';
 }
 function responseTimeFieldFormatter(value) {
     if (value === -1) {
@@ -167,24 +170,18 @@ function responseTimeFieldFormatter(value) {
     return value;
 }
 function statusFormatter(value) {
-    if (value === "") {
+    // need to support boolean and strings for retro-compat
+    if (typeof value === 'undefined' || value === "") {
         return "unknown";
-    } else if (value === "true") {
+    } else if (value === "true" || (typeof value === 'boolean' && value === true)) {
         return "valid";
-    } else if (value === "false") {
+    } else if (value === "false" || (typeof value === 'boolean' && value === false)) {
         return "invalid";
     }
     return value;
 }
 function validationStatusFormatter(value) {
-    if (value === "") {
-        return "unknown";
-    } else if (value === "true") {
-        return "valid";
-    } else if (value === "false") {
-        return "invalid";
-    }
-    return value;
+    return statusFormatter(value);
 }
 
 function validationFormatter(validating) {
@@ -210,17 +207,19 @@ function viewValidator(validatorLink) {
     return false;
 }
 function formatList(list) {
-    var str = "";
-    jQuery.each(list, function (i, val) {
-        str += val + String.fromCharCode(13);
-    });
+    if (list) {
+        var str = "";
+        jQuery.each(list, function(i, val) {
+            str += val + String.fromCharCode(13);
+        });
+    }
     return str;
 }
 
 function formatMap(map) {
     var str = "";
     if (map) {
-        jQuery.each(map, function (i, val) {
+        jQuery.each(map, function(i, val) {
             if (i !== '-') {
                 str += i + "=";
             }
@@ -259,7 +258,7 @@ function displayExchange(exchange) {
     // response
     $('#respheaders pre code').text(formatMap(exchange.back_end_response_headers));
     $('#respcontent pre code').text(exchange.back_end_response);
-    console.log(exchange.response_errors);
+
     if (exchange.response_valid === "true"
             || (exchange.response_errors && exchange.response_errors.length < 1)) {
         $details.find('.nav li:has(a[href="#resperrors"])').hide();
@@ -275,7 +274,7 @@ function displayExchange(exchange) {
 
     // syntax highlighting
     console.log('syntax hl');
-    $('#exchangedetails pre code').each(function (i, block) {
+    $('#exchangedetails pre code').each(function(i, block) {
         hljs.highlightBlock(block);
     });
 }

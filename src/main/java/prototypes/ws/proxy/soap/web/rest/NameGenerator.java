@@ -15,27 +15,35 @@
  */
 package prototypes.ws.proxy.soap.web.rest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  *
  * @author JL06436S
  */
 public class NameGenerator implements org.eclipse.persistence.oxm.XMLNameTransformer {
 
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(NameGenerator.class);
+
     //Use the unqualified class name as our root element name.
+    @Override
     public String transformRootElementName(String name) {
         return name.substring(name.lastIndexOf('.') + 1);
     }
 
     //The same algorithm as root element name plus "Type" appended to the end.
+    @Override
     public String transformTypeName(String name) {
-        System.out.println("Transform type name");
+        LOGGER.debug("Transform type name {}", name);
         return transformRootElementName(name) + "Type";
     }
 
-    //The name will be lower case with word breaks represented by '-'.
-    //Note:  A capital letter in the original name represents the start of a new word.
+    // The name will be lower case with word breaks represented by '-'.
+    // Note:  A capital letter in the original name represents the start of a new word.
+    @Override
     public String transformElementName(String name) {
-        System.out.println("Transform element name");
         StringBuilder strBldr = new StringBuilder();
         for (char character : name.toCharArray()) {
             if (Character.isUpperCase(character)) {
@@ -45,13 +53,15 @@ public class NameGenerator implements org.eclipse.persistence.oxm.XMLNameTransfo
                 strBldr.append(character);
             }
         }
+        LOGGER.trace("Transform element name : {} to {}", name, strBldr.toString());
         return strBldr.toString();
     }
 
     //The original name converted to upper case.
+    @Override
     public String transformAttributeName(String name) {
-        System.out.println("Transform attribute name");
-        return name.toUpperCase();
+        LOGGER.debug("Transform attribute name {}", name);
+        return transformElementName(name);
     }
 
 }

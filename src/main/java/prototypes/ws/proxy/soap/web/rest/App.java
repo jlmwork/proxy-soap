@@ -17,6 +17,7 @@ package prototypes.ws.proxy.soap.web.rest;
 
 import org.glassfish.jersey.message.filtering.SelectableEntityFilteringFeature;
 import org.glassfish.jersey.moxy.json.MoxyJsonConfig;
+import org.glassfish.jersey.moxy.xml.MoxyXmlFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 
 /**
@@ -26,16 +27,22 @@ import org.glassfish.jersey.server.ResourceConfig;
 public class App extends ResourceConfig {
 
     public App() {
+        // Entity Inspector.
+//        bind(EntityInspectorImpl.class)
+//                .to(EntityInspector.class)
+//                .in(Singleton.class);
         // Register all resources present under the package.
         packages("prototypes.ws.proxy.soap.web.rest");
         // Register entity-filtering selectable feature.
         register(SelectableEntityFilteringFeature.class);
+        register(JpaEntityProcessor.class);
 
         // make sampleresource a singleton
         // see : https://jersey.java.net/documentation/latest/jaxrs-resources.html#d0e2331
         //register(SampleResource.class); // DOESNT WORK
+        register(MoxyXmlFeature.class);
         // Configure MOXy Json provider.
-        register(new MoxyJsonConfig().setFormattedOutput(true).resolver());
+        register(new MoxyJsonConfig().setFormattedOutput(true).setMarshalEmptyCollections(false).resolver());
         property(SelectableEntityFilteringFeature.QUERY_PARAM_NAME, "fields");
     }
 

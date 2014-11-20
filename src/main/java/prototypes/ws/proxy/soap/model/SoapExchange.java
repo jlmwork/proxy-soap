@@ -16,15 +16,23 @@
 package prototypes.ws.proxy.soap.model;
 
 import com.eaio.uuid.UUID;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.eclipse.persistence.oxm.annotations.XmlPath;
 import prototypes.ws.proxy.soap.time.Dates;
+import prototypes.ws.proxy.soap.web.rest.BytesAdapter;
+import prototypes.ws.proxy.soap.web.rest.MapAdapter;
 import prototypes.ws.proxy.soap.xml.XmlStrings;
 
-public class SoapExchange {
+@XmlRootElement
+public class SoapExchange implements Serializable {
 
     public static final transient String UID = "proxy-soap.exchange";
 
@@ -41,22 +49,34 @@ public class SoapExchange {
     private boolean proxyBlocking = false;
 
     // request
+    @XmlJavaTypeAdapter(BytesAdapter.class)
     private byte[] frontEndRequest;
+    @XmlJavaTypeAdapter(BytesAdapter.class)
     private byte[] proxyRequest;
+    @XmlPath(".")
+    @XmlJavaTypeAdapter(MapAdapter.class)
     private Map<String, List<String>> frontEndRequestHeaders;
+    //@XmlPath(".")
+    //@XmlJavaTypeAdapter(MapAdapter.class)
     private Map<String, List<String>> proxyRequestHeaders;
     private Boolean requestSoapValid;
     private Boolean requestXmlValid;
     private List<String> requestSoapErrors;
     private List<String> responseSoapErrors;
     // response
+    @XmlJavaTypeAdapter(BytesAdapter.class)
     private byte[] backEndResponse;
     private int backEndResponseCode;
     private int proxyResponseCode;
+    @XmlJavaTypeAdapter(BytesAdapter.class)
     private byte[] proxyResponse;
     private Boolean responseSoapValid;
     private Boolean responseXmlValid;
+    //@XmlPath(".")
+    //@XmlJavaTypeAdapter(MapAdapter.class)
     private Map<String, List<String>> backEndResponseHeaders;
+    //@XmlPath(".")
+    //@XmlJavaTypeAdapter(MapAdapter.class)
     private Map<String, List<String>> proxyResponseHeaders;
     private List<String> requestXmlErrors;
     private List<String> responseXmlErrors;
@@ -107,10 +127,11 @@ public class SoapExchange {
 
     @Override
     public String toString() {
-        return "SoapExchange{" + "time=" + time + ", id=" + id + ", uri=" + to + ", from=" + from + ", "
-                + "operation=" + operation + ", validatorId=" + validatorId
-                + ", backEndResponseTime=" + backEndResponseTime + ", proxyInternalTime=" + proxyInternalTime
-                + "\n, frontEndRequest=" + frontEndRequest
+        return "SoapExchange{" + "time=" + time + ", id=" + id + ", uri=" + to
+                + ", from=" + from + ", " + "operation=" + operation
+                + ", validatorId=" + validatorId + ", backEndResponseTime="
+                + backEndResponseTime + ", proxyInternalTime="
+                + proxyInternalTime + "\n, frontEndRequest=" + frontEndRequest
                 + "\n, frontEndRequestHeaders=" + frontEndRequestHeaders
                 + "\n, proxyRequest=" + proxyRequest
                 + "\n, proxyRequestHeaders=" + proxyRequestHeaders
@@ -240,6 +261,7 @@ public class SoapExchange {
     /**
      * @return the requestValid
      */
+    @XmlElement
     public Boolean getRequestValid() {
         return ((requestXmlValid != null) && requestXmlValid)
                 && ((requestSoapValid != null) && requestSoapValid);
@@ -261,6 +283,7 @@ public class SoapExchange {
     /**
      * @return the responseValid
      */
+    @XmlElement
     public Boolean getResponseValid() {
         return ((responseXmlValid != null) && responseXmlValid)
                 && ((responseSoapValid != null) && responseSoapValid);
@@ -336,6 +359,7 @@ public class SoapExchange {
     /**
      * @return the requestErrors
      */
+    @XmlElement
     public List<String> getRequestErrors() {
         List allErrors = new ArrayList();
         if (requestXmlErrors != null) {
@@ -364,6 +388,7 @@ public class SoapExchange {
     /**
      * @return the requestErrors
      */
+    @XmlElement
     public List<String> getResponseErrors() {
         List allErrors = new ArrayList();
         if (responseXmlErrors != null) {
@@ -437,32 +462,38 @@ public class SoapExchange {
         return frontEndRequestHeaders;
     }
 
-    public void setFrontEndRequestHeaders(Map<String, List<String>> requestHeaders) {
-        this.frontEndRequestHeaders = requestHeaders;
+    public void setFrontEndRequestHeaders(
+            Map<String, List<String>> requestHeaders) {
+        this.frontEndRequestHeaders = new java.util.HashMap(requestHeaders);
     }
 
-    public Map<String, List<String>> getBackendResponseHeaders() {
+    public Map<String, List<String>> getBackEndResponseHeaders() {
         return backEndResponseHeaders;
     }
 
-    public void setBackEndResponseHeaders(Map<String, List<String>> responseHeaders) {
-        this.backEndResponseHeaders = responseHeaders;
+    public void setBackEndResponseHeaders(
+            Map<String, List<String>> responseHeaders) {
+        this.backEndResponseHeaders = new java.util.HashMap(responseHeaders);
+        //this.backEndResponseHeaders.remove(null); // to remove HTTP message with null key
     }
 
     public Map<String, List<String>> getProxyRequestHeaders() {
         return proxyRequestHeaders;
     }
 
-    public void setProxyRequestHeaders(Map<String, List<String>> proxyRequestHeaders) {
-        this.proxyRequestHeaders = proxyRequestHeaders;
+    public void setProxyRequestHeaders(
+            Map<String, List<String>> proxyRequestHeaders) {
+        this.proxyRequestHeaders = new java.util.HashMap(proxyRequestHeaders);
     }
 
     public Map<String, List<String>> getProxyResponseHeaders() {
         return proxyResponseHeaders;
     }
 
-    public void setProxyResponseHeaders(Map<String, List<String>> proxyResponseHeaders) {
-        this.proxyResponseHeaders = proxyResponseHeaders;
+    public void setProxyResponseHeaders(
+            Map<String, List<String>> proxyResponseHeaders) {
+        this.proxyResponseHeaders = new java.util.HashMap(proxyResponseHeaders);
+        //this.proxyResponseHeaders.remove(null); // to remove HTTP message with null key
     }
 
 }

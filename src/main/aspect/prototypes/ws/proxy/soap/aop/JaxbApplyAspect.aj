@@ -1,7 +1,9 @@
-package prototypes.ws.proxy.soap.web.aop;
+package prototypes.ws.proxy.soap.aop;
 
-import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlRootElement;
+
+import prototypes.ws.proxy.soap.model.SoapExchange;
 
 public aspect JaxbApplyAspect {
-    //declare @field: * prototypes.ws.proxy.soap.model.SoapExchange.*: @XmlTransient;
+    declare @type: prototypes.ws.proxy.soap.model..* : @XmlRootElement;
 }
