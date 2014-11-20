@@ -15,13 +15,11 @@
  */
 package prototypes.ws.proxy.soap.model;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
 /**
  *
  * @author jlamande
  */
-@XmlRootElement
+//@XmlRootElement
 public class Sample {
 
     private int code;
