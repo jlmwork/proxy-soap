@@ -20,6 +20,9 @@ import static com.jayway.restassured.RestAssured.given;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
+import javax.json.Json;
+import javax.json.JsonObjectBuilder;
+import javax.ws.rs.core.MediaType;
 import org.hamcrest.Matchers;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -28,7 +31,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.io.Files;
-import prototypes.ws.proxy.soap.web.servlet.SamplesServlet;
+import prototypes.ws.proxy.soap.model.Sample;
 
 /**
  * Documentation on RestAssured :
@@ -39,6 +42,10 @@ import prototypes.ws.proxy.soap.web.servlet.SamplesServlet;
 public class ProxyTestsIT {
 
     private static final Logger logger = LoggerFactory.getLogger(ProxyTestsIT.class);
+
+    private static final String URI_SAMPLES = "/resources/sample";
+
+    private static final String FS_SAMPLES_PATH = "src/test/resources/samples";
 
     private static final String WSDL_PATH = Files.findFromClasspath("samples/definitions/SampleService.wsdl").replaceAll("^file:[/]+", "/");
 
@@ -74,15 +81,24 @@ public class ProxyTestsIT {
     }
 
     private static void createSampleResponse(int returnCode, String name) {
-        SamplesServlet.Sample sample
-                = new SamplesServlet.Sample(returnCode, name,
-                        Files.read("src/test/resources/samples/messages/responses/" + name + ".xml")
+        Sample sample
+                = new Sample(returnCode, name,
+                        Files.read(FS_SAMPLES_PATH + "/messages/responses/" + name + ".xml")
                 );
         given()
-                .body(sample.toJson())
+                .body(buildJson(sample))
+                .contentType(MediaType.APPLICATION_JSON)
                 .when()
-                .post("/samples")
+                .post(URI_SAMPLES)
                 .then().statusCode(201);
+    }
+
+    private static String buildJson(Sample sample) {
+        JsonObjectBuilder oBuidler = Json.createObjectBuilder();
+        oBuidler.add("code", sample.getCode())
+                .add("name", sample.getName())
+                .add("content", sample.getContent());
+        return oBuidler.build().toString();
     }
 
     private void configureProxyDefaultMode() {
@@ -147,12 +163,12 @@ public class ProxyTestsIT {
 
     public String checkProxyMode(String requestName, String responseSampleName, int returnCodeExpected, String block, String validation) {
         counterRequests++;
-        String samplesPath = "/p/" + RestAssured.baseURI + RestAssured.basePath + "/sample";
+        String samplesPath = "/p/" + RestAssured.baseURI + RestAssured.basePath + URI_SAMPLES;
 
         String content = given()
-                .body(Files.read("src/test/resources/samples/messages/requests/" + requestName + ".xml"))
+                .body(Files.read(FS_SAMPLES_PATH + "/messages/requests/" + requestName + ".xml"))
                 .when()
-                .post(samplesPath + "/" + responseSampleName)
+                .post(samplesPath + "/" + responseSampleName + "/content")
                 .then().statusCode(returnCodeExpected)
                 .header("X-Filtering-Blocking", block)
                 .header("X-Filtering-Validation", validation)
@@ -162,12 +178,12 @@ public class ProxyTestsIT {
 
     public String checkWithProxyStatus(String requestName, String responseSampleName, String proxyStatus, int returnCodeExpected) {
         counterRequests++;
-        String samplesPath = "/p/" + RestAssured.baseURI + RestAssured.basePath + "/sample";
+        String samplesPath = "/p/" + RestAssured.baseURI + RestAssured.basePath + URI_SAMPLES;
 
         String content = given()
-                .body(Files.read("src/test/resources/samples/messages/requests/" + requestName + ".xml"))
+                .body(Files.read(FS_SAMPLES_PATH + "/messages/requests/" + requestName + ".xml"))
                 .when()
-                .post(samplesPath + "/" + responseSampleName)
+                .post(samplesPath + "/" + responseSampleName + "/content")
                 .then().statusCode(returnCodeExpected)
                 .header("X-Filtered-Status", proxyStatus)
                 .extract().response().body().print();
@@ -176,12 +192,12 @@ public class ProxyTestsIT {
 
     public String check(String requestName, String responseSampleName, int returnCodeExpected) {
         counterRequests++;
-        String samplesPath = "/p/" + RestAssured.baseURI + RestAssured.basePath + "/sample";
+        String samplesPath = "/p/" + RestAssured.baseURI + RestAssured.basePath + URI_SAMPLES;
 
         String content = given()
-                .body(Files.read("src/test/resources/samples/messages/requests/" + requestName + ".xml"))
+                .body(Files.read(FS_SAMPLES_PATH + "/messages/requests/" + requestName + ".xml"))
                 .when()
-                .post(samplesPath + "/" + responseSampleName)
+                .post(samplesPath + "/" + responseSampleName + "/content")
                 .then().statusCode(returnCodeExpected)
                 .extract().response().body().print();
         return content;
@@ -201,7 +217,7 @@ public class ProxyTestsIT {
         String targetUrl = "/p/" + url;
 
         String content = given()
-                .body(Files.read("src/test/resources/samples/messages/requests/" + requestName + ".xml"))
+                .body(Files.read(FS_SAMPLES_PATH + "/messages/requests/" + requestName + ".xml"))
                 .when()
                 .post(targetUrl)
                 .then().statusCode(returnCodeExpected)
@@ -246,7 +262,7 @@ public class ProxyTestsIT {
         checkWithCustomUrl("operation1-req_OK", RestAssured.baseURI + RestAssured.basePath + "/sample-resp-longtime.jsp", 502, "Time out");
         // connect timeout
         // no host target for loopback calls
-        checkWithCustomUrl("operation2-req_OK", RestAssured.basePath.substring(1) + "/sample/operation2-resp_OK", 200);
+        checkWithCustomUrl("operation2-req_OK", RestAssured.basePath.substring(1) + URI_SAMPLES + "/operation2-resp_OK/content", 200);
     }
 
     @Test
@@ -279,7 +295,7 @@ public class ProxyTestsIT {
         checkWithCustomUrl("operation1-req_OK", RestAssured.baseURI + RestAssured.basePath + "/sample-resp-longtime.jsp", 502, "Time out");
         // connect timeout
         // no host target for loopback calls
-        checkWithCustomUrl("operation2-req_OK", RestAssured.basePath.substring(1) + "/sample/operation2-resp_OK", 200);
+        checkWithCustomUrl("operation2-req_OK", RestAssured.basePath.substring(1) + URI_SAMPLES + "/operation2-resp_OK/content", 200);
     }
 
     @Test

@@ -7,16 +7,14 @@ package prototypes.ws.proxy.soap.web.rest;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.ws.rs.Produces;
 import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import org.eclipse.persistence.jaxb.JAXBContextProperties;
 import prototypes.ws.proxy.soap.model.SoapExchange;
 
-@Provider
-@Produces({"application/xml", "application/json"})
+//@Provider
+//@Produces({"application/xml", "application/json"})
 public class CustomContextResolver implements ContextResolver<JAXBContext> {
 
     private JAXBContext jc;

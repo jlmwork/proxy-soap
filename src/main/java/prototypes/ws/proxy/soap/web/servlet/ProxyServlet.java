@@ -173,6 +173,7 @@ public class ProxyServlet extends AbstractServlet {
 
         // type of connection
         httpConn.setDoOutput(true);
+        LOGGER.debug("Request method : {}", request.getMethod());
         httpConn.setRequestMethod(request.getMethod());
 
         // Headers

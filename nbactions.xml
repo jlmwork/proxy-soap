@@ -82,6 +82,9 @@
         <goals>
             <goal>verify</goal>
         </goals>
+        <properties>
+                <skipTests>false</skipTests>
+            </properties>
     </action>
     <action>
         <actionName>CUSTOM-Install</actionName>

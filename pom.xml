@@ -15,7 +15,7 @@
         <eclipselink.version>2.5.2</eclipselink.version>
         <!-- jersey 2.6 max for compat with java 1.6 -->
         <jersey.version>2.6</jersey.version>
-        <it.port>9005</it.port>
+        <it.port>8083</it.port>
         <it.host>localhost</it.host>
         <!-- jetty 8.x max for compat with java 1.6 -->
         <jetty.version>8.1.16.v20140903</jetty.version>

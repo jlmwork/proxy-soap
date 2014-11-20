@@ -30,6 +30,10 @@ public class App extends ResourceConfig {
         packages("prototypes.ws.proxy.soap.web.rest");
         // Register entity-filtering selectable feature.
         register(SelectableEntityFilteringFeature.class);
+
+        // make sampleresource a singleton
+        // see : https://jersey.java.net/documentation/latest/jaxrs-resources.html#d0e2331
+        //register(SampleResource.class); // DOESNT WORK
         // Configure MOXy Json provider.
         register(new MoxyJsonConfig().setFormattedOutput(true).resolver());
         property(SelectableEntityFilteringFeature.QUERY_PARAM_NAME, "fields");
