@@ -15,6 +15,7 @@
  */
 package prototypes.ws.proxy.soap.xml;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +23,9 @@ import java.util.Map;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import org.eclipse.persistence.jaxb.MarshallerProperties;
+import org.hamcrest.Matchers;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import prototypes.ws.proxy.soap.model.SoapExchange;
 
@@ -44,30 +48,53 @@ public class XmlUtilsTest {
         }
     }
 
-    @Test
-    public void mapMarshalling() throws Exception {
-        JAXBContext jc = JAXBContext.newInstance(SoapExchange.class, List.class);
+    JAXBContext jaxbContext;
+    SoapExchange soapExchange;
 
-        SoapExchange soapExchange = new SoapExchange();
+    @Before
+    public void setup() throws Exception {
+
+        // can use direct MOXy JAXBContextFactory
+        // org.eclipse.persistence.jaxb.JAXBContextFactory
+        //JAXBContext jaxbContext = JAXBContextFactory.createContext(new Class[]{SoapExchange.class}, null);
+        jaxbContext = JAXBContext.newInstance(SoapExchange.class, List.class);
+
+        soapExchange = new SoapExchange();
         Map<String, List<String>> map = new HashMap<String, List<String>>();
         List<String> list = new ArrayList<String>();
         list.add("hello");
         list.add("hello2");
         map.put("HelloKey", list);
         soapExchange.setBackEndResponseHeaders(map);
+        soapExchange.setResponse("HELLO WORLD".getBytes());
+    }
 
-        Marshaller marshaller = jc.createMarshaller();
+    private String marshallAndGetResultString(Marshaller marshaller) throws Exception {
+        ByteArrayOutputStream xmlBAOS = new ByteArrayOutputStream();
+        marshaller.marshal(soapExchange, xmlBAOS);
+        return new String(xmlBAOS.toByteArray());
+    }
+
+    @Test
+    public void xmlMarshallMapsAndBytes() throws Exception {
+        Marshaller marshaller = jaxbContext.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        String xmlString = marshallAndGetResultString(marshaller);
+        System.out.println("XML : " + xmlString);
+        Assert.assertThat(xmlString, Matchers.containsString("<HelloKey>hello#!#hello2</HelloKey>"));
+        Assert.assertThat(xmlString, Matchers.containsString("<backEndResponse>HELLO WORLD</backEndResponse>"));
+    }
+
+    @Test
+    public void jsonMarshallMapsAndBytes() throws Exception {
+        Marshaller marshaller = jaxbContext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, "application/json");
         marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
-        marshaller.marshal(soapExchange, System.out);
-
-        /*
-         JAXBContext jc2 = JAXBContext.newInstance();
-         Marshaller marshaller2 = jc2.createMarshaller();
-         marshaller2.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-         marshaller2.setProperty(MarshallerProperties.MEDIA_TYPE, "application/json");
-         marshaller2.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
-         marshaller2.marshal(new String[]{"test", "test2"}, System.out);*/
+        String jsonString = marshallAndGetResultString(marshaller);
+        System.out.println("JSON : " + jsonString);
+        Assert.assertThat(jsonString, Matchers.containsString("backEndResponseHeaders"));
+        Assert.assertThat(jsonString, Matchers.containsString("\"HelloKey\" : \"hello#!#hello2\""));
+        Assert.assertThat(jsonString, Matchers.containsString("\"backEndResponse\" : \"HELLO WORLD\""));
     }
 }

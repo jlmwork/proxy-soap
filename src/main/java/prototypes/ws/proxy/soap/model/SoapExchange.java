@@ -24,11 +24,7 @@ import java.util.List;
 import java.util.Map;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.eclipse.persistence.oxm.annotations.XmlPath;
 import prototypes.ws.proxy.soap.time.Dates;
-import prototypes.ws.proxy.soap.web.rest.BytesAdapter;
-import prototypes.ws.proxy.soap.web.rest.MapAdapter;
 import prototypes.ws.proxy.soap.xml.XmlStrings;
 
 @XmlRootElement
@@ -49,34 +45,23 @@ public class SoapExchange implements Serializable {
     private boolean proxyBlocking = false;
 
     // request
-    @XmlJavaTypeAdapter(BytesAdapter.class)
     private byte[] frontEndRequest;
-    @XmlJavaTypeAdapter(BytesAdapter.class)
     private byte[] proxyRequest;
-    @XmlPath(".")
-    @XmlJavaTypeAdapter(MapAdapter.class)
     private Map<String, List<String>> frontEndRequestHeaders;
-    //@XmlPath(".")
-    //@XmlJavaTypeAdapter(MapAdapter.class)
     private Map<String, List<String>> proxyRequestHeaders;
     private Boolean requestSoapValid;
     private Boolean requestXmlValid;
     private List<String> requestSoapErrors;
     private List<String> responseSoapErrors;
     // response
-    @XmlJavaTypeAdapter(BytesAdapter.class)
     private byte[] backEndResponse;
     private int backEndResponseCode;
     private int proxyResponseCode;
-    @XmlJavaTypeAdapter(BytesAdapter.class)
     private byte[] proxyResponse;
     private Boolean responseSoapValid;
     private Boolean responseXmlValid;
-    //@XmlPath(".")
-    //@XmlJavaTypeAdapter(MapAdapter.class)
+
     private Map<String, List<String>> backEndResponseHeaders;
-    //@XmlPath(".")
-    //@XmlJavaTypeAdapter(MapAdapter.class)
     private Map<String, List<String>> proxyResponseHeaders;
     private List<String> requestXmlErrors;
     private List<String> responseXmlErrors;
