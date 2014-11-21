@@ -172,11 +172,11 @@ function responseTimeFieldFormatter(value) {
 function statusFormatter(value) {
     // need to support boolean and strings for retro-compat
     if (typeof value === 'undefined' || value === "") {
-        return "unknown";
+        return '<span class="text-warning">unknown</span>';
     } else if (value === "true" || (typeof value === 'boolean' && value === true)) {
-        return "valid";
+        return '<span class="text-success">valid</span>';
     } else if (value === "false" || (typeof value === 'boolean' && value === false)) {
-        return "invalid";
+        return '<span class="text-danger">invalid</span>';
     }
     return value;
 }
@@ -207,8 +207,8 @@ function viewValidator(validatorLink) {
     return false;
 }
 function formatList(list) {
+    var str = "";
     if (list) {
-        var str = "";
         jQuery.each(list, function(i, val) {
             str += val + String.fromCharCode(13);
         });
@@ -246,7 +246,7 @@ function displayExchange(exchange) {
     // request
     $('#reqheaders pre code').text(formatMap(exchange.front_end_request_headers));
     $('#reqcontent pre code').text(exchange.front_end_request);
-    if (exchange.request_valid === "true") {
+    if (typeof exchange.request_errors === 'undefined' || exchange.request_errors.length < 1) {
         $details.find('.nav li:has(a[href="#reqerrors"])').hide();
         $('#reqerrors pre code').text('');
         $details.find('.nav a:first').tab('show');
@@ -259,8 +259,7 @@ function displayExchange(exchange) {
     $('#respheaders pre code').text(formatMap(exchange.back_end_response_headers));
     $('#respcontent pre code').text(exchange.back_end_response);
 
-    if (exchange.response_valid === "true"
-            || (exchange.response_errors && exchange.response_errors.length < 1)) {
+    if (typeof exchange.response_errors === 'undefined' || exchange.response_errors.length < 1) {
         $details.find('.nav li:has(a[href="#resperrors"])').hide();
         $('#resperrors pre code').text('');
         $details.find('.nav a:first').tab('show');

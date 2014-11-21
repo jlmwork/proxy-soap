@@ -8,11 +8,11 @@ function responseTimeFieldFormatter(value, row) {
 function statusFormatter(value) {
     // need to support boolean and strings for retro-compat
     if (typeof value === 'undefined' || value === "") {
-        return "inconnu";
+        return '<span class="text-warning">inconnu</span>';
     } else if (value === "true" || (typeof value === 'boolean' && value === true)) {
-        return "valide";
+        return '<span class="text-success">valide</span>';
     } else if (value === "false" || (typeof value === 'boolean' && value === false)) {
-        return "invalide";
+        return '<span class="text-danger">invalide</span>';
     }
     return value;
 }

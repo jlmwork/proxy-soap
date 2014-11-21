@@ -63,9 +63,9 @@
 <div id="exchangedetails" class="hidden panel panel-default">
     <div class="panel-heading" data-toggle="collapse" data-target="#exchangedetails .panel-body">
         <h5 class="panel-title"><fmt:message key="exchanges.exchange.details.label"/><span id="exchangeId"></span></h5>
-        <span id="proxy_validation_status" class="label label-info"></span>&nbsp;
-        <span id="proxy_blocking_status" class="label label-info"></span>
-        <fmt:message key="exchanges.exchange.request"/> : <span id="request_status"></span>
+        <span id="proxy_validation_status" class="text-info"></span>&nbsp;/
+        <span id="proxy_blocking_status" class="text-info"></span> /
+        <fmt:message key="exchanges.exchange.request"/> : <span id="request_status"></span> /
         <fmt:message key="exchanges.exchange.response"/> : <span id="response_status"></span>
     </div>
     <div class="panel-body panel-collapse collapse">
