@@ -5,6 +5,9 @@ Proxy Soap
 [![Build Status](https://travis-ci.org/jlmwork/proxy-soap.svg?branch=master)](https://travis-ci.org/jlmwork/proxy-soap)
 
 
+Trello : https://trello.com/b/eSqIxqmG/proxy-soap
+
+
 Tests on WebLogic
 -----------------
 The weblogic-maven-plugin (available from WLS 10.3.3) is required.
