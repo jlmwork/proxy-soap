@@ -50,6 +50,7 @@ public class MapAdapter extends XmlAdapter<MapAdapter.AdaptedMap, Map<String, Li
 
     @Override
     public AdaptedMap marshal(Map<String, List<String>> map) throws Exception {
+        System.out.println("Marshal Adapter");
         AdaptedMap adaptedMap = new AdaptedMap();
         for (Entry<String, List<String>> entry : map.entrySet()) {
             AdaptedEntry adaptedEntry = new AdaptedEntry();
@@ -62,6 +63,7 @@ public class MapAdapter extends XmlAdapter<MapAdapter.AdaptedMap, Map<String, Li
 
     @Override
     public Map<String, List<String>> unmarshal(AdaptedMap adaptedMap) throws Exception {
+        System.out.println("UnMarshal Adapter");
         List<AdaptedEntry> adaptedEntries = adaptedMap.entries;
         Map<String, List<String>> map = new HashMap<String, List<String>>(adaptedEntries.size());
         for (AdaptedEntry adaptedEntry : adaptedEntries) {
