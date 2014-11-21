@@ -4,8 +4,8 @@
 <fmt:setBundle basename="messages"/>
 
 <table id="exchangestable" data-toggle="table"
-       data-sort-name="date" data-sort-order="desc"
-       data-url="exchanges?accept=application/json" data-cache="false"
+       data-sort-name="time" data-sort-order="desc"
+       data-url="resources/exchange?accept=application/json" data-cache="false"
        data-clear-url="exchanges"
        data-height="500"
        data-toolbar="#custom-toolbar"
@@ -20,40 +20,40 @@
     <thead>
         <tr class="text-center">
             <th data-field="id" data-visible="false">ID</th>
-            <th data-field="date" data-sortable="true"><fmt:message key="exchanges.exchange.date"/></th>
+            <th data-field="time" data-sortable="true"><fmt:message key="exchanges.exchange.date"/></th>
             <th data-field="from"><fmt:message key="exchanges.exchange.from"/></th>
             <th data-field="to"><fmt:message key="exchanges.exchange.to"/></th>
-            <th data-field="validator" data-sortable="true" data-formatter="validatorFieldFormatter">
+            <th data-field="validatorId" data-sortable="true" data-formatter="validatorFieldFormatter">
                 <fmt:message key="exchanges.exchange.validator"/>
             </th>
             <th data-field="operation">
                 <fmt:message key="exchanges.exchange.operation"/>
             </th>
-            <th data-field="back_end_response_time" data-sortable="true" data-formatter="responseTimeFieldFormatter">
+            <th data-field="backEndResponseTime" data-sortable="true" data-formatter="responseTimeFieldFormatter">
                 <fmt:message key="exchanges.exchange.back_end_response_time"/>
             </th>
-            <th data-field="proxy_internal_time" data-sortable="true"  data-visible="false" data-formatter="responseTimeFieldFormatter">
+            <th data-field="proxyInternalTime" data-sortable="true"  data-visible="false" data-formatter="responseTimeFieldFormatter">
                 <fmt:message key="exchanges.exchange.proxy_internal_time"/>
             </th>
-            <th data-field="back_end_response_code"  data-visible="false">
+            <th data-field="backEndResponseCode"  data-visible="false">
                 <fmt:message key="exchanges.exchange.response.code"/>
             </th>
-            <th data-field="request_valid" data-visible="false" data-formatter="validationStatusFormatter">
+            <th data-field="requestValid" data-visible="false" data-formatter="validationStatusFormatter">
                 <fmt:message key="exchanges.exchange.request"/> Status
             </th>
-            <th data-field="request_xml_valid" data-visible="false" data-formatter="validationStatusFormatter">
+            <th data-field="requestXmlValid" data-visible="false" data-formatter="validationStatusFormatter">
                 <fmt:message key="exchanges.exchange.request"/> XML
             </th>
-            <th data-field="request_soap_valid" data-visible="false" data-formatter="validationStatusFormatter">
+            <th data-field="requestSoapValid" data-visible="false" data-formatter="validationStatusFormatter">
                 <fmt:message key="exchanges.exchange.request"/> SOAP
             </th>
-            <th data-field="response_valid" data-visible="false" data-formatter="validationStatusFormatter">
+            <th data-field="responseValid" data-visible="false" data-formatter="validationStatusFormatter">
                 <fmt:message key="exchanges.exchange.response"/> Status
             </th>
-            <th data-field="response_xml_valid" data-visible="false" data-formatter="validationStatusFormatter">
+            <th data-field="responseXmlValid" data-visible="false" data-formatter="validationStatusFormatter">
                 <fmt:message key="exchanges.exchange.response"/> XML
             </th>
-            <th data-field="response_soap_valid" data-visible="false" data-formatter="validationStatusFormatter">
+            <th data-field="responseSoapValid" data-visible="false" data-formatter="validationStatusFormatter">
                 <fmt:message key="exchanges.exchange.response"/> SOAP
             </th>
         </tr>

@@ -19,6 +19,7 @@ package prototypes.ws.proxy.soap.web.rest;
  *
  * @author jlamande
  */
+import java.util.Collection;
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -52,7 +53,7 @@ public class SoapExchangeResource {
     @GET
     @Path("/{exchangeId}")
     @Produces({MediaType.APPLICATION_JSON + ";charset=utf-8", MediaType.APPLICATION_XML + ";charset=utf-8"})
-    public SoapExchange createSimpleBean(@PathParam("exchangeId") String exchangeId) {
+    public SoapExchange getExchange(@PathParam("exchangeId") String exchangeId) {
         LOGGER.debug("Ask for exchange : {}", exchangeId);
         SoapExchange soapExchange = exchangeRepository.get(exchangeId, null);
         if (soapExchange == null) {
@@ -61,5 +62,19 @@ public class SoapExchangeResource {
             LOGGER.debug("Soap Exchange : {}", soapExchange);
         }
         return soapExchange;
+    }
+
+    // no id
+    @GET
+    @Produces({MediaType.APPLICATION_JSON + ";charset=utf-8", MediaType.APPLICATION_XML + ";charset=utf-8"})
+    public Collection<SoapExchange> getExchanges() {
+        LOGGER.debug("Ask for exchanges");
+        Collection<SoapExchange> soapExchanges = exchangeRepository.listWithoutContent();
+        if (soapExchanges == null) {
+            LOGGER.debug("No Exchange found !");
+        } else {
+            LOGGER.debug("{} Soap Exchange found", soapExchanges.size());
+        }
+        return soapExchanges;
     }
 }

@@ -5,9 +5,9 @@
     xsi:schemaLocation="http://www.eclipse.org/eclipselink/xsds/persistence/oxm
             http://www.eclipse.org/eclipselink/xsds/eclipselink_oxm_2_4.xsd"
     package-name="prototypes.ws.proxy.soap.model"
-    xml-name-transformer="prototypes.ws.proxy.soap.web.rest.NameGenerator"
+
     >
-    <!--
+    <!-- xml-name-transformer="prototypes.ws.proxy.soap.web.rest.NameGenerator"
     About variables names conventions and the name generator
 
     For JSON
@@ -40,7 +40,10 @@
     Some variables appear in URL as fields selection parameter.
     A shared convention is to not use upper Case letters in URLs.
     Google has applied consistency between URLs and JSON formats. The naming convention is respected
-    but Google is
+
+    Using namegenerator is OK for marshalling Java to Json
+    But EntityFiltering of Jersey use Java attributes name and so to use the same
+    naming all along the components, we will use the camelCase naming.
 
     -->
     <java-types>

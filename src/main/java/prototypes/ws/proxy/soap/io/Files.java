@@ -76,6 +76,13 @@ public class Files {
         return new String[0];
     }
 
+    public static void createDirectory(String dirPath) throws IOException {
+        File temp = new File(dirPath);
+        if (!temp.exists()) {
+            temp.mkdir();
+        }
+    }
+
     public static File createTempDirectory() throws IOException {
         final File temp;
 

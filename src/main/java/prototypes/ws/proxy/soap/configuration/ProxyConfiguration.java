@@ -42,7 +42,7 @@ public class ProxyConfiguration extends HashMap<String, Object> {
     private String wsdlDirs = "";
     private final AtomicBoolean isPersistedConf = new AtomicBoolean(false);
     private final AtomicBoolean ignoreValidExchanges = new AtomicBoolean(false);
-    private final String persistedConfPath = ApplicationConfig.DEFAULT_STORAGE_PATH + "proxy-soap.properties";
+    private final String persistedConfPath = ApplicationConfig.DEFAULT_STORAGE_PATH_CONF + "proxy-soap.properties";
     private final AtomicInteger runMode = new AtomicInteger(ApplicationConfig.RUN_MODE_PROD);
     private final AtomicInteger connectTimeout = new AtomicInteger(2000);
     private final AtomicInteger readTimeout = new AtomicInteger(10000);
@@ -58,10 +58,16 @@ public class ProxyConfiguration extends HashMap<String, Object> {
      * Load default configuration from system properties
      */
     public ProxyConfiguration() {
+        try {
+            Files.createDirectory(ApplicationConfig.DEFAULT_STORAGE_PATH_CONF);
+        } catch (IOException e) {
+            LOGGER.warn("Storage path for configuration incorrect : {}", e.getMessage());
+        }
     }
 
     public ProxyConfiguration(String validation, String blockingMode,
             String wsdlDirs, String maxRequests, String ignoreValidRequests, String runMode) {
+        this();
         // check if a persisted configuration is available
         boolean persistedConf = (new File(persistedConfPath)).exists();
         if (persistedConf) {

@@ -5,20 +5,20 @@ function responseTimeFieldFormatter(value, row) {
     return value;
 }
 
-function statusFormatter(value) {
-    // need to support boolean and strings for retro-compat
-    if (typeof value === 'undefined' || value === "") {
-        return '<span class="text-warning">inconnu</span>';
-    } else if (value === "true" || (typeof value === 'boolean' && value === true)) {
+
+function statusFormatter(valid, xmlValid, validator) {
+    if (valid) {
         return '<span class="text-success">valide</span>';
-    } else if (value === "false" || (typeof value === 'boolean' && value === false)) {
+    }
+    else if (!valid && validator && validator !== "") {
         return '<span class="text-danger">invalide</span>';
     }
-    return value;
+    if (!xmlValid) {
+        return '<span class="text-danger">invalide</span>';
+    }
+    return '<span class="text-warning">inconnu</span>';
 }
-function validationStatusFormatter(value) {
-    return statusFormatter(value);
-}
+
 function validationFormatter(validating) {
     if (validating) {
         return "Validation active ";

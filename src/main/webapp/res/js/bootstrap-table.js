@@ -1092,13 +1092,21 @@
             return;
         }
 
+        // add fields filtering
+        // based on column fields names
+        var fields = "";
+        $.each(this.options.columns, function(i, column) {
+            fields = fields + column.field + ",";
+        });
+
         if (this.options.queryParamsType === 'limit') {
             params = {
                 limit: params.pageSize,
                 offset: params.pageSize * (params.pageNumber - 1),
                 search: params.searchText,
                 sort: params.sortName,
-                order: params.sortOrder
+                order: params.sortOrder,
+                fields: fields
             };
         }
         data = calculateObjectValue(this.options, this.options.queryParams, [params], data);

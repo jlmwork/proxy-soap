@@ -146,16 +146,68 @@ $(function() {
 }
 );
 
-function rowStyle(row, index) {
-    if (row.request_valid === "true" && row.response_valid === "true") {
+function displayExchange(exchange) {
+    $details = $('#exchangedetails');
+    $details.removeClass('hidden');
+    $details.find('.panel-body').collapse('show');
+    $('html,body').animate({
+        scrollTop: $details.offset().top
+    });
+
+    $('#exchangeId').html(exchange.id);
+    $('#request_status').html(statusFormatter(exchange.requestValid, exchange.requestXmlValid, exchange.validatorId));
+    $('#response_status').html(statusFormatter(exchange.responseValid, exchange.responseXmlValid, exchange.validatorId));
+    $('#proxy_validation_status').html(validationFormatter(exchange.proxyValidating));
+    $('#proxy_blocking_status').html(blockingFormatter(exchange.proxyBlocking));
+
+    // request
+    $('#reqheaders pre code').text(formatMap(exchange.frontEndRequestHeaders));
+    $('#reqcontent pre code').text(exchange.frontEndRequest);
+    if (typeof exchange.requestErrors === 'undefined' || exchange.requestErrors.length < 1) {
+        $details.find('.nav li:has(a[href="#reqerrors"])').hide();
+        $('#reqerrors pre code').text('');
+        $details.find('.nav a:first').tab('show');
+    } else {
+        $details.find('.nav li:has(a[href="#reqerrors"])').show();
+        $('#reqerrors pre code').text(formatList(exchange.requestErrors));
+    }
+
+    // response
+    $('#respheaders pre code').text(formatMap(exchange.backEndResponseHeaders));
+    $('#respcontent pre code').text(exchange.backEndResponse);
+
+    if (typeof exchange.responseErrors === 'undefined' || exchange.responseErrors.length < 1) {
+        $details.find('.nav li:has(a[href="#resperrors"])').hide();
+        $('#resperrors pre code').text('');
+        $details.find('.nav a:first').tab('show');
+    } else {
+        $details.find('.nav li:has(a[href="#resperrors"])').show();
+        $('#resperrors pre code').text(formatList(exchange.responseErrors));
+    }
+
+    // proxy details
+    $('#proxyresponse pre code').text(exchange.proxyResponse);
+
+    // syntax highlighting
+    console.log('syntax hl');
+    $('#exchangedetails pre code').each(function(i, block) {
+        hljs.highlightBlock(block);
+    });
+}
+
+function rowStyle(row) {
+    if (row.requestValid && row.responseValid) {
         return {classes: 'success'};
-    } else if ((row.request_valid !== "true" || row.response_valid !== "true") && row.validator !== "") {
+    }
+    else if ((!row.requestValid || !row.responseValid) && row.validatorId && row.validatorId !== "") {
         return {classes: 'danger'};
-    } else if (row.request_xml_valid !== "true" || row.response_xml_valid !== "true") {
+    }
+    if (!row.requestXmlValid || !row.responseXmlValid) {
         return {classes: 'danger'};
     }
     return {classes: 'warning'};
 }
+
 
 function validatorFieldFormatter(value, row) {
     if (value)
@@ -169,19 +221,29 @@ function responseTimeFieldFormatter(value) {
     }
     return value;
 }
-function statusFormatter(value) {
-    // need to support boolean and strings for retro-compat
-    if (typeof value === 'undefined' || value === "") {
-        return '<span class="text-warning">unknown</span>';
-    } else if (value === "true" || (typeof value === 'boolean' && value === true)) {
+function statusFormatter(valid, xmlValid, validator) {
+    if (valid) {
         return '<span class="text-success">valid</span>';
-    } else if (value === "false" || (typeof value === 'boolean' && value === false)) {
+    }
+    else if (!valid && validator && validator !== "") {
+        return '<span class="text-danger">invalid</span>';
+    }
+    if (!xmlValid) {
+        return '<span class="text-danger">invalid</span>';
+    }
+    return '<span class="text-warning">unknown</span>';
+}
+
+function validationStatusFormatter(value) {
+    // need to support boolean and strings for retro-compat
+    if (!isDefined(value) || value === "") {
+        return '<span class="text-warning">unknown</span>';
+    } else if (parseBoolean(value)) {
+        return '<span class="text-success">valid</span>';
+    } else if (!parseBoolean(value)) {
         return '<span class="text-danger">invalid</span>';
     }
     return value;
-}
-function validationStatusFormatter(value) {
-    return statusFormatter(value);
 }
 
 function validationFormatter(validating) {
@@ -229,52 +291,16 @@ function formatMap(map) {
     return str;
 }
 
-function displayExchange(exchange) {
-    $details = $('#exchangedetails');
-    $details.removeClass('hidden');
-    $details.find('.panel-body').collapse('show');
-    $('html,body').animate({
-        scrollTop: $details.offset().top
-    });
+function isDefined(value) {
+    return typeof value !== 'undefined';
+}
 
-    $('#exchangeId').html(exchange.id);
-    $('#request_status').html(statusFormatter(exchange.request_valid));
-    $('#response_status').html(statusFormatter(exchange.response_valid));
-    $('#proxy_validation_status').html(validationFormatter(exchange.proxy_validating));
-    $('#proxy_blocking_status').html(blockingFormatter(exchange.proxy_blocking));
-
-    // request
-    $('#reqheaders pre code').text(formatMap(exchange.front_end_request_headers));
-    $('#reqcontent pre code').text(exchange.front_end_request);
-    if (typeof exchange.request_errors === 'undefined' || exchange.request_errors.length < 1) {
-        $details.find('.nav li:has(a[href="#reqerrors"])').hide();
-        $('#reqerrors pre code').text('');
-        $details.find('.nav a:first').tab('show');
-    } else {
-        $details.find('.nav li:has(a[href="#reqerrors"])').show();
-        $('#reqerrors pre code').text(formatList(exchange.request_errors));
+function parseBoolean(value) {
+    if (value === "true" || (typeof value === 'boolean' && value === true)) {
+        return true;
+    } else if (value === "false" || (typeof value === 'boolean' && value === false)) {
+        return false;
     }
-
-    // response
-    $('#respheaders pre code').text(formatMap(exchange.back_end_response_headers));
-    $('#respcontent pre code').text(exchange.back_end_response);
-
-    if (typeof exchange.response_errors === 'undefined' || exchange.response_errors.length < 1) {
-        $details.find('.nav li:has(a[href="#resperrors"])').hide();
-        $('#resperrors pre code').text('');
-        $details.find('.nav a:first').tab('show');
-    } else {
-        $details.find('.nav li:has(a[href="#resperrors"])').show();
-        $('#resperrors pre code').text(formatList(exchange.response_errors));
-    }
-
-    // proxy details
-    $('#proxyresponse pre code').text(exchange.proxy_response);
-
-    // syntax highlighting
-    console.log('syntax hl');
-    $('#exchangedetails pre code').each(function(i, block) {
-        hljs.highlightBlock(block);
-    });
+    return;
 }
 

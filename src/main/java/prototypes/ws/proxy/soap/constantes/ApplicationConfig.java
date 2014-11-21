@@ -35,6 +35,8 @@ public class ApplicationConfig {
 
     public static String PROP_RUN_MODE = "proxy.soap.run.mode";
 
+    public static final String DEFAULT_STORAGE_PATH_CONF = FilenameUtils.normalize(System.getProperty("user.home") + File.separator + ".proxy-soap" + File.separator);
+
     public static final String DEFAULT_STORAGE_PATH = FilenameUtils.normalize(System.getProperty("java.io.tmpdir") + File.separator + "proxy-soap" + File.separator);
 
     public static final String EXCHANGES_STORAGE_PATH = ApplicationConfig.DEFAULT_STORAGE_PATH + "exchanges" + File.separator;
