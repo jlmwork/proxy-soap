@@ -35,17 +35,15 @@ public class XmlUtilsTest {
     public void test() {
         String str = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">\r\n"
                 + "   <soapenv:Header/>\r\n"
-                + "   <soapenv:Body>\r\n"
-                + "   </soapenv:Body>\r\n" + "</soapenv:Envelope>";
+                + "   <soapenv:Body>  <test>  </test> \r\n"
+                + "   </soapenv:Body> \r\n" + "</soapenv:Envelope>";
         // bypass first one
-        XmlStrings.cleanXmlRequest(str);
-        for (int i = 0; i < 1; i++) {
-            long start = System.currentTimeMillis();
-            XmlStrings.cleanXmlRequest(str);
-            System.out
-                    .println("Time : " + (System.currentTimeMillis() - start));
-            str = new StringBuilder(str).toString();
-        }
+        String tidyXml = XmlStrings.cleanXmlRequest(str);
+        //Assert.assertThat(xmlString, Matchers.containsString("<HelloKey>hello#!#hello2</HelloKey>"));
+        System.out.println(tidyXml);
+        Assert.assertEquals(1, tidyXml.split("\\n").length);
+        Assert.assertEquals(1, tidyXml.split("\\r").length);
+        Assert.assertEquals(1, tidyXml.split(">\\W+<").length);
     }
 
     JAXBContext jaxbContext;
