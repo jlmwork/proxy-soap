@@ -19,6 +19,9 @@ To get this plugin :
 * Extract the pom from the newly created jar weblogic-maven-plugin.jar!/META-INF/maven/com.oracle.weblogic/weblogic-maven-plugin/pom.xml
 * launch the Maven install command : `mvn install:install-file -Dfile=weblogic-maven-plugin.jar -DpomFile=pom.xml`
 
+All in one :
+`cd $WLS_HOME/server/lib; java -jar wljarbuilder.jar -profile weblogic-maven-plugin ; POM_FILE=$(unzip -l weblogic-maven-plugin.jar  | grep pom.xml | awk '{print $4}'); unzip -p weblogic-maven-plugin.jar $POM_FILE > pom.xml; mvn install:install-file -Dfile=weblogic-maven-plugin.jar -DpomFile=pom.xml`
+
 See [Official Documentation](https://docs.oracle.com/cd/E17904_01/web.1111/e13702/maven_deployer.htm#DEPGD386) for full details
 
 Launch the tests

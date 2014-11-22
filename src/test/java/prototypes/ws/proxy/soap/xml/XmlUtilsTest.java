@@ -75,6 +75,10 @@ public class XmlUtilsTest {
 
     @Test
     public void xmlMarshallMapsAndBytes() throws Exception {
+        // To avoid declaration of XML Root Element in model classes
+        // but kepping a root element in generated XML
+        // we could use process decribed here :
+        // http://blog.bdoughan.com/2012/07/jaxb-no-annotations-required.html
         Marshaller marshaller = jaxbContext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         String xmlString = marshallAndGetResultString(marshaller);

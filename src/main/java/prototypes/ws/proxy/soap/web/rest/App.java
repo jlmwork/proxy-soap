@@ -40,18 +40,14 @@ public class App extends ResourceConfig {
         // make sampleresource a singleton
         // see : https://jersey.java.net/documentation/latest/jaxrs-resources.html#d0e2331
         //register(SampleResource.class); // DOESNT WORK
+        // http://blog.bdoughan.com/2012/05/moxy-as-your-jax-rs-json-provider.html
         register(MoxyXmlFeature.class);
         // Configure MOXy Json provider.
         register(new MoxyJsonConfig().setFormattedOutput(true).setMarshalEmptyCollections(false).resolver());
+
+        // filtering could be used with views too
+        // stackoverflow.com/questions/19194966/how-to-specify-and-organize-oxm-metadata-source-in-glassfish-v4-moxy-provider
         property(SelectableEntityFilteringFeature.QUERY_PARAM_NAME, "fields");
     }
 
-    /*
-     public static ContextResolver<MoxyJsonConfig> createMoxyJsonResolver() {
-     final MoxyJsonConfig moxyJsonConfig = new MoxyJsonConfig();
-     Map<String, String> namespacePrefixMapper = new HashMap<String, String>(1);
-     namespacePrefixMapper.put("http://www.w3.org/2001/XMLSchema-instance", "xsi");
-     moxyJsonConfig.setNamespacePrefixMapper(namespacePrefixMapper).setNamespaceSeparator(':');
-     return moxyJsonConfig.resolver();
-     }*/
 }

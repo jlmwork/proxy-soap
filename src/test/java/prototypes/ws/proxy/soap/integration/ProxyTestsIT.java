@@ -150,7 +150,7 @@ public class ProxyTestsIT {
     }
 
     ///////////////////
-    // TESTS
+    // Utils
     ///////////////////
     public void check(String requestName, String responseSampleName, int returnCodeExpected, String... contentsToCheck) {
         String content = check(requestName, responseSampleName, returnCodeExpected);
@@ -225,6 +225,9 @@ public class ProxyTestsIT {
         return content;
     }
 
+    ///////////////////
+    // TESTS
+    ///////////////////
     @Test
     public void testDefaultMode() {
         // not validable request (no configuration of wsdl paths)
