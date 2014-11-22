@@ -41,4 +41,9 @@ public class Dates {
         DateTime dt = new DateTime(cal);
         return dt.toString(fmt);
     }
+
+    public static Calendar parseToCalendar(String cal, String pattern) {
+        DateTime dt = DateTime.parse(cal, DateTimeFormat.forPattern(pattern));
+        return dt.toGregorianCalendar();
+    }
 }

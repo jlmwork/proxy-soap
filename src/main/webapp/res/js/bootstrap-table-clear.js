@@ -3,21 +3,21 @@
  * extensions: https://github.com/kayalshri/tableExport.jquery.plugin
  */
 
-(function($) {
+(function ($) {
     'use strict';
 
     $.extend($.fn.bootstrapTable.defaults, {
         showClear: false,
         clearUrl: "",
-        formatClear: function() {
-            return "Clear table"
+        formatClear: function () {
+            return "Clear table";
         }
     });
 
     var BootstrapTable = $.fn.bootstrapTable.Constructor,
             _initToolbar = BootstrapTable.prototype.initToolbar;
 
-    BootstrapTable.prototype.clear = function(params) {
+    BootstrapTable.prototype.clear = function (params) {
         if (this.options.clearUrl !== "") {
             var oldUrl = this.options.url;
             var oldMethod = this.options.method;
@@ -30,7 +30,7 @@
             // didnt find better way to reset view
             // and restore state if an error occurs
             this.initData([]);
-            this.options['onLoadError'] = function(args, bsTable) {
+            this.options['onLoadError'] = function (args, bsTable) {
                 console.log("error on delete");
                 this.initData(oldData);
                 return false;
@@ -42,7 +42,7 @@
         }
     }
 
-    BootstrapTable.prototype.initToolbar = function() {
+    BootstrapTable.prototype.initToolbar = function () {
         _initToolbar.apply(this, Array.prototype.slice.apply(arguments));
 
         if (this.options.showClear) {

@@ -56,8 +56,14 @@ body .modal-dialog {
     height:200px;
     overflow-y: visible;
 }
+.bootstrap-table tbody {
+    cursor: pointer;
+}
 #exchangedetails .nav-tabs a, #exchangedetails .nav-tabs a:hover{
     color:#777;
+}
+#exchangedetails .nav-tabs a.text-danger, #exchangedetails .nav-tabs a.text-danger:hover{
+    color: #b94a48;
 }
 #exchangedetails .panel-heading {
     cursor: pointer;

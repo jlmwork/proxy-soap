@@ -1,33 +1,28 @@
-/*********************************************
- * COOKIE MANAGEMENT
- *********************************************/
-// TODO : delete
-var Cookie = {
-    set: function(name, value) {
-        document.cookie = name + "=" + value + "; max-age=" + (60 * 60 * 24 * 10);
-    },
-    get: function(name) {
-        var cookies = document.cookie.split(';');
 
-        for (var i in cookies) {
-            var c = cookies[i].trim().split('=');
-            if (c[0] == name)
-                return c[1];
-        }
 
-        return null;
-    }
+// Override Bootstrap table functions
+var BootstrapTable = $.fn.bootstrapTable.Constructor,
+        _onPageListChange = BootstrapTable.prototype.onPageListChange;
+
+BootstrapTable.prototype.onPageListChange = function () {
+    _onPageListChange.apply(this, Array.prototype.slice.apply(arguments));
+    $.cookie('exchanges.pageSize', this.options.pageSize, {expires: 7, path: '/'});
 };
 
-/*********************************************
- * /COOKIE MANAGEMENT
- *********************************************/
+var size = $.cookie('exchanges.pageSize');
+if (size !== undefined) {
+    $.extend($.fn.bootstrapTable.defaults, {
+        pageSize: size
+    });
+}
 
+// jQuery extension to select element on click
+//
 // create fully selectable areas
-jQuery.fn.selectText = function() {
+jQuery.fn.selectText = function () {
     var doc = document;
     var element = this[0];
-    // add blur / click behavior
+    // TODO : add blur / click behavior
     console.log(this, element);
     if (doc.body.createTextRange) {
         var range = document.body.createTextRange();
@@ -42,25 +37,26 @@ jQuery.fn.selectText = function() {
     }
 };
 
-$(function() {
-    var timer = 0;
-    /*$table = $('.fixed-table-container');
-     $table.addClass('panel-collapse collapse in');
-     $table.attr('role', 'tabpanel');
-     $table.attr('aria-labelledby', 'headingOne');*/
+// OnLoad
+$(function () {
 
-
-    $(window).resize(function() {
+    $(window).resize(function () {
         $('#exchangestable').bootstrapTable('resetView');
     });
 
-    $("#exchangedetails pre code").click(function() {
+    $("#exchangedetails pre code").click(function () {
         $(this).selectText();
     });
-    $('#exchangestable').on('column-switch.bs.table', function(e, field, checked) {
+
+    $('#exchangestable').on('load-error.bs.table', function (e, status) {
+
+        console.log(status);
+    });
+
+    $('#exchangestable').on('column-switch.bs.table', function (e, field, checked) {
         // TODO : set httpOnly on the cookie to avoid sending it to server via ajax
         // read
-        var fields = $.cookie('fields')
+        var fields = $.cookie('exchanges.fields')
         if (fields === undefined) {
             fields = {};
         } else {
@@ -68,15 +64,15 @@ $(function() {
         }
         fields[field] = checked;
         // save
-        $.cookie('fields', JSON.stringify(fields), {expires: 7, path: '/'});
+        $.cookie('exchanges.fields', JSON.stringify(fields), {expires: 7, path: '/'});
     });
 
-    var fields = $.cookie('fields');
+    var fields = $.cookie('exchanges.fields');
     if (fields !== undefined) {
-        console.log('cookie found : ' + fields);
+        console.log('cookie Fields found : ' + fields);
         fields = JSON.parse(fields);
         for (var key in fields) {
-            console.log(key + "=" + fields[key]);
+            //console.log(key + "=" + fields[key]);
             if (fields[key] === true) {
                 $('#exchangestable').bootstrapTable('showColumn', key);
             } else {
@@ -86,7 +82,7 @@ $(function() {
     }
 
     var exchangesCache = {};
-    $('#exchangestable').on('click-row.bs.table', function(e, rowData, elem) {
+    $('#exchangestable').on('click-row.bs.table', function (e, rowData, elem) {
         if (rowData.id) {
             $('#exchangestable tr.selected').removeClass('selected');
             elem.addClass('selected');
@@ -99,47 +95,27 @@ $(function() {
                     url: 'resources/exchange/' + rowData.id + '?accept=application/json',
                     dataType: 'json'
                 })
-                        .done(function(exchange) {
+                        .done(function (exchange) {
                             exchangesCache[exchange.id] = exchange;
                             displayExchange(exchange);
                         })
-                        .fail(function() {
+                        .fail(function () {
                             console.log("error on loading exchange");
                         });
             }
         }
     });
 
-    $('#menutabs a[href="#validators"]').on('shown.bs.tab', function(e) {
+    $('#menutabs a[href="#validators"]').on('shown.bs.tab', function (e) {
         validator = window.location.hash;
         console.log(validator);
         if (validator) {
             $('html,body').scrollTop($(validator).offset().top);
         }
-    })
+    });
 
-    $('.autorefresh')
-            .click(function() {
-                console.log($(this));
-                if ($(this).data('enabled')) {
-                    clearTimeout(timer);
-                    $(this).data('enabled', false);
-                    $('span', this).text('off');
-                } else {
-                    timer = setTimeout(function() {
-                        window.location.reload();
-                    }, 4000);
-                    $(this).data('enabled', true);
-                    $('span', this).text('on');
-                }
-
-                Cookie.set('autorefresh', $(this).data('enabled'));
-            })
-            .data('enabled', Cookie.get('autorefresh') != "true")
-            .click();
-
-    $('[accesskey]').each(function() {
-        $(document).on('keyup', null, $(this).attr('accesskey'), function(e) {
+    $('[accesskey]').each(function () {
+        $(document).on('keyup', null, $(this).attr('accesskey'), function (e) {
             $('[accesskey=' + e.key + ']').click();
         });
     });
@@ -190,7 +166,7 @@ function displayExchange(exchange) {
 
     // syntax highlighting
     console.log('syntax hl');
-    $('#exchangedetails pre code').each(function(i, block) {
+    $('#exchangedetails pre code').each(function (i, block) {
         hljs.highlightBlock(block);
     });
 }
@@ -271,7 +247,7 @@ function viewValidator(validatorLink) {
 function formatList(list) {
     var str = "";
     if (list) {
-        jQuery.each(list, function(i, val) {
+        jQuery.each(list, function (i, val) {
             str += val + String.fromCharCode(13);
         });
     }
@@ -281,7 +257,7 @@ function formatList(list) {
 function formatMap(map) {
     var str = "";
     if (map) {
-        jQuery.each(map, function(i, val) {
+        jQuery.each(map, function (i, val) {
             if (i !== '-') {
                 str += i + "=";
             }

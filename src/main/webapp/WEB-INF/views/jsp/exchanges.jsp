@@ -7,7 +7,7 @@
        data-sort-name="time" data-sort-order="desc"
        data-url="resources/exchange?accept=application/json" data-cache="false"
        data-clear-url="exchanges"
-       data-height="500"
+       data-height="458"
        data-toolbar="#custom-toolbar"
        data-show-refresh="true"
        data-show-toggle="true"
@@ -83,7 +83,7 @@
                 </a>
             </li>
             <li role="presentation">
-                <a href="#reqerrors" role="tab" data-toggle="tab">
+                <a href="#reqerrors" role="tab" data-toggle="tab" class=" text-danger">
                     <fmt:message key="exchanges.exchange.errors_of"/>
                     <fmt:message key="exchanges.exchange.request"/>
                 </a>
@@ -100,7 +100,7 @@
                 </a>
             </li>
             <li role="presentation">
-                <a href="#resperrors" role="tab" data-toggle="tab">
+                <a href="#resperrors" role="tab" data-toggle="tab" class=" text-danger">
                     <fmt:message key="exchanges.exchange.errors_of"/>
                     <fmt:message key="exchanges.exchange.response"/>
                 </a>
