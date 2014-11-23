@@ -84,14 +84,18 @@ public class ZipOut {
 
     public void addDirToZipStream(String dirPath, String[] extensions) {
         dirPath = FilenameUtils.normalize(dirPath);
+        // Files entries
+        File dir = new File(dirPath);
+        if (!dir.exists()) {
+            LOGGER.warn("Directory {} to zip doesn't exist", dirPath);
+            return;
+        }
         LOGGER.debug("Add directory {} to zip", dirPath);
         ZipParameters parameters = new ZipParameters();
         parameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
         InputStream inputStream = null;
         String filename = "";
         try {
-            // Files entries
-            File dir = new File(dirPath);
 
             List<File> files = (List<File>) FileUtils.listFiles(dir, extensions, true);
             for (File file : files) {
