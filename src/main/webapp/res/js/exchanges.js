@@ -16,6 +16,27 @@ if (size !== undefined) {
     });
 }
 
+// Better init table by changing data-visible attributes
+// before bootstrapTable starts (performance)
+var fields = $.cookie('exchanges.fields');
+if (fields !== undefined) {
+    console.log('cookie Fields found : ' + fields);
+    fields = JSON.parse(fields);
+    for (var key in fields) {
+        $tableField = $('#exchangestable').find('thead th[data-field="' + key + '"]');
+        if ($tableField) {
+            //console.log(key + "=" + fields[key]);
+            if (fields[key] === true) {
+                $tableField.attr('data-visible', "true");
+                //$('#exchangestable').bootstrapTable('showColumn', key);
+            } else {
+                $tableField.attr('data-visible', "false");
+                //$('#exchangestable').bootstrapTable('hideColumn', key);
+            }
+        }
+    }
+}
+
 // jQuery extension to select element on click
 //
 // create fully selectable areas
@@ -48,9 +69,11 @@ $(function () {
         $(this).selectText();
     });
 
+    $('#exchangestable').on('load-success.bs.table', function (e, status) {
+        $('.fixed-table-toolbar .pull-left').html('');
+    });
     $('#exchangestable').on('load-error.bs.table', function (e, status) {
-
-        console.log(status);
+        $('.fixed-table-toolbar .pull-left').html('<span class="label label-danger"> An error occured during loading... [' + status + ']</span>');
     });
 
     $('#exchangestable').on('column-switch.bs.table', function (e, field, checked) {
@@ -67,19 +90,7 @@ $(function () {
         $.cookie('exchanges.fields', JSON.stringify(fields), {expires: 7, path: '/'});
     });
 
-    var fields = $.cookie('exchanges.fields');
-    if (fields !== undefined) {
-        console.log('cookie Fields found : ' + fields);
-        fields = JSON.parse(fields);
-        for (var key in fields) {
-            //console.log(key + "=" + fields[key]);
-            if (fields[key] === true) {
-                $('#exchangestable').bootstrapTable('showColumn', key);
-            } else {
-                $('#exchangestable').bootstrapTable('hideColumn', key);
-            }
-        }
-    }
+
 
     var exchangesCache = {};
     $('#exchangestable').on('click-row.bs.table', function (e, rowData, elem) {
