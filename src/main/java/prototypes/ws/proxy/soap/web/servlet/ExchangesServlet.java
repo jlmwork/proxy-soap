@@ -18,7 +18,6 @@ package prototypes.ws.proxy.soap.web.servlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collection;
-import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -32,6 +31,7 @@ import prototypes.ws.proxy.soap.model.SoapExchange;
 import prototypes.ws.proxy.soap.repository.SoapExchangeRepository;
 import prototypes.ws.proxy.soap.time.Dates;
 import prototypes.ws.proxy.soap.web.context.ApplicationContext;
+import prototypes.ws.proxy.soap.web.converter.csv.CsvConverter;
 import prototypes.ws.proxy.soap.web.converter.json.SoapExchangeJsonPConverter;
 
 /**
@@ -100,10 +100,10 @@ public class ExchangesServlet extends AbstractServlet {
         response.setHeader("Pragma", "public");
         ZipOut zipOut = new ZipOut(response.getOutputStream());
         PrintWriter writer = zipOut.getFileWriter(generateFilename("csv"));
-        CsvWriter csvBuilder = new CsvWriter(writer);
+        CsvConverter csvConverter = new CsvConverter(writer);
         LOGGER.debug("Export {} soapExchanges", soapExchanges.size());
         for (SoapExchange soapRequest : soapExchanges) {
-            csvBuilder.append(soapRequest).flush();
+            csvConverter.append(soapRequest).flush();
         }
         zipOut.closeFileWriter();
         zipOut.addDirToZipStream(ApplicationConfig.EXCHANGES_STORAGE_PATH, new String[]{"xml"});
@@ -135,10 +135,10 @@ public class ExchangesServlet extends AbstractServlet {
         response.setHeader("Pragma", "public");
         PrintWriter out = response.getWriter();
         try {
-            CsvWriter csvBuilder = new CsvWriter(out);
+            CsvConverter csvConverter = new CsvConverter(out);
             LOGGER.debug("Export {} soapExchanges ", soapExchanges.size());
             for (SoapExchange soapRequest : soapExchanges) {
-                csvBuilder.append(soapRequest).flush();
+                csvConverter.append(soapRequest).flush();
             }
         } finally {
             out.close();
@@ -150,72 +150,6 @@ public class ExchangesServlet extends AbstractServlet {
         sb.append(Dates.getFormattedDate(Dates.YYYYMMDD_HHMMSS));
         sb.append(".").append(extension);
         return sb.toString();
-    }
-
-    private static class CsvWriter {
-
-        String separator = ";";
-        StringBuilder sb = new StringBuilder();
-        PrintWriter out;
-
-        CsvWriter(PrintWriter out) {
-            this.out = out;
-            init();
-        }
-
-        public void flush() {
-            this.out.println(sb.toString());
-            sb = new StringBuilder();
-        }
-
-        private void init() {
-            // title
-            this.append("ID")
-                    .append("Date")
-                    .append("From")
-                    .append("To")
-                    .append("Request XML Errors")
-                    .append("Request SOAP Errors")
-                    .append("Response SOAP errors");
-            this.flush();
-        }
-
-        public CsvWriter append(SoapExchange s) {
-            this.append(s.getId()).append(s.getDate()).append(s.getFrom()).append(s.getTo());
-            this.append(s.getRequestXmlErrors());
-            this.append(s.getRequestSoapErrors());
-            this.append(s.getResponseXmlErrors());
-            this.append(s.getResponseSoapErrors());
-            return this;
-        }
-
-        private String cleanupField(String field) {
-            String cleanField = field.replaceAll(separator, "#");
-            return cleanField;
-        }
-
-        public CsvWriter append(String field) {
-            sb.append(cleanupField(field)).append(separator);
-            return this;
-        }
-
-        public CsvWriter append(List<?> field) {
-            if (field != null && field.size() > 0) {
-                this.append(field.toString());
-            } else {
-                this.append("");
-            }
-            return this;
-        }
-
-        public CsvWriter append(Object field) {
-            if (field != null) {
-                this.append(field.toString());
-            } else {
-                this.append("");
-            }
-            return this;
-        }
     }
 
     @Override

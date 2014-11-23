@@ -95,6 +95,7 @@ public class ZipOut {
 
             List<File> files = (List<File>) FileUtils.listFiles(dir, extensions, true);
             for (File file : files) {
+                //LOGGER.debug("File {} to add to zip", file.getAbsolutePath());
                 filename = file.getCanonicalPath().replace(dirPath, "");
                 //Initialize inputstream
                 inputStream = new FileInputStream(file);
