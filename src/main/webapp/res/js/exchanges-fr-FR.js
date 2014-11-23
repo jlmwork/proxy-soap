@@ -34,3 +34,7 @@ function blockingFormatter(blocking) {
         return "Mode Non bloquant";
     }
 }
+
+function formatErrorProcessing(code) {
+    return 'Une erreur est survenue durant le traitement... [Code :  ' + code + ']';
+}

@@ -27,6 +27,7 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.Collection;
 import javax.servlet.ServletContext;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -49,7 +50,8 @@ import prototypes.ws.proxy.soap.web.converter.csv.CsvConverter;
 import prototypes.ws.proxy.soap.web.servlet.SamplesServlet;
 
 /**
- * @author Pavel Bucek (pavel.bucek at oracle.com)
+ * SoapExchange JAX-RS REST Resource
+ *
  */
 @Path("/exchange")
 public class SoapExchangeResource {
@@ -64,8 +66,15 @@ public class SoapExchangeResource {
         exchangeRepository = ApplicationContext.getSoapExchangeRepository(context);
     }
 
+    @DELETE
+    public Response delete() {
+        exchangeRepository.removeAll();
+        LOGGER.info("Exchanges successfully deleted");
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
     @GET
-    @Path("/{exchangeId}")
+    @Path("/{exchangeId : [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}")
     @Produces({MediaType.APPLICATION_JSON + ";charset=utf-8", MediaType.APPLICATION_XML + ";charset=utf-8"})
     public SoapExchange getExchange(@PathParam("exchangeId") String exchangeId) {
         LOGGER.debug("Ask for exchange : {}", exchangeId);
@@ -153,4 +162,5 @@ public class SoapExchangeResource {
         sb.append(".").append(extension);
         return sb.toString();
     }
+
 }

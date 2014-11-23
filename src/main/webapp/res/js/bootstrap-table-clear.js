@@ -29,6 +29,7 @@
             var previousFunction = this.options['onLoadError'];
             // didnt find better way to reset view
             // and restore state if an error occurs
+            // when an error occurs, tools become inactive
             this.initData([]);
             this.options['onLoadError'] = function (args, bsTable) {
                 console.log("error on delete");

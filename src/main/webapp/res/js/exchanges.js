@@ -73,13 +73,13 @@ $(function () {
         $('.fixed-table-toolbar .pull-left').html('');
     });
     $('#exchangestable').on('load-error.bs.table', function (e, status) {
-        $('.fixed-table-toolbar .pull-left').html('<span class="label label-danger"> An error occured during loading... [' + status + ']</span>');
+        $('.fixed-table-toolbar .pull-left').html('<span class="label label-danger">' + formatErrorProcessing(status) + '</span>');
     });
 
     $('#exchangestable').on('column-switch.bs.table', function (e, field, checked) {
         // TODO : set httpOnly on the cookie to avoid sending it to server via ajax
         // read
-        var fields = $.cookie('exchanges.fields')
+        var fields = $.cookie('exchanges.fields');
         if (fields === undefined) {
             fields = {};
         } else {
@@ -195,6 +195,9 @@ function rowStyle(row) {
     return {classes: 'warning'};
 }
 
+function formatErrorProcessing(code) {
+    return 'An error occured while processing... [Code :  ' + code + ']';
+}
 
 function validatorFieldFormatter(value, row) {
     if (value)
