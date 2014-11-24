@@ -15,13 +15,28 @@
  */
 package prototypes.ws.proxy.soap.configuration;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.stream.StreamSource;
+import org.eclipse.persistence.jaxb.JAXBContextFactory;
+import org.eclipse.persistence.jaxb.JAXBContextProperties;
+import org.eclipse.persistence.jaxb.MarshallerProperties;
+import org.eclipse.persistence.jaxb.UnmarshallerProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.constantes.ApplicationConfig;
@@ -29,18 +44,21 @@ import prototypes.ws.proxy.soap.io.Files;
 import prototypes.ws.proxy.soap.io.Strings;
 import prototypes.ws.proxy.soap.validation.SoapValidatorFactory;
 
-public class ProxyConfiguration extends HashMap<String, Object> {
+public final class ProxyConfiguration extends HashMap<String, Object> {
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(ProxyConfiguration.class);
 
-    public static String UID = "proxy.soap.config";
+    public static transient final String UID = "proxy.soap.config";
 
     private final AtomicBoolean validationActive = new AtomicBoolean(true);
     private final AtomicBoolean inBlockingMode = new AtomicBoolean(true);
     private final AtomicInteger nbMaxExchanges = new AtomicInteger(50);
     private String wsdlDirs = "";
     private final AtomicBoolean isPersistedConf = new AtomicBoolean(false);
+    /**
+     * @deprecated use ignoreExpressions instead
+     */
     private final AtomicBoolean ignoreValidExchanges = new AtomicBoolean(false);
     private final String persistedConfPath = ApplicationConfig.DEFAULT_STORAGE_PATH_CONF + "proxy-soap.properties";
     private final AtomicInteger runMode = new AtomicInteger(ApplicationConfig.RUN_MODE_PROD);
@@ -53,6 +71,9 @@ public class ProxyConfiguration extends HashMap<String, Object> {
     private String persistenceDbUsername = "proxy";
     private String persistenceDbPassword = "soap";
     private String persistenceDbProperties = "create=true";
+    // ignore expressions will replace the ignoreValid exchanges
+    private final List<CaptureExpression> captureExpressions = new ArrayList<CaptureExpression>();
+    private final List<Expression> ignoreExpressions = new ArrayList<Expression>();
 
     /**
      * Load default configuration from system properties
@@ -127,7 +148,9 @@ public class ProxyConfiguration extends HashMap<String, Object> {
             ApplicationConfig.PROP_PERSIST_MODE_DB_URL,
             ApplicationConfig.PROP_PERSIST_MODE_DB_USERNAME,
             ApplicationConfig.PROP_PERSIST_MODE_DB_PASSWORD,
-            ApplicationConfig.PROP_PERSIST_MODE_DB_PROPERTIES,};
+            ApplicationConfig.PROP_PERSIST_MODE_DB_PROPERTIES,
+            ApplicationConfig.PROP_EXPRESSIONS_CAPTURE,
+            ApplicationConfig.PROP_EXPRESSIONS_IGNORE,};
     }
 
     /**
@@ -169,6 +192,10 @@ public class ProxyConfiguration extends HashMap<String, Object> {
             return this.persistenceDbPassword;
         } else if (ApplicationConfig.PROP_PERSIST_MODE_DB_PROPERTIES.equals(key)) {
             return this.persistenceDbProperties;
+        } else if (ApplicationConfig.PROP_EXPRESSIONS_CAPTURE.equals(key)) {
+            return marshallExpressions(this.captureExpressions);
+        } else if (ApplicationConfig.PROP_EXPRESSIONS_IGNORE.equals(key)) {
+            return marshallExpressions(this.ignoreExpressions);
         }
         return null;
     }
@@ -221,6 +248,16 @@ public class ProxyConfiguration extends HashMap<String, Object> {
             } else if (ApplicationConfig.PROP_PERSIST_MODE_DB_PROPERTIES.equals(key)) {
                 if (!Strings.isNullOrEmpty(value)) {
                     this.persistenceDbProperties = value;
+                }
+            } else if (ApplicationConfig.PROP_EXPRESSIONS_CAPTURE.equals(key)) {
+                if (!Strings.isNullOrEmpty(value)) {
+                    // TODO : load capture expressions
+                    this.captureExpressions.addAll(this.parseCaptureExpressions(value));
+                }
+            } else if (ApplicationConfig.PROP_EXPRESSIONS_IGNORE.equals(key)) {
+                if (!Strings.isNullOrEmpty(value)) {
+                    // TODO : load ignore expressions
+                    this.ignoreExpressions.addAll(this.parseExpressions(value));
                 }
             }
         }
@@ -312,10 +349,16 @@ public class ProxyConfiguration extends HashMap<String, Object> {
         }
     }
 
+    /**
+     * @deprecated @return
+     */
     public boolean isIgnoreValidExchanges() {
         return this.ignoreValidExchanges.get();
     }
 
+    /**
+     * @deprecated
+     */
     public void setIgnoreValidExchanges(boolean ignore) {
         this.ignoreValidExchanges.set(ignore);
     }
@@ -334,6 +377,14 @@ public class ProxyConfiguration extends HashMap<String, Object> {
 
     public void setReadTimeout(int readTimeout) {
         this.readTimeout.set(readTimeout);
+    }
+
+    public final List<CaptureExpression> getCaptureExpressions() {
+        return captureExpressions;
+    }
+
+    public final List<Expression> getIgnoreExpressions() {
+        return ignoreExpressions;
     }
 
     public Integer getPersistenceMode() {
@@ -417,6 +468,81 @@ public class ProxyConfiguration extends HashMap<String, Object> {
     @Override
     public String toString() {
         return "ProxyConfiguration{" + "validationActive=" + validationActive + ", inBlockingMode=" + inBlockingMode + ", nbMaxRequests=" + nbMaxExchanges + ", wsdlDirs=" + wsdlDirs + ", isPersisted=" + isPersistedConf + ", ignoreValidRequests=" + ignoreValidExchanges + ", persistPath=" + persistedConfPath + ", runMode=" + runMode + '}';
+    }
+
+    protected String marshallExpressions(List expressions) {
+        try {
+            Map<String, Object> properties = new HashMap<String, Object>(1);
+            properties.put(JAXBContextProperties.MEDIA_TYPE, "application/json");
+            // for use of Moxy
+            JAXBContext jaxbContext = JAXBContextFactory.createContext(new Class[]{Expression.class}, properties);
+            Marshaller marshaller = jaxbContext.createMarshaller();
+            marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            marshaller.marshal(expressions, baos);
+            return baos.toString();
+        } catch (JAXBException e) {
+            LOGGER.warn("JAXB marshalling error {}", e.getMessage());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.warn("Cause : {}", e.getCause().getMessage());
+            }
+        }
+        return null;
+    }
+
+    protected List<CaptureExpression> parseCaptureExpressions(String expressions) {
+        List<CaptureExpression> expressionsList = (List<CaptureExpression>) parseExpressions(expressions, CaptureExpression.class);
+        if (validateExpressions(expressionsList)) {
+            LOGGER.debug("Capture expressions : {}", expressions);
+            return expressionsList;
+        }
+        return new ArrayList<CaptureExpression>(0);
+    }
+
+    protected List<Expression> parseExpressions(String expressions) {
+        List<Expression> expressionsList = (List<Expression>) parseExpressions(expressions, Expression.class);
+        if (validateExpressions(expressionsList)) {
+            LOGGER.debug("Capture expressions : {}", expressions);
+            return expressionsList;
+        }
+        return new ArrayList<Expression>(0);
+    }
+
+    private boolean validateExpressions(List expressionsList) {
+        if (expressionsList != null) {
+            try {
+                // need to validate fields of expression after the jaxb mapping
+                for (Object expression : expressionsList) {
+                    ((Expression) expression).validate();
+
+                }
+            } catch (IllegalArgumentException ex) {
+                LOGGER.warn("Bad expression found : {}", ex.getMessage());
+                return false;
+            }
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    private Object parseExpressions(String expressions, Class<?> clazz) {
+        try {
+            Map<String, Object> properties = new HashMap<String, Object>(1);
+            properties.put(JAXBContextProperties.MEDIA_TYPE, "application/json");
+            // for use of Moxy
+            JAXBContext jaxbContext = JAXBContextFactory.createContext(new Class[]{clazz}, properties);
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            unmarshaller.setProperty(UnmarshallerProperties.JSON_INCLUDE_ROOT, false);
+            JAXBElement o = unmarshaller.unmarshal(new StreamSource(new StringReader(expressions)), clazz);
+            return o.getValue();
+        } catch (JAXBException e) {
+            LOGGER.warn("JAXB unmarshalling error {}", e.getMessage());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.warn("Cause : {}", e.getCause().getMessage());
+            }
+        }
+        return null;
     }
 
 }

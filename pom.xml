@@ -363,6 +363,11 @@
                     </dependency>
                 </dependencies>
             </plugin>
+            <!-- TODO : produce fat jar with shade plugin (avoid collisions
+            which may happen with assembly plugin)
+             http://maven.apache.org/plugins/maven-shade-plugin/
+             http://www.mkyong.com/maven/create-a-fat-jar-file-maven-shade-plugin/
+            -->
         </plugins>
     </build>
     <profiles>
@@ -381,31 +386,6 @@
                                 <include>**/*Test.java</include>
                                 <include>**/*IT.java</include>
                             </includes>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>windows</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.eclipse.jetty</groupId>
-                        <artifactId>jetty-maven-plugin</artifactId>
-                        <version>9.2.3.v20140905</version>
-                        <configuration>
-                            <webApp>
-                                <contextPath>/proxy-soap</contextPath>
-                                <!-- hack for Windows development -->
-                                <!-- work around against file locking on windows -->
-                                <defaultsDescriptor>${project.basedir}/src/test/resources/jetty/webdefault.xml</defaultsDescriptor>
-                            </webApp>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -448,6 +428,12 @@
                             </systemProperties>
                             <webApp>
                                 <contextPath>/proxy-soap</contextPath>
+                                <!-- hack for Windows development -->
+                                <!-- work around against file locking on windows -->
+                                <!-- seems to only work with jetty 9 -->
+                                <defaultsDescriptor>${project.basedir}/src/test/resources/jetty/webdefault.xml</defaultsDescriptor>
+                                <!-- look at https://wiki.eclipse.org/Jetty/Howto/Deal_with_Locked_Windows_Files
+                                for jetty 8 -->
                             </webApp>
                         </configuration>
                         <executions>

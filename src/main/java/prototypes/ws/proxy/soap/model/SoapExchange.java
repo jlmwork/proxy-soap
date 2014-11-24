@@ -66,6 +66,8 @@ public class SoapExchange implements Serializable {
     private List<String> requestXmlErrors;
     private List<String> responseXmlErrors;
 
+    //
+    //private byte[] customFields;
     public BackendExchange createBackendExchange() {
         return new BackendExchange(to, frontEndRequest, frontEndRequestHeaders);
     }

@@ -31,6 +31,9 @@ public class ApplicationConfig {
     // on preivous installed proxies
     public static String PROP_WSDL_DIRS = "proxy.soap.wsdls";
     public static String PROP_MAX_EXCHANGES = "proxy.soap.maxexchanges";
+    /**
+     * @deprecated
+     */
     public static String PROP_IGNORE_VALID_EXCHANGES = "proxy.soap.ignore.exchanges.valid";
 
     public static String PROP_RUN_MODE = "proxy.soap.run.mode";
@@ -63,4 +66,6 @@ public class ApplicationConfig {
     public static String PROP_PERSIST_MODE_DB_PASSWORD = "proxy.soap.persist.mode.db.password";
     public static String PROP_PERSIST_MODE_DB_PROPERTIES = "proxy.soap.persist.mode.db.properties";
 
+    public static String PROP_EXPRESSIONS_IGNORE = "proxy.soap.expressions.ignore";
+    public static String PROP_EXPRESSIONS_CAPTURE = "proxy.soap.expressions.capture";
 }

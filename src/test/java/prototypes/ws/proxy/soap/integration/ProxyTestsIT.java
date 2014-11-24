@@ -54,7 +54,7 @@ public class ProxyTestsIT {
     @BeforeClass
     public static void init() {
         RestAssured.baseURI = "http://" + System.getProperty("it.host", getLocalHostname()) + ":" + System.getProperty("it.port", "8083");
-        logger.info("Test Target URL : ", RestAssured.baseURI);
+        logger.info("Test Target URL : {}", RestAssured.baseURI);
         RestAssured.basePath = "/proxy-soap";
         RestAssured.urlEncodingEnabled = false;
         // cleanup exchanges

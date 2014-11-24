@@ -6,12 +6,12 @@
         </encoder>
     </appender>
     <logger name="prototypes" level="debug"/>
-    <logger name="prototypes.ws.proxy.soap.web" level="TRACE"/>
-    <logger name="prototypes.ws.proxy.soap.repository" level="TRACE"/>
+    <logger name="prototypes.ws.proxy.soap.web" level="info"/>
+    <logger name="prototypes.ws.proxy.soap.repository" level="info"/>
     <logger name="org.eclipse.persistence" level="info"/>
-    <logger name="org.eclipse.persistence.logging.sql" level="TRACE"/>
+    <logger name="org.eclipse.persistence.logging.sql" level="info"/>
     <logger name="eclipselink.logging" level="info"/>
-    <logger name="org.glassfish.jersey" level="debug" />
+    <logger name="org.glassfish.jersey" level="info" />
     <logger name="org.apache.http" level="INFO" />
     <root level="debug">
         <appender-ref ref="STDOUT" />
