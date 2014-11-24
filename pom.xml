@@ -433,7 +433,7 @@
                                 <!-- seems to only work with jetty 9 -->
                                 <defaultsDescriptor>${project.basedir}/src/test/resources/jetty/webdefault-8.xml</defaultsDescriptor>
                                 <!-- for Jetty 9
-                                <defaultsDescriptor>${project.basedir}/src/test/resources/jetty/webdefault.xml</defaultsDescriptor>
+                                <defaultsDescriptor>${project.basedir}/src/test/resources/jetty/webdefault-9.xml</defaultsDescriptor>
                                 -->
                                 <!-- look at https://wiki.eclipse.org/Jetty/Howto/Deal_with_Locked_Windows_Files
                                 for jetty 8 -->
