@@ -431,7 +431,8 @@
                                 <!-- hack for Windows development -->
                                 <!-- work around against file locking on windows -->
                                 <!-- seems to only work with jetty 9 -->
-                                <defaultsDescriptor>${project.basedir}/src/test/resources/jetty/webdefault.xml</defaultsDescriptor>
+                                <!--<defaultsDescriptor>${project.basedir}/src/test/resources/jetty/webdefault.xml</defaultsDescriptor>
+                                TODO : must be adapted for Jetty 8 (compilation target...-->
                                 <!-- look at https://wiki.eclipse.org/Jetty/Howto/Deal_with_Locked_Windows_Files
                                 for jetty 8 -->
                             </webApp>
