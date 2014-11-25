@@ -8,7 +8,7 @@
 <table id="exchangestable" data-toggle="table"
        data-sort-name="time" data-sort-order="desc"
        data-url="resources/exchange?accept=application/json" data-cache="false"
-       data-clear-url="resources/exchange?accept=none"
+       data-clear-url="resources/exchange"
        data-height="458"
        data-toolbar="#custom-toolbar"
        data-show-refresh="true"

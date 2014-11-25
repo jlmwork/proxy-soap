@@ -24,7 +24,6 @@ import javax.xml.bind.Marshaller;
 import org.eclipse.persistence.jaxb.JAXBContextProperties;
 import org.junit.Test;
 import prototypes.ws.proxy.soap.model.SoapExchange;
-import prototypes.ws.proxy.soap.web.converter.json.SoapExchangeJsonPConverter;
 
 /**
  *
@@ -50,12 +49,6 @@ public class SandboxIT {
 
         //body("$", Matchers.empty());
         mappingJsonMoxy();
-    }
-
-    public void mappingJsonCustom() {
-        SoapExchangeJsonPConverter converter = new SoapExchangeJsonPConverter();
-        String json = converter.toJson(new SoapExchange());
-        System.out.println("json : " + json);
     }
 
     public void mappingJsonMoxy() throws Exception {

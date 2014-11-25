@@ -59,10 +59,10 @@ public class ProxyTestsIT {
         RestAssured.urlEncodingEnabled = false;
         // cleanup exchanges
         RestAssured.expect().statusCode(204)
-                .when().delete("/exchanges");
+                .when().delete("/resources/exchange");
         given().
                 when().
-                get("/exchanges?accept=application/json").
+                get("/resources/exchange?accept=application/json").
                 then().statusCode(200).
                 body("$", Matchers.empty());
 
@@ -321,7 +321,7 @@ public class ProxyTestsIT {
         List<String> ids
                 = given().
                 when()
-                .get("/exchanges?accept=application/json").
+                .get("/resources/exchange?accept=application/json").
                 then()
                 .statusCode(200)
                 .extract()

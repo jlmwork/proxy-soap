@@ -47,7 +47,6 @@ import prototypes.ws.proxy.soap.repository.SoapExchangeRepository;
 import prototypes.ws.proxy.soap.time.Dates;
 import prototypes.ws.proxy.soap.web.context.ApplicationContext;
 import prototypes.ws.proxy.soap.web.converter.csv.CsvConverter;
-import prototypes.ws.proxy.soap.web.servlet.SamplesServlet;
 
 /**
  * SoapExchange JAX-RS REST Resource
@@ -59,7 +58,7 @@ public class SoapExchangeResource {
     private final SoapExchangeRepository exchangeRepository;
 
     private static final Logger LOGGER = LoggerFactory
-            .getLogger(SamplesServlet.class);
+            .getLogger(SoapExchangeResource.class);
 
     public SoapExchangeResource(@Context ServletContext context) {
         LOGGER.debug("SampleResource creation.");
