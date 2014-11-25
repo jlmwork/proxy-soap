@@ -5,7 +5,7 @@
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
-    <logger name="prototypes" level="debug"/>
+    <logger name="prototypes" level="info"/>
     <logger name="prototypes.ws.proxy.soap.web" level="debug"/>
     <logger name="prototypes.ws.proxy.soap.repository" level="info"/>
     <logger name="org.eclipse.persistence" level="info"/>
