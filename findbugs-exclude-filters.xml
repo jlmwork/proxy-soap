@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+  <!-- Ces excludes ont ete positionnes
+       car le code genere par le weaver EclipseLink et analyse
+       par Findbugs provoque des violations.
+       Ces violations sont des faux positifs.
+       La comparaison de String par == est voulu par le framework
+       pour accelerer les comparaisons.
+       La comparaison est effectuee par == entre une variable statique locale
+       a l'Entity et la meme variable statique. Ce qui en Findbugs
+       leve une violation critique.
+
+       Exemple de faux positif releve par Findbugs :
+       public class Test {
+
+			public static final String MY_STRING = "mine";
+
+			public static boolean _persistence_get(final String paramString) {
+				if (paramString == MY_STRING) {
+					return true;
+				}
+				return false;
+			}
+
+			public static void main(final String... strings) {
+				System.out.println(Test._persistence_get(MY_STRING));
+			}
+		}
+
+                  Nous avons volontairement declare explicitement les 2 méthodes qui lèvent cette violation
+                  pour etre capables de detecter des violations sur les autres methodes generes plutot
+                  que mis un pattern du type "_persistence_*".
+    -->
+    <Match>
+        <Method name="~_persistence_[gs]et" />
+        <Bug pattern="ES_COMPARING_PARAMETER_STRING_WITH_EQ" />
+    </Match>
+</FindBugsFilter>

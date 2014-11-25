@@ -19,12 +19,9 @@ package prototypes.ws.proxy.soap.web.rest;
  *
  * @author jlamande
  */
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.Writer;
 import java.util.Collection;
 import javax.servlet.ServletContext;
 import javax.ws.rs.DELETE;
@@ -103,11 +100,11 @@ public class SoapExchangeResource {
     @GET
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public Response getExchangesAsZip(@QueryParam("type") final String type) {
-
+        // TODO : Review code to avoid double check of zip format
         StreamingOutput stream = new StreamingOutput() {
             @Override
             public void write(OutputStream os) throws IOException, WebApplicationException {
-                if (type != null && type.equals("zip")) {
+                if (type != null && "zip".equals(type)) {
                     Collection<SoapExchange> soapExchanges = exchangeRepository.listWithoutContent();
                     ZipOut zipOut = new ZipOut(os);
                     PrintWriter writer = zipOut.getFileWriter(generateFilename("csv"));
@@ -119,25 +116,13 @@ public class SoapExchangeResource {
                     zipOut.closeFileWriter();
                     zipOut.addDirToZipStream(ApplicationConfig.EXCHANGES_STORAGE_PATH, new String[]{"xml", "xml.gz"});
                     zipOut.finish();
-                } else {
-                    Writer writer = new BufferedWriter(new OutputStreamWriter(os));
-                    for (int i = 0; i < 1000; i++) {
-                        writer.write("testtesttesttesttesttesttesttesttesttest" + "\n");
-                        System.out.println("writing a chunk");
-                        try {
-                            Thread.sleep(5);
-                        } catch (InterruptedException ex) {
-                            ex.printStackTrace();
-                        }
-                        writer.flush();
-                    }
                 }
             }
         };
 
         // could use Filter for more flexible Cache Control :
         // http://alex.nederlof.com/blog/2013/07/28/caching-using-annotations-with-jersey/
-        if (type != null && type.equals("zip")) {
+        if (type != null && "zip".equals(type)) {
             return Response.ok(stream)
                     .header("Content-Type", "application/zip")
                     .header("Content-Description", "File Transfer")
@@ -146,13 +131,10 @@ public class SoapExchangeResource {
                     .header("Cache-Control", "must-revalidate")
                     .header("Pragma", "public")
                     .header("content-disposition", "attachment; filename = " + generateFilename("zip")).build();
-        } else {
-            return Response.ok(stream)
-                    .header("Content-Type", MediaType.TEXT_PLAIN)
-                    //.header("Content-Description", "File Transfer")
-                    //.header("content-disposition", "inline; filename = " + generateFilename("txt"))
-                    .build();
         }
+        // format non accepted
+        return Response.status(Response.Status.NOT_ACCEPTABLE)
+                .build();
     }
 
     private String generateFilename(String extension) {

@@ -86,7 +86,7 @@ public class Strings {
     }
 
     public static byte[] compressString(String input) {
-        ByteArrayInputStream bAIS = new ByteArrayInputStream(input.getBytes());
+        //ByteArrayInputStream bAIS = new ByteArrayInputStream(input.getBytes());
         return Streams.compressString(input);
     }
 

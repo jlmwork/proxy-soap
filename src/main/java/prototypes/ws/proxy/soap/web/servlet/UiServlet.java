@@ -129,13 +129,11 @@ public class UiServlet extends AbstractServlet {
                             .getString(new FileInputStream(wsdlFile)));
                 } else {
                     response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                    return;
                 }
             }
         } catch (URISyntaxException e) {
-            LOGGER.warn("Problem during WSDL url resolving " + e.getMessage());
+            LOGGER.warn("Problem during WSDL url resolving {}", e);
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
         }
     }
 

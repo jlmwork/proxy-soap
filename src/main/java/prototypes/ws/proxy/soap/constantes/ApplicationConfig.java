@@ -24,19 +24,19 @@ import org.apache.commons.io.FilenameUtils;
  */
 public class ApplicationConfig {
 
-    public static String PROP_VALIDATION = "proxy.soap.validate";
-    public static String PROP_BLOCKING_MODE = "proxy.soap.blockingmode";
+    public static final String PROP_VALIDATION = "proxy.soap.validate";
+    public static final String PROP_BLOCKING_MODE = "proxy.soap.blockingmode";
     // changed the value of following key from "proxy.soap.schemadir" to force
     // reconfiguration
     // on preivous installed proxies
-    public static String PROP_WSDL_DIRS = "proxy.soap.wsdls";
-    public static String PROP_MAX_EXCHANGES = "proxy.soap.maxexchanges";
+    public static final String PROP_WSDL_DIRS = "proxy.soap.wsdls";
+    public static final String PROP_MAX_EXCHANGES = "proxy.soap.maxexchanges";
     /**
      * @deprecated
      */
-    public static String PROP_IGNORE_VALID_EXCHANGES = "proxy.soap.ignore.exchanges.valid";
+    public static final String PROP_IGNORE_VALID_EXCHANGES = "proxy.soap.ignore.exchanges.valid";
 
-    public static String PROP_RUN_MODE = "proxy.soap.run.mode";
+    public static final String PROP_RUN_MODE = "proxy.soap.run.mode";
 
     public static final String DEFAULT_STORAGE_PATH_CONF = FilenameUtils.normalize(System.getProperty("user.home") + File.separator + ".proxy-soap" + File.separator);
 
@@ -49,23 +49,23 @@ public class ApplicationConfig {
         (new File(DEFAULT_STORAGE_PATH)).mkdirs();
     }
 
-    public static Integer RUN_MODE_PROD = 0;
-    public static Integer RUN_MODE_DEV = 1;
+    public static final Integer RUN_MODE_PROD = 0;
+    public static final Integer RUN_MODE_DEV = 1;
 
     // persistence options
-    public static String PROP_PERSIST_MODE = "proxy.soap.persist.mode";
+    public static final String PROP_PERSIST_MODE = "proxy.soap.persist.mode";
     public static final Integer PERSIST_MODE_MEMORY = 0;
     public static final Integer PERSIST_MODE_DB = 1;
     // persist xml of exchanges in db or not
-    public static String PROP_PERSIST_MODE_DB_XML = "proxy.soap.persist.mode.db.xml";
+    public static final String PROP_PERSIST_MODE_DB_XML = "proxy.soap.persist.mode.db.xml";
     public static final Boolean PERSIST_MODE_DB_XML_OUT = false;
     public static final Boolean PERSIST_MODE_DB_XML_IN = true;
-    public static String PROP_PERSIST_MODE_DB_DRIVER = "proxy.soap.persist.mode.db.driver";
-    public static String PROP_PERSIST_MODE_DB_URL = "proxy.soap.persist.mode.db.url";
-    public static String PROP_PERSIST_MODE_DB_USERNAME = "proxy.soap.persist.mode.db.username";
-    public static String PROP_PERSIST_MODE_DB_PASSWORD = "proxy.soap.persist.mode.db.password";
-    public static String PROP_PERSIST_MODE_DB_PROPERTIES = "proxy.soap.persist.mode.db.properties";
+    public static final String PROP_PERSIST_MODE_DB_DRIVER = "proxy.soap.persist.mode.db.driver";
+    public static final String PROP_PERSIST_MODE_DB_URL = "proxy.soap.persist.mode.db.url";
+    public static final String PROP_PERSIST_MODE_DB_USERNAME = "proxy.soap.persist.mode.db.username";
+    public static final String PROP_PERSIST_MODE_DB_PASSWORD = "proxy.soap.persist.mode.db.password";
+    public static final String PROP_PERSIST_MODE_DB_PROPERTIES = "proxy.soap.persist.mode.db.properties";
 
-    public static String PROP_EXPRESSIONS_IGNORE = "proxy.soap.expressions.ignore";
-    public static String PROP_EXPRESSIONS_CAPTURE = "proxy.soap.expressions.capture";
+    public static final String PROP_EXPRESSIONS_IGNORE = "proxy.soap.expressions.ignore";
+    public static final String PROP_EXPRESSIONS_CAPTURE = "proxy.soap.expressions.capture";
 }

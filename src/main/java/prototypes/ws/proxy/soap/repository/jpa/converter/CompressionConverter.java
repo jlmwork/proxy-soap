@@ -39,7 +39,7 @@ public class CompressionConverter implements AttributeConverter<String, byte[]> 
                 LOGGER.trace("Compressed number of bytes : {}", bytes.length);
                 return bytes;
             } catch (Exception ex) {
-                LOGGER.warn("Error when compressing Column {}", ex.getMessage());
+                LOGGER.warn("Error when compressing Column  : {}", ex);
             }
         }
         return new byte[0];
@@ -52,7 +52,7 @@ public class CompressionConverter implements AttributeConverter<String, byte[]> 
             try {
                 return Strings.uncompressString(bytes);
             } catch (Exception ex) {
-                LOGGER.warn("Error when uncompressing Column {}", ex.getMessage());
+                LOGGER.warn("Error when uncompressing Column  : {}", ex);
                 return new String(bytes);
             }
         }

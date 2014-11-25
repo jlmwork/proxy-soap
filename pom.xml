@@ -19,6 +19,7 @@
         <it.host>localhost</it.host>
         <!-- jetty 8.x max for compat with java 1.6 -->
         <jetty.version>8.1.16.v20140903</jetty.version>
+        <sonar.findbugs.excludesFilters>findbugs-exclude-filters.xml</sonar.findbugs.excludesFilters>
     </properties>
     <repositories>
         <repository>

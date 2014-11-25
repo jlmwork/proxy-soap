@@ -78,21 +78,26 @@ public class ExtendedWsdlValidator extends WsdlValidator {
 
             if ((nodes != null) && (nodes.getLength() > 0)) {
                 Node header = nodes.item(0);
-                XmlObject x = XmlObject.Factory.parse(header.getFirstChild());
-                String strY = x.toString().replaceAll(
-                        header.getFirstChild().getPrefix() + ":"
-                        + header.getFirstChild().getLocalName(),
-                        "xml-fragment");
-                XmlObject y = XmlObject.Factory.parse(strY);
-                Part part = new PartImpl();
-                QName headerQName = new QName(header.getFirstChild()
-                        .getNamespaceURI(), header.getFirstChild()
-                        .getLocalName(), "");
-                part.setElementName(headerQName);
-                foundHeaders.add(headerQName);
-                SchemaType typeH = WsdlUtils.getSchemaTypeForPart(wsdlContext,
-                        part);
-                validateMessageBody(errorsH, typeH, y);
+                if (header != null) {
+                    Node firstChild = header.getFirstChild();
+                    if (firstChild != null) {
+                        XmlObject x = XmlObject.Factory.parse(firstChild);
+                        String strY = x.toString().replaceAll(
+                                firstChild.getPrefix() + ":"
+                                + firstChild.getLocalName(),
+                                "xml-fragment");
+                        XmlObject y = XmlObject.Factory.parse(strY);
+                        Part part = new PartImpl();
+                        QName headerQName = new QName(firstChild
+                                .getNamespaceURI(), firstChild
+                                .getLocalName(), "");
+                        part.setElementName(headerQName);
+                        foundHeaders.add(headerQName);
+                        SchemaType typeH = WsdlUtils.getSchemaTypeForPart(wsdlContext,
+                                part);
+                        validateMessageBody(errorsH, typeH, y);
+                    }
+                }
             }
 
             // TODO : check if found headers were expected in operation
@@ -118,9 +123,9 @@ public class ExtendedWsdlValidator extends WsdlValidator {
             return errors;
 
         } catch (XmlException e) {
-            LOGGER.warn("Headers Validation XMLError : " + e.getMessage());
+            LOGGER.warn("Headers Validation XMLError :  : {}", e);
         } catch (Exception e) {
-            LOGGER.warn("Headers Validation Exception : " + e.getMessage());
+            LOGGER.warn("Headers Validation Exception :  : {}", e);
         }
         return errors;
     }
@@ -162,9 +167,9 @@ public class ExtendedWsdlValidator extends WsdlValidator {
                 errsF.add("Too many faults found in message");
             }
         } catch (XmlException ex) {
-            LOGGER.debug("Error validating faults");
+            LOGGER.debug("Error validating faults : {}", ex);
         } catch (Exception ex) {
-            LOGGER.debug("Error validating faults");
+            LOGGER.debug("Error validating faults : {}", ex);
         }
         for (XmlError xmlError : xmlErrors) {
             errsF.add(xmlError.toString());

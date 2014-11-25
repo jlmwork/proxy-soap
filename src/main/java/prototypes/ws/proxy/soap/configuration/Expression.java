@@ -58,6 +58,7 @@ public class Expression {
         try {
             this.regex = Pattern.compile(regex);
         } catch (PatternSyntaxException e) {
+            LOGGER.warn("Error : {}", e);
             throw new IllegalArgumentException("Format of capture expression '" + regex + "' is not correct. Must provide a correct regular expression.");
         }
     }
@@ -101,9 +102,9 @@ public class Expression {
                 return match(targetField.toString());
             }
         } catch (IllegalArgumentException ex) {
-            LOGGER.warn("Unknown field {} on object of class {}", this.objectField, object.getClass().getName());
+            LOGGER.warn("Unknown field {} on object of class {} - Details : {}", this.objectField, object.getClass().getName(), ex);
         } catch (IllegalAccessException ex) {
-            LOGGER.warn("Cant access field {} on object of class {}", this.objectField, object.getClass().getName());
+            LOGGER.warn("Cant access field {} on object of class {} - Details : {}", this.objectField, object.getClass().getName(), ex);
         }
         return false;
     }

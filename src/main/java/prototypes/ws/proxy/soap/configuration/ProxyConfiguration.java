@@ -46,6 +46,8 @@ import prototypes.ws.proxy.soap.validation.SoapValidatorFactory;
 
 public final class ProxyConfiguration extends HashMap<String, Object> {
 
+    final static long serialVersionUID = 1L;
+
     private static final Logger LOGGER = LoggerFactory
             .getLogger(ProxyConfiguration.class);
 
@@ -82,7 +84,7 @@ public final class ProxyConfiguration extends HashMap<String, Object> {
         try {
             Files.createDirectory(ApplicationConfig.DEFAULT_STORAGE_PATH_CONF);
         } catch (IOException e) {
-            LOGGER.warn("Storage path for configuration incorrect : {}", e.getMessage());
+            LOGGER.warn("Storage path for configuration incorrect : {}", e);
         }
     }
 
@@ -249,11 +251,9 @@ public final class ProxyConfiguration extends HashMap<String, Object> {
                 if (!Strings.isNullOrEmpty(value)) {
                     this.persistenceDbProperties = value;
                 }
-            } else if (ApplicationConfig.PROP_EXPRESSIONS_CAPTURE.equals(key)) {
-                if (!Strings.isNullOrEmpty(value)) {
-                    // TODO : load capture expressions
-                    this.captureExpressions.addAll(this.parseCaptureExpressions(value));
-                }
+            } else if (ApplicationConfig.PROP_EXPRESSIONS_CAPTURE.equals(key) && !Strings.isNullOrEmpty(value)) {
+                // TODO : load capture expressions
+                this.captureExpressions.addAll(this.parseCaptureExpressions(value));
             } else if (ApplicationConfig.PROP_EXPRESSIONS_IGNORE.equals(key)) {
                 if (!Strings.isNullOrEmpty(value)) {
                     // TODO : load ignore expressions
@@ -268,6 +268,7 @@ public final class ProxyConfiguration extends HashMap<String, Object> {
             this.runMode.set(Integer.parseInt(env));
             LOGGER.debug("Now run in mode : {}", this.runMode.get());
         } catch (Exception e) {
+            LOGGER.warn("Error  : {}", e);
             this.runMode.set(ApplicationConfig.RUN_MODE_PROD);
         }
     }
@@ -440,8 +441,10 @@ public final class ProxyConfiguration extends HashMap<String, Object> {
     private void loadPersistedConf() {
         LOGGER.debug("Load persisted configuration from {}", this.persistedConfPath);
         Properties props = new Properties();
+        FileInputStream fis = null;
         try {
-            props.load(new FileInputStream(new File(persistedConfPath)));
+            fis = new FileInputStream(new File(persistedConfPath));
+            props.load(fis);
             for (String key : getInternalKeys()) {
                 if (props.getProperty(key) != null) {
                     this.setProperty(key, props.getProperty(key));
@@ -449,6 +452,14 @@ public final class ProxyConfiguration extends HashMap<String, Object> {
             }
         } catch (IOException ex) {
             LOGGER.error(ex.getMessage(), ex);
+        } finally {
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    LOGGER.warn("Fail on inputstream close : {}", e);
+                }
+            }
         }
     }
 
@@ -482,9 +493,9 @@ public final class ProxyConfiguration extends HashMap<String, Object> {
             marshaller.marshal(expressions, baos);
             return baos.toString();
         } catch (JAXBException e) {
-            LOGGER.warn("JAXB marshalling error {}", e.getMessage());
+            LOGGER.warn("JAXB marshalling error {}", e);
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.warn("Cause : {}", e.getCause().getMessage());
+                LOGGER.warn("Cause : {}", e.getCause());
             }
         }
         return null;
@@ -517,7 +528,7 @@ public final class ProxyConfiguration extends HashMap<String, Object> {
 
                 }
             } catch (IllegalArgumentException ex) {
-                LOGGER.warn("Bad expression found : {}", ex.getMessage());
+                LOGGER.warn("Bad expression found : {}", ex);
                 return false;
             }
         } else {
@@ -537,9 +548,9 @@ public final class ProxyConfiguration extends HashMap<String, Object> {
             JAXBElement o = unmarshaller.unmarshal(new StreamSource(new StringReader(expressions)), clazz);
             return o.getValue();
         } catch (JAXBException e) {
-            LOGGER.warn("JAXB unmarshalling error {}", e.getMessage());
+            LOGGER.warn("JAXB unmarshalling error {}", e);
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.warn("Cause : {}", e.getCause().getMessage());
+                LOGGER.warn("Cause : {}", e.getCause());
             }
         }
         return null;

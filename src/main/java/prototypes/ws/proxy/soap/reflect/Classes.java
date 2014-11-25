@@ -19,6 +19,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,10 +38,15 @@ public class Classes {
             }
             return method.invoke(calledObject, paramArrayOfObject);
         } catch (SecurityException e) {
+            LOGGER.warn("Error  : {}", e);
         } catch (IllegalArgumentException e) {
+            LOGGER.warn("Error  : {}", e);
         } catch (IllegalAccessException e) {
+            LOGGER.warn("Error  : {}", e);
         } catch (InvocationTargetException e) {
+            LOGGER.warn("Error  : {}", e);
         } catch (NoSuchMethodException e) {
+            LOGGER.warn("Error  : {}", e);
         }
         return null;
     }
@@ -54,11 +60,11 @@ public class Classes {
                 method.setAccessible(true);
             }
         } catch (SecurityException e) {
-            LOGGER.warn("Error : " + e.getMessage());
+            LOGGER.warn("Error  : {}", e);
         } catch (IllegalArgumentException e) {
-            LOGGER.warn("Error : " + e.getMessage());
+            LOGGER.warn("Error : {}", e);
         } catch (NoSuchMethodException e) {
-            LOGGER.warn("Error : " + e.getMessage());
+            LOGGER.warn("Error  : {}", e);
         }
     }
 
@@ -115,7 +121,7 @@ public class Classes {
     }
 
     public static String[] getAllFieldsName(Class<? extends Object> clazz, String[] prefixFilters) {
-        ArrayList<String> arList = new ArrayList();
+        List<String> arList = new ArrayList();
         try {
             Field[] fields = clazz.getDeclaredFields();
             for (Field field : fields) {

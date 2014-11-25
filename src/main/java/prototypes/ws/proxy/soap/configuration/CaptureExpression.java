@@ -57,7 +57,7 @@ public class CaptureExpression extends Expression {
             try {
                 captured = m.group(1);
             } catch (IllegalStateException e) {
-                LOGGER.warn("Matching error on {} : {}", content, e.getMessage());
+                LOGGER.warn("Matching error on {} : {}", content, e);
             }
         }
         return captured;
@@ -73,8 +73,10 @@ public class CaptureExpression extends Expression {
                 return capture(targetField.toString());
             }
         } catch (IllegalArgumentException ex) {
+            LOGGER.warn("Error : {}", ex);
             LOGGER.warn("Unknown field {} on object of class {}", this.objectField, object.getClass().getName());
         } catch (IllegalAccessException ex) {
+            LOGGER.warn("Error : {}", ex);
             LOGGER.warn("Cant access field {} on object of class {}", this.objectField, object.getClass().getName());
         }
         return "";

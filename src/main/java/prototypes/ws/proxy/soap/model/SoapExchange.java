@@ -18,6 +18,7 @@ package prototypes.ws.proxy.soap.model;
 import com.eaio.uuid.UUID;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -32,6 +33,8 @@ import prototypes.ws.proxy.soap.xml.XmlStrings;
 
 @XmlRootElement
 public class SoapExchange implements Serializable {
+
+    final static long serialVersionUID = 1L;
 
     public static final transient String UID = "proxy-soap.exchange";
 
@@ -123,14 +126,14 @@ public class SoapExchange implements Serializable {
                 + ", from=" + from + ", " + "operation=" + operation
                 + ", validatorId=" + validatorId + ", backEndResponseTime="
                 + backEndResponseTime + ", proxyInternalTime="
-                + proxyInternalTime + "\n, frontEndRequest=" + frontEndRequest
+                + proxyInternalTime + "\n, frontEndRequest=" + Arrays.toString(frontEndRequest)
                 + "\n, frontEndRequestHeaders=" + frontEndRequestHeaders
-                + "\n, proxyRequest=" + proxyRequest
+                + "\n, proxyRequest=" + Arrays.toString(proxyRequest)
                 + "\n, proxyRequestHeaders=" + proxyRequestHeaders
                 + "\n, proxyResponseHeaders=" + proxyResponseHeaders
-                + "\n, proxyResponse=" + proxyResponse
+                + "\n, proxyResponse=" + Arrays.toString(proxyResponse)
                 + "\n, proxyResponseCode=" + proxyResponseCode
-                + "\n, backEndResponse=" + backEndResponse
+                + "\n, backEndResponse=" + Arrays.toString(backEndResponse)
                 + "\n, backEndResponseCode=" + backEndResponseCode
                 + "\n, backEndResponseHeaders=" + backEndResponseHeaders
                 + "\n, responseSoapValid=" + responseSoapValid

@@ -124,15 +124,15 @@ public class ZipOut {
                 inputStream.close();
             }
         } catch (ZipException e) {
-            LOGGER.warn("Error while adding file {} : {}", filename, e.getMessage());
+            LOGGER.warn("Error while adding file {} : {}", filename, e);
         } catch (IOException e) {
-            LOGGER.warn("Error while opening file {} : {}", filename, e.getMessage());
+            LOGGER.warn("Error while opening file {} : {}", filename, e);
         } finally {
             if (inputStream != null) {
                 try {
                     inputStream.close();
                 } catch (IOException e) {
-                    LOGGER.error("Error on inputStream close {} ", e.getMessage());
+                    LOGGER.error("Error on inputStream close : {} ", e);
                 }
             }
         }
@@ -143,9 +143,9 @@ public class ZipOut {
             try {
                 zipOut.finish();
             } catch (ZipException ex1) {
-                LOGGER.error("Error on zip finish {} ", ex1.getMessage());
+                LOGGER.error("Error on zip finish : {} ", ex1);
             } catch (IOException ex1) {
-                LOGGER.error("Error on zip finish {} ", ex1.getMessage());
+                LOGGER.error("Error on zip finish : {} ", ex1);
             }
         }
     }

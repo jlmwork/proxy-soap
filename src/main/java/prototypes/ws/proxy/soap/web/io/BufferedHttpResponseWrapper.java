@@ -50,7 +50,7 @@ public class BufferedHttpResponseWrapper extends HttpServletResponseWrapper {
             LOGGER.debug("Response character encoding : {}", this.getCharacterEncoding());
             return new String(this.getBuffer(), this.getCharacterEncoding());
         } catch (UnsupportedEncodingException ex) {
-            LOGGER.warn("Bad character Encoding : {}", this.getCharacterEncoding());
+            LOGGER.warn("Bad character Encoding : {} - Error details : {}", this.getCharacterEncoding(), ex);
             return new String(this.getBuffer());
         }
     }

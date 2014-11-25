@@ -143,9 +143,10 @@ public class Requests {
     }
 
     public static void setRequestHeaders(HttpURLConnection httpConn, Map<String, List<String>> headersFrom, List<String> headersToForget) {
-        for (String headerName : headersFrom.keySet()) {
+        for (Map.Entry<String, List<String>> entry : headersFrom.entrySet()) {
+            String headerName = entry.getKey();
             if (headerName != null && !headersToForget.contains(headerName.toLowerCase())) {
-                for (String headerValue : headersFrom.get(headerName)) {
+                for (String headerValue : entry.getValue()) {
                     LOGGER.trace("set Request Header {}, : {}", headerName, headerValue);
                     httpConn.setRequestProperty(headerName, headerValue);
                 }

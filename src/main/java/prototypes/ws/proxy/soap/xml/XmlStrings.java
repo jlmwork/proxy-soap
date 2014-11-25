@@ -187,7 +187,7 @@ public class XmlStrings {
         try {
             return new String(format(xml.getBytes("UTF-8")), "UTF-8");
         } catch (UnsupportedEncodingException ex) {
-            LOGGER.debug("XmlUtils.format Error : {}", ex.getMessage());
+            LOGGER.debug("XmlUtils.format Error : {}", ex);
         }
         return xml;
     }
@@ -208,17 +208,17 @@ public class XmlStrings {
 
                 @Override
                 public void warning(TransformerException exception) throws TransformerException {
-                    LOGGER.warn(exception.getMessage());
+                    LOGGER.warn("Error : {}", exception);
                 }
 
                 @Override
                 public void error(TransformerException exception) throws TransformerException {
-                    LOGGER.error(exception.getMessage());
+                    LOGGER.error("Error : {}", exception);
                 }
 
                 @Override
                 public void fatalError(TransformerException exception) throws TransformerException {
-                    LOGGER.error(exception.getMessage());
+                    LOGGER.error("Error : {}", exception);
                 }
             });
             serializer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -243,9 +243,9 @@ public class XmlStrings {
             return ((ByteArrayOutputStream) res.getOutputStream())
                     .toByteArray();
         } catch (IllegalArgumentException ex) {
-            LOGGER.debug("XmlUtils.format Error : {}", ex.getMessage());
+            LOGGER.debug("XmlUtils.format Error : {}", ex);
         } catch (TransformerException ex) {
-            LOGGER.debug("XmlUtils.format Error : " + ex.getMessage());
+            LOGGER.debug("XmlUtils.format Error : " + ex);
             LOGGER.debug("XML Message was : {}", xml);
         }
         return xml;
@@ -267,6 +267,7 @@ public class XmlStrings {
             // XmlObject.Factory.parse( request, xmlOptions );
             XmlStrings.parseXml(xml, xmlOptions);
         } catch (XmlException e) {
+            LOGGER.warn("Error occured : {}", e);
             if (e.getErrors() != null) {
                 LOGGER.debug("XML errors found : {}", e.getErrors());
                 for (Object error : e.getErrors()) {
@@ -275,6 +276,7 @@ public class XmlStrings {
             }
             errs.add(XmlError.forMessage(e.getMessage()).toString());
         } catch (Exception e) {
+            LOGGER.warn("Error occured : {}", e);
             errs.add(XmlError.forMessage(e.getMessage()).toString());
         }
 

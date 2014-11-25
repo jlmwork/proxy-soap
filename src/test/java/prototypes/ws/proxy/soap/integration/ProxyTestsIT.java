@@ -144,7 +144,7 @@ public class ProxyTestsIT {
             System.out.println("Hostname: " + hostname);
             return hostname;
         } catch (UnknownHostException e) {
-            System.out.println("Host not found: " + e.getMessage());
+            logger.error("Host not found : {}", e);
             return "localhost";
         }
     }

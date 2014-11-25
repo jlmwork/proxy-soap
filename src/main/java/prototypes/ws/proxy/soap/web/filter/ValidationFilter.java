@@ -238,9 +238,9 @@ public class ValidationFilter extends HttpServletFilter {
                     logger.info("Validator found for {}", qname);
                 }
             } catch (SAXException ex) {
-                logger.warn("XML Error while resolving service operation from XML {} ", ex.getMessage());
+                logger.warn("XML Error while resolving service operation from XML {} ", ex);
             } catch (IOException ex) {
-                logger.warn("IO error while resolving service operation from XML {} ", ex.getMessage());
+                logger.warn("IO error while resolving service operation from XML {} ", ex);
             }
         }
         return soapValidator;

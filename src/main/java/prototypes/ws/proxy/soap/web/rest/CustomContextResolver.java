@@ -44,7 +44,7 @@ public class CustomContextResolver implements ContextResolver<JAXBContext> {
         try {
             return JAXBContext.newInstance(clazz);
         } catch (JAXBException ex) {
-            LOGGER.warn("JAXBContext instantiation failed : {}", ex.getMessage());
+            LOGGER.warn("JAXBContext instantiation failed : {}", ex);
         }
         return null;
     }

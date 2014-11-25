@@ -85,12 +85,10 @@ public class SoapValidatorSoapUI implements SoapValidator {
      */
     private void loadDefinition() {
         // Check file exists if it is not a remote resource
-        if (!Requests.isHttpPath(schemaPath)) {
-            if (!new File(schemaPath).exists()) {
-                LOGGER.debug("File does not exists : {}", schemaPath);
-                throw new NotFoundSoapException(String.format(
-                        SoapErrorConstantes.WSDL_NOT_FOUND, schemaPath));
-            }
+        if (!Requests.isHttpPath(schemaPath) && !new File(schemaPath).exists()) {
+            LOGGER.debug("File does not exists : {}", schemaPath);
+            throw new NotFoundSoapException(String.format(
+                    SoapErrorConstantes.WSDL_NOT_FOUND, schemaPath));
         }
 
         try {
@@ -112,8 +110,8 @@ public class SoapValidatorSoapUI implements SoapValidator {
                     wsdlInterface.getWsdlContext());
 
             Map<QName, Message> vars = (Map<QName, Message>) this.wsdlInterface.getDefinitionContext().getDefinition().getMessages();
-            for (QName qname : vars.keySet()) {
-                Message mess = vars.get(qname);
+            for (Map.Entry<QName, Message> entry : vars.entrySet()) {
+                Message mess = entry.getValue();
                 Map<String, Part> parts = mess.getParts();
                 for (Part qNamePart : parts.values()) {
                     operationsQname.add(qNamePart.getElementName());

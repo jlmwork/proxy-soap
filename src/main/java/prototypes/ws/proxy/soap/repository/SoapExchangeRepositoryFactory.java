@@ -60,6 +60,7 @@ public class SoapExchangeRepositoryFactory {
             try {
                 return new SoapExchangeJpaRepository(proxyConfig);
             } catch (RuntimeException ex) {
+                LOGGER.error("Error creating JPA Repository. Failover to InMemory implementation. Error details : {}", ex);
                 // fall back to a in-memory implementation
                 return new SoapExchangeInMemoryRepository(proxyConfig);
             }

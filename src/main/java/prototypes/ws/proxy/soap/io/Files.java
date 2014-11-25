@@ -137,7 +137,9 @@ public class Files {
             zipIn.close();
             return folder.getAbsolutePath();
         } catch (FileNotFoundException e) {
+            LOGGER.warn("Error  : {}", e);
         } catch (IOException e) {
+            LOGGER.warn("Error  : {}", e);
         }
         return null;
     }
@@ -167,6 +169,7 @@ public class Files {
      * @return
      */
     public static String unzipFile(String zipFile) {
+        FileOutputStream fos = null;
         try {
             File folder = createTempDirectory();
             // (new File()).mkdir();
@@ -195,7 +198,7 @@ public class Files {
                 // else you will hit FileNotFoundException for compressed folder
                 new File(newFile.getParent()).mkdirs();
 
-                FileOutputStream fos = new FileOutputStream(newFile);
+                fos = new FileOutputStream(newFile);
 
                 int len;
                 while ((len = zis.read(buffer)) > 0) {
@@ -212,6 +215,14 @@ public class Files {
 
         } catch (IOException ex) {
             LOGGER.error(ex.getMessage(), ex);
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    LOGGER.warn("Error on close : {}", e);
+                }
+            }
         }
         return null;
     }
@@ -266,7 +277,7 @@ public class Files {
             }
             content = Streams.getString(is);
         } catch (IOException ex) {
-            LOGGER.warn("Error reading {}, {}", svgPath, ex.getMessage());
+            LOGGER.warn("Error reading {}, {}", svgPath, ex);
         }
         return content;
     }
@@ -280,7 +291,7 @@ public class Files {
             }
             content = Streams.getBytes(is);
         } catch (IOException ex) {
-            LOGGER.warn("Error reading {}, {}", svgPath, ex.getMessage());
+            LOGGER.warn("Error reading {}, {}", svgPath, ex);
         }
         return content;
     }
@@ -330,7 +341,7 @@ public class Files {
             LOGGER.debug("delete directory {} ", path);
             FileUtils.deleteDirectory(new File(path));
         } catch (IOException ex) {
-            LOGGER.warn("Cant delete directory {} : {}", path, ex.getMessage());
+            LOGGER.warn("Cant delete directory {} : {}", path, ex);
         }
     }
 
@@ -339,7 +350,7 @@ public class Files {
             LOGGER.debug("delete file {} ", path);
             FileUtils.forceDelete(new File(path));
         } catch (IOException ex) {
-            LOGGER.warn("Cant delete file {} : {} ", path, ex.getMessage());
+            LOGGER.warn("Cant delete file {} : {} ", path, ex);
         }
     }
 
@@ -355,6 +366,7 @@ public class Files {
             URL url = Files.class.getClassLoader().getResource(classpathPath);
             return url.toString();
         } catch (Exception e) {
+            LOGGER.warn("Error  : {}", e);
             return "";
         }
 

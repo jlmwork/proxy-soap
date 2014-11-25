@@ -26,9 +26,9 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class Dates {
 
-    public static String YYYYMMDD_HHMMSS = "yyyyMMdd-HHmmss";
+    public static final String YYYYMMDD_HHMMSS = "yyyyMMdd-HHmmss";
 
-    public static String YYYYMMDD_HH = "yyyyMMdd-HH";
+    public static final String YYYYMMDD_HH = "yyyyMMdd-HH";
 
     public static String getFormattedDate(String pattern) {
         DateTimeFormatter fmt = DateTimeFormat.forPattern(pattern);

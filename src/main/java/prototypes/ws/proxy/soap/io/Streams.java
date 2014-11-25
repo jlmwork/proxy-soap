@@ -84,6 +84,7 @@ public class Streams {
             try {
                 finalIS = new java.util.zip.GZIPInputStream(is);
             } catch (IOException e) {
+                LOGGER.warn("Error  : {}", e);
             }
         }
         return getString(finalIS);
@@ -104,6 +105,7 @@ public class Streams {
                 try {
                     finalOS.close();
                 } catch (Exception e) {
+                    LOGGER.warn("Error  : {}", e);
                 }
             }
         }
@@ -141,6 +143,7 @@ public class Streams {
             try {
                 finalIS = new java.util.zip.GZIPInputStream(is);
             } catch (IOException e) {
+                LOGGER.warn("Error  : {}", e);
             }
         }
         return getBytes(finalIS);
@@ -160,18 +163,18 @@ public class Streams {
                 oS.write(readed);
             }
         } catch (IOException e) {
-            // e.printStackTrace();
+            LOGGER.warn("Error  : {}", e);
         } finally {
             try {
                 oS.close();
             } catch (IOException e) {
-                // e.printStackTrace();
+                LOGGER.warn("Error  : {}", e);
             }
             if (iS != null) {
                 try {
                     iS.close();
                 } catch (IOException e) {
-                    // e.printStackTrace();
+                    LOGGER.warn("Error  : {}", e);
                 }
             }
         }

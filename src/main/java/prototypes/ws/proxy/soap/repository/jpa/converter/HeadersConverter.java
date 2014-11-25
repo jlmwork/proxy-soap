@@ -44,12 +44,12 @@ public class HeadersConverter implements AttributeConverter<Map<String, List<Str
         LOGGER.debug("Convert headers to DB");
         if (map != null) {
             JsonObjectBuilder oBuilder = Json.createObjectBuilder();
-            for (String key : map.keySet()) {
+            for (Map.Entry<String, List<String>> entry : map.entrySet()) {
                 JsonArrayBuilder aBuilder = Json.createArrayBuilder();
-                for (String value : map.get(key)) {
+                for (String value : entry.getValue()) {
                     aBuilder.add(value);
                 }
-                String compatKey = (key == null) ? "_" : key;
+                String compatKey = (entry.getKey() == null) ? "_" : entry.getKey();
                 oBuilder.add(compatKey, aBuilder.build());
             }
             String finalColumnContent = oBuilder.build().toString();
@@ -71,10 +71,10 @@ public class HeadersConverter implements AttributeConverter<Map<String, List<Str
 
             try {
                 Map<String, JsonValue> jsonMap = (Map<String, JsonValue>) jsonst;
-                for (String key : jsonMap.keySet()) {
+                for (Map.Entry<String, JsonValue> entry : jsonMap.entrySet()) {
                     List<String> list = new ArrayList<String>();
-                    list.addAll((List) jsonMap.get(key));
-                    outMap.put(key, list);
+                    list.addAll((List) entry.getValue());
+                    outMap.put(entry.getValue(), list);
                 }
             } catch (ClassCastException ex) {
                 LOGGER.warn("Bad class found while converting from db : {}", ex);

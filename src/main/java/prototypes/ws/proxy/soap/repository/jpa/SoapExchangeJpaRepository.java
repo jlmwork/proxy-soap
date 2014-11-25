@@ -22,6 +22,7 @@ import javax.persistence.EntityGraph;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceException;
 import org.eclipse.persistence.internal.jpa.metamodel.ManagedTypeImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -188,13 +189,13 @@ public class SoapExchangeJpaRepository extends SoapExchangeRepository {
                 if (!xmlInDbs) {
                     Files.deleteDirectory(ApplicationConfig.EXCHANGES_STORAGE_PATH);
                 }
-            } catch (Exception truncE) {
-                LOGGER.warn("Error on TRUNCATE operation " + truncE.getMessage());
+            } catch (Exception ex) {
+                LOGGER.warn("Error on TRUNCATE operation : {}", ex);
                 em.createQuery("delete from SoapExchange").executeUpdate();
             }
             em.getTransaction().commit();
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error("Erorr details : {}", e);
         } finally {
             closeTransaction(em);
         }
@@ -215,7 +216,7 @@ public class SoapExchangeJpaRepository extends SoapExchangeRepository {
             EntityManagerFactory emfClose = Persistence.createEntityManagerFactory(persistenceUnitName, connectionProps);
             emfClose.close();
             cleanupDb();
-        } catch (Exception e) {
+        } catch (PersistenceException e) {
             LOGGER.warn(e.getMessage(), e);
         }
     }

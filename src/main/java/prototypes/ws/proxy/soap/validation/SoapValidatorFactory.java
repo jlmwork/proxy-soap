@@ -151,6 +151,7 @@ public class SoapValidatorFactory {
                 }
                 LOGGER.debug("Saves the new WSDL Validator under key : {}", key);
             } catch (NotFoundSoapException e) {
+                LOGGER.warn("Error : {}", e);
                 return null;
             }
         }

@@ -16,6 +16,7 @@
 package prototypes.ws.proxy.soap.model;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -127,7 +128,11 @@ public class BackendExchange {
 
     @Override
     public String toString() {
-        return "BackendExchange{" + "uri=" + uri + ", starttime=" + starttime + ", requestBody=" + requestBody + ", requestHeaders=" + requestHeaders + ", responseCode=" + responseCode + ", responseBody=" + responseBody + ", responseHeaders=" + responseHeaders + ", stoptime=" + stoptime + '}';
+        return "BackendExchange{" + "uri=" + uri + ", starttime="
+                + starttime + ", requestBody=" + Arrays.toString(requestBody)
+                + ", requestHeaders=" + requestHeaders + ", responseCode="
+                + responseCode + ", responseBody=" + Arrays.toString(responseBody)
+                + ", responseHeaders=" + responseHeaders + ", stoptime=" + stoptime + '}';
     }
 
 }

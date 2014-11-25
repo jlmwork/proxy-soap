@@ -100,7 +100,7 @@ public class ProxyServlet extends AbstractServlet {
             } catch (java.net.SocketTimeoutException ex) {
                 throw new IOException("Time out");
             } catch (IOException e) {
-                LOGGER.warn("Failed to read target response body {}", e.getMessage());
+                LOGGER.warn("Failed to read target response body {}", e);
                 backendExchange.setResponseBody(Streams.getBytes(httpConn.getErrorStream(), gzipped));
             } finally {
                 backendExchange.stop();
@@ -147,7 +147,7 @@ public class ProxyServlet extends AbstractServlet {
             Requests.sendErrorServer(request, response,
                     e.getMessage());
         } catch (Exception e) {
-            LOGGER.error("Error during proxying : {}", e.getMessage());
+            LOGGER.error("Error during proxying : {}", e);
             // protect from all exceptions
             Requests.sendInternalErrorServer(request, response,
                     e.getMessage());
@@ -158,7 +158,7 @@ public class ProxyServlet extends AbstractServlet {
                 try {
                     httpConn.disconnect();
                 } catch (Exception e) {
-                    LOGGER.warn("Error on disconnect {}", e.getMessage());
+                    LOGGER.warn("Error on disconnect {}", e);
                 }
             }
         }
@@ -186,8 +186,8 @@ public class ProxyServlet extends AbstractServlet {
         String reqContentType = (!Strings.isNullOrEmpty(request.getContentType()))
                 ? request.getContentType()
                 : (!Strings.isNullOrEmpty(request.getHeader("Content-Type"))
-                        ? request.getHeader("Content-Type")
-                        : "text/xml");
+                ? request.getHeader("Content-Type")
+                : "text/xml");
         httpConn.setRequestProperty("Content-Type", reqContentType);
 
         return httpConn;
