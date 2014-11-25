@@ -20,11 +20,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import prototypes.ws.proxy.soap.time.Dates;
+import prototypes.ws.proxy.soap.xml.MapAdapter2;
 import prototypes.ws.proxy.soap.xml.XmlStrings;
 
 @XmlRootElement
@@ -65,6 +68,8 @@ public class SoapExchange implements Serializable {
     private Map<String, List<String>> proxyResponseHeaders;
     private List<String> requestXmlErrors;
     private List<String> responseXmlErrors;
+    @XmlJavaTypeAdapter(value = MapAdapter2.class)
+    private Map<String, byte[]> capturedFields;
 
     //
     //private byte[] customFields;
@@ -481,6 +486,21 @@ public class SoapExchange implements Serializable {
             Map<String, List<String>> proxyResponseHeaders) {
         this.proxyResponseHeaders = new java.util.HashMap(proxyResponseHeaders);
         //this.proxyResponseHeaders.remove(null); // to remove HTTP message with null key
+    }
+
+    public Map<String, byte[]> getCapturedFields() {
+        return capturedFields;
+    }
+
+    public void setCapturedFields(Map<String, byte[]> capturedFields) {
+        this.capturedFields = capturedFields;
+    }
+
+    public void addCapturedField(String key, String capturedField) {
+        if (this.capturedFields == null) {
+            this.capturedFields = new HashMap<String, byte[]>();
+        }
+        this.capturedFields.put(key, capturedField.getBytes());
     }
 
 }

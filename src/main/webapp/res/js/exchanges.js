@@ -183,6 +183,10 @@ function displayExchange(exchange) {
 }
 
 function rowStyle(row) {
+    //row.outVal = row.capturedFields.outVal;
+    $.each(customFields, function (i, field) {
+        eval("row." + field + "=" + "row.capturedFields." + field);
+    });
     if (row.requestValid && row.responseValid) {
         return {classes: 'success'};
     }

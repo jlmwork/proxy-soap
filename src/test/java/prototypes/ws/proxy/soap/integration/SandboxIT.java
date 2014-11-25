@@ -15,7 +15,9 @@
  */
 package prototypes.ws.proxy.soap.integration;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -47,7 +49,7 @@ public class SandboxIT {
          Assert.assertEquals(36, ids.size());*/
 
         //body("$", Matchers.empty());
-        //mappingJsonMoxy();
+        mappingJsonMoxy();
     }
 
     public void mappingJsonCustom() {
@@ -62,15 +64,21 @@ public class SandboxIT {
         properties.put(JAXBContextProperties.MEDIA_TYPE, "application/json");
         // oxm json syntax is inspired by http://www.eclipse.org/eclipselink/xsds/eclipselink_oxm_2_4.xsd
 
-        properties.put("eclipselink-oxm-xml", SoapExchange.class.getPackage().getName().replace(".", "/") + "/soapexchange-summary-binding.json");
+        //properties.put("eclipselink-oxm-xml", SoapExchange.class.getPackage().getName().replace(".", "/") + "/soapexchange-summary-binding.json");
         // properties.put("eclipselink.json.include-root", false); // not necessary
-
         JAXBContext context = JAXBContext.newInstance(new Class[]{SoapExchange.class}, properties);
         Marshaller marshaller = context.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         marshaller.setProperty("eclipselink.media-type", "application/json");
         System.out.println("Start marshalling");
         SoapExchange soap = new SoapExchange();
+        Map<String, List<String>> map = new HashMap<String, List<String>>();
+        List<String> list = new ArrayList<String>();
+        list.add("element");
+        list.add("element2");
+        map.put("key", list);
+        soap.setBackEndResponseHeaders(map);
+        soap.addCapturedField("myField", "content captured");
         marshaller.marshal(soap, System.out);
     }
 

@@ -1,3 +1,5 @@
+<%@page import="prototypes.ws.proxy.soap.configuration.Expression"%>
+<%@page import="prototypes.ws.proxy.soap.configuration.ProxyConfiguration"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
@@ -56,9 +58,27 @@
             <th data-field="responseSoapValid" data-visible="false" data-formatter="validationStatusFormatter">
                 <fmt:message key="exchanges.exchange.response"/> SOAP
             </th>
+            <%
+                ProxyConfiguration proxyConfig = (ProxyConfiguration) request.getAttribute("proxy");
+                String customFields = "";
+                if (proxyConfig.getCaptureExpressions() != null && !proxyConfig.getCaptureExpressions().isEmpty()) {
+                    for (Expression expression : proxyConfig.getCaptureExpressions()) {
+                        String name = expression.getName();
+                        customFields += "\"" + name + "\",";
+            %>
+            <th data-field="<%=name%>" data-visible="true">
+                <%=name%>
+            </th>
+            <%}
+                }
+            %><%
+            %>
+            <th data-field="capturedFields" data-visible="false">
+            </th>
         </tr>
     </thead>
 </table>
+<script type="text/javascript">var customFields = [<%=customFields%>];</script>
 
 <div id="exchangedetails" class="hidden panel panel-default">
     <div class="panel-heading" data-toggle="collapse" data-target="#exchangedetails .panel-body">

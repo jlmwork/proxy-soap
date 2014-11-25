@@ -192,7 +192,7 @@ public final class ProxyConfiguration extends HashMap<String, Object> {
             return this.persistenceDbPassword;
         } else if (ApplicationConfig.PROP_PERSIST_MODE_DB_PROPERTIES.equals(key)) {
             return this.persistenceDbProperties;
-        } else if (ApplicationConfig.PROP_EXPRESSIONS_CAPTURE.equals(key)) {
+        } else if ("captureExpressions".equals(key) || ApplicationConfig.PROP_EXPRESSIONS_CAPTURE.equals(key)) {
             return marshallExpressions(this.captureExpressions);
         } else if (ApplicationConfig.PROP_EXPRESSIONS_IGNORE.equals(key)) {
             return marshallExpressions(this.ignoreExpressions);

@@ -129,11 +129,13 @@ public class ExchangeTracerFilter extends HttpServletFilter {
             }
         }
 
-        // compute captures on the fly
-        String capturedFields = "";
+        // captures on the fly
         for (CaptureExpression ce : proxyConfig.getCaptureExpressions()) {
             String capturedContent = ce.capture(soapExchange);
             logger.debug("Captured expression '{}' : {}", ce.getName(), capturedContent);
+            if (capturedContent != null) {
+                soapExchange.addCapturedField(ce.getName(), capturedContent);
+            }
         }
 
         // save exchange after response has been sent back to client
