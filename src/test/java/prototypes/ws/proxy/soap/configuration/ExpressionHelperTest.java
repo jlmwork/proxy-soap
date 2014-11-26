@@ -18,15 +18,20 @@ package prototypes.ws.proxy.soap.configuration;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
  *
  * @author jlamande
  */
-public class ProxyConfigurationTest {
+public class ExpressionHelperTest {
 
-    public ProxyConfigurationTest() {
+    ExpressionHelper expressionHelper;
+
+    @Before
+    public void init() {
+        expressionHelper = new ExpressionHelper();
     }
 
     /**
@@ -34,19 +39,18 @@ public class ProxyConfigurationTest {
      */
     @Test
     public void testParseCaptureExpressions() {
-        ProxyConfiguration proxyConfig = new ProxyConfiguration();
-        List<CaptureExpression> ces = proxyConfig.parseCaptureExpressions("[{\"name\":\"out\",\"objectField\": \"backEndResponse\",\"regex\":\"<out>(.*)</out>\"}]");
+        List<CaptureExpression> ces = expressionHelper.parseCaptureExpressions("[{\"name\":\"out\",\"objectField\": \"backEndResponse\",\"body\":\"<out>(.*)</out>\"}]");
         Assert.assertNotNull(ces);
         Assert.assertEquals("out", ces.get(0).getName());
-        Assert.assertEquals("<out>(.*)</out>", ces.get(0).getRegex().toString());
+        Assert.assertEquals("<out>(.*)</out>", ces.get(0).getBody());
 
         // bad format
-        ces = proxyConfig.parseCaptureExpressions("[{\"name\":\"out\",\"objectField\": \"backEndResponse\",\"regut>\"}]");
+        ces = expressionHelper.parseCaptureExpressions("[{\"name\":\"out\",\"objectField\": \"backEndResponse\",\"regut>\"}]");
         Assert.assertNotNull(ces);
         Assert.assertEquals(0, ces.size());
 
         // bad format
-        ces = proxyConfig.parseCaptureExpressions("[{\"name\":\"out\",\"objectField\": \"backEndResponse\",\"regex\":\"<out>.*</out>\"}]");
+        ces = expressionHelper.parseCaptureExpressions("[{\"name\":\"out\",\"objectField\": \"backEndResponse\",\"body\":\"<out>.*</out>\"}]");
         Assert.assertNotNull(ces);
         Assert.assertEquals(0, ces.size());
     }
@@ -56,25 +60,23 @@ public class ProxyConfigurationTest {
      */
     @Test
     public void testParseExpressions() {
-        ProxyConfiguration proxyConfig = new ProxyConfiguration();
-        List<Expression> ces = proxyConfig.parseExpressions("[{\"name\":\"out\",\"objectField\": \"backEndResponse\",\"regex\":\"<out>OK</out>\"}]");
+        List<Expression> ces = expressionHelper.parseExpressions("[{\"name\":\"out\",\"body\":\"<out>OK</out>\"}]");
         Assert.assertNotNull(ces);
         Assert.assertEquals("out", ces.get(0).getName());
-        Assert.assertEquals("<out>OK</out>", ces.get(0).getRegex().toString());
+        Assert.assertEquals("<out>OK</out>", ces.get(0).getBody());
 
         // bad format
-        ces = proxyConfig.parseExpressions("[{\"name\":\"out\",\"objectField\": \"backEndResponse\",\"regex\":*)</out>\"}]");
+        ces = expressionHelper.parseExpressions("[{\"name\":\"out\",\"body\":*)</out>\"}]");
         Assert.assertNotNull(ces);
         Assert.assertEquals(0, ces.size());
     }
 
     @Test
     public void testMarshallExpressions() {
-        ProxyConfiguration proxyConfig = new ProxyConfiguration();
         List<Expression> ces = new ArrayList<Expression>();
         ces.add(new CaptureExpression("out", "<out>(.*)</out>"));
         ces.add(new Expression("in", "<in>.*</in>"));
-        String json = proxyConfig.marshallExpressions(ces);
+        String json = expressionHelper.marshallExpressions(ces);
         System.out.println(json);
         Assert.assertTrue(json.startsWith("["));
         Assert.assertTrue(json.contains("out"));

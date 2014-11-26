@@ -15,10 +15,6 @@
  */
 package prototypes.ws.proxy.soap.configuration;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.io.Strings;
@@ -34,9 +30,7 @@ public class Expression {
 
     protected String name;
 
-    protected Pattern regex;
-
-    protected String objectField;
+    protected String body;
 
     protected Expression() {
     }
@@ -53,72 +47,17 @@ public class Expression {
             throw new IllegalArgumentException("Capture expression has no name.");
         }
         this.name = name;
-        this.objectField = null;
-        checkRegexFormat(regex);
-        try {
-            this.regex = Pattern.compile(regex);
-        } catch (PatternSyntaxException e) {
-            LOGGER.warn("Error : {}", e);
-            throw new IllegalArgumentException("Format of capture expression '" + regex + "' is not correct. Must provide a correct regular expression.");
-        }
-    }
-
-    /**
-     * wont use pattern fluent interface builder as this class contains only two
-     * fields
-     *
-     * @param name
-     * @param objectField
-     * @param regex
-     */
-    public Expression(String name, String objectField, String regex) {
-        this(name, regex);
-        this.objectField = objectField;
     }
 
     public void validate() {
-        this.checkRegexFormat(this.regex.pattern());
-    }
-
-    protected void checkRegexFormat(String regex) {
-        // default expression dont control regex format
-    }
-
-    public boolean match(String content) {
-        Matcher m = this.regex.matcher(content);
-        if (m.find()) {
-            return true;
-        }
-        return false;
-    }
-
-    public boolean match(Object object) {
-        try {
-            Object targetField = FieldUtils.readField(object, this.objectField, true);
-            if (targetField != null) {
-                if (targetField instanceof byte[]) {
-                    return match(new String((byte[]) targetField));
-                }
-                return match(targetField.toString());
-            }
-        } catch (IllegalArgumentException ex) {
-            LOGGER.warn("Unknown field {} on object of class {} - Details : {}", this.objectField, object.getClass().getName(), ex);
-        } catch (IllegalAccessException ex) {
-            LOGGER.warn("Cant access field {} on object of class {} - Details : {}", this.objectField, object.getClass().getName(), ex);
-        }
-        return false;
     }
 
     public String getName() {
         return name;
     }
 
-    public Pattern getRegex() {
-        return regex;
-    }
-
-    public String getObjectField() {
-        return objectField;
+    public String getBody() {
+        return body;
     }
 
 }

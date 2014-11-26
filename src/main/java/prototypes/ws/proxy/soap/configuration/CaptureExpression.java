@@ -17,7 +17,9 @@ package prototypes.ws.proxy.soap.configuration;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import static prototypes.ws.proxy.soap.configuration.Expression.LOGGER;
 
 /**
  *
@@ -27,19 +29,39 @@ public class CaptureExpression extends Expression {
 
     private static final Pattern CAPTURE_REGEX_FORMAT = Pattern.compile(".*\\([^\\(]+\\).*");
 
+    protected Pattern regexCompiled;
+
+    protected String objectField;
+
     protected CaptureExpression() {
         super();
     }
 
-    public CaptureExpression(String name, String regex) {
-        super(name, regex);
+    public CaptureExpression(String name, String body) {
+        super(name, body);
+        checkRegexFormat(body);
+        try {
+            this.regexCompiled = Pattern.compile(body);
+        } catch (PatternSyntaxException e) {
+            LOGGER.warn("Error : {}", e);
+            throw new IllegalArgumentException("Format of capture expression '" + body + "' is not correct. Must provide a correct regular expression.");
+        }
     }
 
     public CaptureExpression(String name, String objectField, String regex) {
-        super(name, objectField, regex);
+        this(name, regex);
+        this.objectField = objectField;
     }
 
     @Override
+    public void validate() {
+        checkRegexFormat(body);
+    }
+
+    public String getObjectField() {
+        return objectField;
+    }
+
     protected final void checkRegexFormat(String regex) {
         Matcher m = CAPTURE_REGEX_FORMAT.matcher(regex);
         if (!m.find()) {
@@ -52,7 +74,7 @@ public class CaptureExpression extends Expression {
 
     public String capture(String content) {
         String captured = "";
-        Matcher m = this.regex.matcher(content);
+        Matcher m = this.regexCompiled.matcher(content);
         if (m.find()) {
             try {
                 captured = m.group(1);
@@ -80,6 +102,31 @@ public class CaptureExpression extends Expression {
             LOGGER.warn("Cant access field {} on object of class {}", this.objectField, object.getClass().getName());
         }
         return "";
+    }
+
+    public boolean match(String content) {
+        Matcher m = this.regexCompiled.matcher(content);
+        if (m.find()) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean match(Object object) {
+        try {
+            Object targetField = FieldUtils.readField(object, this.objectField, true);
+            if (targetField != null) {
+                if (targetField instanceof byte[]) {
+                    return match(new String((byte[]) targetField));
+                }
+                return match(targetField.toString());
+            }
+        } catch (IllegalArgumentException ex) {
+            LOGGER.warn("Unknown field {} on object of class {} - Details : {}", this.objectField, object.getClass().getName(), ex);
+        } catch (IllegalAccessException ex) {
+            LOGGER.warn("Cant access field {} on object of class {} - Details : {}", this.objectField, object.getClass().getName(), ex);
+        }
+        return false;
     }
 
 }
