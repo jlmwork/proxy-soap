@@ -15,14 +15,8 @@
  */
 package prototypes.ws.proxy.soap.utils;
 
-import java.io.ByteArrayInputStream;
-import java.security.Permissions;
-import java.security.ProtectionDomain;
-import java.security.SecureClassLoader;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
-import javax.el.ExpressionFactory;
 import javax.script.Bindings;
 import javax.script.Compilable;
 import javax.script.CompiledScript;
@@ -30,12 +24,6 @@ import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
-import org.codehaus.janino.ClassLoaderIClassLoader;
-import org.codehaus.janino.ExpressionEvaluator;
-import org.codehaus.janino.Parser;
-import org.codehaus.janino.Scanner;
-import org.codehaus.janino.UnitCompiler;
-import org.codehaus.janino.util.ClassFile;
 import org.junit.Test;
 import prototypes.ws.proxy.soap.model.SoapExchange;
 
@@ -119,86 +107,4 @@ public class EvalScriptTest {
         System.out.println("Result : " + result);
     }
 
-    public void testJanino() throws Exception {
-        ExpressionEvaluator ee = new ExpressionEvaluator(
-                "c > d ? c : d", // expression
-                int.class, // expressionType
-                new String[]{"c", "d"}, // parameterNames
-                new Class[]{int.class, int.class} // parameterTypes
-        );
-
-        // Evaluate it with varying parameter values; very fast.
-        Integer res = (Integer) ee.evaluate(
-                new Object[]{ // parameterValues
-                    new Integer(10),
-                    new Integer(11),}
-        );
-        System.out.println("res = " + res);
-
-        // Compile the expression once; relatively slow.
-        ExpressionEvaluator esoap = new ExpressionEvaluator(
-                "s.getBackEndResponseTime() < 1", // expression
-                boolean.class, // expressionType
-                new String[]{"s"}, // parameterNames
-                new Class[]{SoapExchange.class} // parameterTypes
-        );
-        SoapExchange exchange = new SoapExchange();
-        // Evaluate it with varying parameter values; very fast.
-        Boolean res2 = (Boolean) esoap.evaluate(
-                new Object[]{ // parameterValues
-                    exchange,}
-        );
-        System.out.println("res2 = " + res2);
-
-        ExpressionFactory eFactory = ExpressionFactory.newInstance();
-        System.out.println(eFactory.getClass().getName());
-        //eFactory.createValueExpression(null, "${}", Boolean.class);
-
-        // http://docs.codehaus.org/display/JANINO/Basic
-    }
-}
-
-final class JaninoFastexpr {
-
-    private final static AtomicLong COMPILED_CLASS_INDEX = new AtomicLong();
-
-    private final static class JaninoRestrictedClassLoader extends
-            SecureClassLoader {
-
-        Class<?> defineClass(String name, byte[] b) {
-            return defineClass(name, b, 0, b.length, new ProtectionDomain(null,
-                    new Permissions(), this, null));
-        }
-    }
-
-    public UnaryDoubleFunction compile(String expression) throws Exception {
-        if (!java.util.regex.Pattern.matches(
-                "^[a-zA-Z0-9+\\-()/\\* \t^%\\.\\?]+$", expression)) {
-            throw new SecurityException();
-        }
-        String classPackage = getClass().getPackage().getName() + ".compiled";
-        String className = "JaninoCompiledFastexpr"
-                + COMPILED_CLASS_INDEX.incrementAndGet();
-        String source = "package " + classPackage + ";\n"
-                + "import static java.lang.Math.*;\n" + "public final class "
-                + className + " implements "
-                + UnaryDoubleFunction.class.getCanonicalName() + " {\n"
-                + "public double evaluate(double x) {\n"
-                + "return (" + expression + ");\n" + "}\n" + "}";
-        Scanner scanner = new Scanner(null, new ByteArrayInputStream(
-                source.getBytes("UTF-8")), "UTF-8");
-        JaninoRestrictedClassLoader cl = new JaninoRestrictedClassLoader();
-        UnitCompiler unitCompiler = new UnitCompiler(
-                new Parser(scanner).parseCompilationUnit(),
-                new ClassLoaderIClassLoader(cl));
-        ClassFile[] classFiles = unitCompiler.compileUnit(true, true, true);
-        Class<?> clazz = cl.defineClass(classPackage + "." + className,
-                classFiles[0].toByteArray());
-        return (UnaryDoubleFunction) clazz.newInstance();
-    }
-}
-
-interface UnaryDoubleFunction {
-
-    public double evaluate(double x);
 }
