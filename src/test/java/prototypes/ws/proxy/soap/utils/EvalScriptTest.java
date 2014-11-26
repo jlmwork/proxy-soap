@@ -17,7 +17,9 @@ package prototypes.ws.proxy.soap.utils;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import org.codehaus.janino.ExpressionEvaluator;
 import org.junit.Test;
+import prototypes.ws.proxy.soap.model.SoapExchange;
 
 /**
  *
@@ -44,5 +46,35 @@ public class EvalScriptTest {
         // in order to use Javascript
         //engine.eval("println('Hello, ' + greetingname)");
         //engine.eval("println('The name length is ' +  greetingname.length)");
+        // Compile the expression once; relatively slow.
+        ExpressionEvaluator ee = new ExpressionEvaluator(
+                "c > d ? c : d", // expression
+                int.class, // expressionType
+                new String[]{"c", "d"}, // parameterNames
+                new Class[]{int.class, int.class} // parameterTypes
+        );
+
+        // Evaluate it with varying parameter values; very fast.
+        Integer res = (Integer) ee.evaluate(
+                new Object[]{ // parameterValues
+                    new Integer(10),
+                    new Integer(11),}
+        );
+        System.out.println("res = " + res);
+
+        // Compile the expression once; relatively slow.
+        ExpressionEvaluator esoap = new ExpressionEvaluator(
+                "s.getBackEndResponseTime() > 0", // expression
+                boolean.class, // expressionType
+                new String[]{"s"}, // parameterNames
+                new Class[]{SoapExchange.class} // parameterTypes
+        );
+        SoapExchange exchange = new SoapExchange();
+        // Evaluate it with varying parameter values; very fast.
+        /*Boolean res2 = (Boolean) ee.evaluate(
+         new Object[]{ // parameterValues
+         exchange,}
+         );
+         System.out.println("res2 = " + res2);*/
     }
 }
