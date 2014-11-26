@@ -306,6 +306,8 @@ public class ProxyTestsIT {
         // check behavior of bad url provided
         checkWithCustomUrl("operation1-req_OK", "http://test:test:test:port/", 400);
         checkWithCustomUrl("operation1-req_OK", "file://local/file", 400);
+        // unresolvable IP
+        checkWithCustomUrl("operation1-req_OK", "http://136.23.47.56/", 502);
     }
 
     @AfterClass

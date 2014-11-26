@@ -87,18 +87,20 @@ public class ProxyServlet extends AbstractServlet {
             byte[] body = backendExchange.getRequestBody();
 
             backendExchange.start();
-            if (body.length > 0) {
-                httpConn.getOutputStream().write(body);
-            } else {
-                LOGGER.warn("Body Empty");
-            }
-
-            boolean gzipped = "gzip".equals(httpConn.getContentEncoding());
-            // Get response. If response is gzipped, uncompress it
+            boolean gzipped = false;
             try {
+                if (body.length > 0) {
+                    httpConn.getOutputStream().write(body);
+                } else {
+                    LOGGER.warn("Body Empty");
+                }
+
+                gzipped = "gzip".equals(httpConn.getContentEncoding());
+                // Get response. If response is gzipped, uncompress it
+
                 backendExchange.setResponseBody(Streams.getBytes(httpConn.getInputStream(), gzipped));
             } catch (java.net.SocketTimeoutException ex) {
-                throw new IOException("Time out");
+                throw new IOException("Time out : " + ex.getMessage(), ex);
             } catch (IOException e) {
                 LOGGER.warn("Failed to read target response body {}", e);
                 backendExchange.setResponseBody(Streams.getBytes(httpConn.getErrorStream(), gzipped));
@@ -186,8 +188,8 @@ public class ProxyServlet extends AbstractServlet {
         String reqContentType = (!Strings.isNullOrEmpty(request.getContentType()))
                 ? request.getContentType()
                 : (!Strings.isNullOrEmpty(request.getHeader("Content-Type"))
-                ? request.getHeader("Content-Type")
-                : "text/xml");
+                        ? request.getHeader("Content-Type")
+                        : "text/xml");
         httpConn.setRequestProperty("Content-Type", reqContentType);
 
         return httpConn;

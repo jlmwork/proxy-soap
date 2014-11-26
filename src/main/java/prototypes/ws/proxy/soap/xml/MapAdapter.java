@@ -70,7 +70,6 @@ public class MapAdapter extends XmlAdapter<MapAdapter.AdaptedMap, Map<String, Li
             for (Map.Entry<String, List<String>> entry : map.entrySet()) {
                 AdaptedEntry adaptedEntry = new AdaptedEntry();
                 if (entry.getKey() != null) {
-                    LOGGER.debug("KEY class[{}] : {}", entry.getKey().getClass().getName(), entry.getKey());
                     adaptedEntry.key = entry.getKey();
                 } else {
                     adaptedEntry.key = "";

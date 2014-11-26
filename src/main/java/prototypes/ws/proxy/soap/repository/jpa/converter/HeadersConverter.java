@@ -74,8 +74,15 @@ public class HeadersConverter implements AttributeConverter<Map<String, List<Str
                 for (Map.Entry<String, JsonValue> entry : jsonMap.entrySet()) {
                     List<String> list = new ArrayList<String>();
                     list.addAll((List) entry.getValue());
-                    outMap.put(entry.getValue(), list);
-                }
+                    outMap.put(entry.getKey(), list);
+                }/*
+                 Map<String, JsonValue> jsonMap = (Map<String, JsonValue>) jsonst;
+                 for (String key : jsonMap.keySet()) {
+                 List<String> list = new ArrayList<String>();
+                 list.addAll((List) jsonMap.get(key));
+                 outMap.put(key, list);
+                 }*/
+
             } catch (ClassCastException ex) {
                 LOGGER.warn("Bad class found while converting from db : {}", ex);
             } catch (NullPointerException ex) {

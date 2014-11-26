@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.io.Streams;
 import prototypes.ws.proxy.soap.web.io.Requests;
@@ -30,6 +31,9 @@ import prototypes.ws.proxy.soap.web.io.Requests;
  * @author julamand
  */
 public class BackendExchange {
+
+    private static final transient Logger LOGGER = LoggerFactory
+            .getLogger(BackendExchange.class);
 
     public static final String UID = "proxy.soap.backend-exchange";
 
@@ -53,7 +57,7 @@ public class BackendExchange {
         try {
             this.requestBody = Streams.getBytes(request.getInputStream());
         } catch (IOException ex) {
-            LoggerFactory.getLogger(BackendExchange.class.getName()).warn("Init Backend Failed on reading request input", ex);
+            LOGGER.warn("Init Backend Failed on reading request input", ex);
         }
         this.requestHeaders = Requests.getRequestHeaders(request);
     }
@@ -64,6 +68,12 @@ public class BackendExchange {
 
     public Long stop() {
         this.stoptime = System.currentTimeMillis();
+        if (this.stoptime - this.starttime < 0 || this.stoptime - this.starttime > 1000000) {
+            // incorrect capture, can occurs with too short intervals
+            // reset the markers
+            LOGGER.warn("Time measure incorrect : start={}, stop={}", this.starttime, this.stoptime);
+            this.stoptime = this.starttime;
+        }
         return this.stoptime - this.starttime;
     }
 
