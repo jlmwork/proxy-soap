@@ -39,7 +39,8 @@
             <artifactId>logback-classic</artifactId>
             <version>1.0.13</version>
         </dependency>
-        <!-- janino required for conditions in logback configurations -->
+        <!-- janino required for conditions in logback configurations
+        and expressions evaluation -->
         <dependency>
             <groupId>org.codehaus.janino</groupId>
             <artifactId>janino</artifactId>
