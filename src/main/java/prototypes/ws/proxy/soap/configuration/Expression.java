@@ -49,6 +49,7 @@ public class Expression {
             throw new IllegalArgumentException("Expression has no name.");
         }
         this.name = name;
+        this.body = regex;
     }
 
     public void validate() {
