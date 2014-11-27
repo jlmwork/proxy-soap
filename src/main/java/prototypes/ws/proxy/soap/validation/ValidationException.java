@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 jlamande.
+ * Copyright 2014 JL06436S.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package prototypes.ws.proxy.soap.constantes;
+package prototypes.ws.proxy.soap.validation;
 
-public class SoapErrorConstantes {
+/**
+ *
+ * @author JL06436S
+ */
+public class ValidationException extends Exception {
 
-    public static final String WSDL_NOT_FOUND = "WSDL: file not exists. Schema path : %s";
+    public ValidationException(Throwable cause) {
+        super(cause);
+    }
 }

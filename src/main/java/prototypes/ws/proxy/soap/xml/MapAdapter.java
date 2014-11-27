@@ -81,8 +81,8 @@ public class MapAdapter extends XmlAdapter<MapAdapter.AdaptedMap, Map<String, Li
                 }
                 adaptedMap.entries.add(adaptedEntry);
             }
-        } catch (Exception e) {
-            LOGGER.warn("Error occured : {}", e);
+        } catch (Exception ex) {
+            LOGGER.warn("Error occured : {}", ex);
         }
         return adaptedMap;
     }
@@ -92,7 +92,6 @@ public class MapAdapter extends XmlAdapter<MapAdapter.AdaptedMap, Map<String, Li
         LOGGER.debug("unmarshalling");
         List<AdaptedEntry> adaptedEntries = adaptedMap.entries;
         Map<String, List<String>> map = new HashMap<String, List<String>>(adaptedEntries.size());
-        //StringUtils.join(list, ", ");
         for (AdaptedEntry adaptedEntry : adaptedEntries) {
             map.put(adaptedEntry.key, Arrays.asList(StringUtils.split(adaptedEntry.value, "#!#")));
         }

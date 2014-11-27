@@ -68,7 +68,6 @@ public class UiServlet extends AbstractServlet {
         request.setAttribute("settings", ProxyConfiguration.getKeys());
         request.setAttribute("proxy", proxyConfig);
 
-        //request.setAttribute("requestList", exchangeRepository.list());
         request.setAttribute("validators", SoapValidatorFactory.getInstance().getValidators());
 
         if ("clearRequests".equals(action)) {
@@ -131,8 +130,8 @@ public class UiServlet extends AbstractServlet {
                     response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 }
             }
-        } catch (URISyntaxException e) {
-            LOGGER.warn("Problem during WSDL url resolving {}", e);
+        } catch (URISyntaxException ex) {
+            LOGGER.warn("Problem during WSDL url resolving {}", ex);
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
     }

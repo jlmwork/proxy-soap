@@ -27,14 +27,16 @@ import org.eclipse.persistence.internal.jpa.metamodel.ManagedTypeImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
-import prototypes.ws.proxy.soap.constantes.ApplicationConfig;
+import prototypes.ws.proxy.soap.constants.ApplicationConfig;
+import prototypes.ws.proxy.soap.constants.Messages;
 import prototypes.ws.proxy.soap.io.Files;
 import prototypes.ws.proxy.soap.model.SoapExchange;
 import prototypes.ws.proxy.soap.reflect.Classes;
 import prototypes.ws.proxy.soap.repository.SoapExchangeRepository;
-import prototypes.ws.proxy.soap.time.Dates;
 
 /**
+ *
+ * TODO : better error handling (db connect ko, request failed, bad syntax, ...)
  *
  * @author jlamande
  */
@@ -75,6 +77,16 @@ public class SoapExchangeJpaRepository extends SoapExchangeRepository {
         //emf.createEntityManager().close();
     }
 
+    /**
+     * the loadgraph version if it had worked : EntityGraph<SoapExchange>
+     * loadGraph = em.createEntityGraph(SoapExchange.class);
+     * loadGraph.addAttributeNodes("request", "response", "requestHeaders",
+     * "responseHeaders"); Map<String, Object> hints = new HashMap<String,
+     * Object>(); hints.put("javax.persistence.loadgraph", loadGraph);
+     *
+     * @param id
+     * @return
+     */
     @Override
     public SoapExchange get(String id) {
         LOGGER.debug("get soap exchange {} from db", id);
@@ -85,18 +97,10 @@ public class SoapExchangeJpaRepository extends SoapExchangeRepository {
         // So we need to use a fetch graph and to add all attributes to use a fetch graph ! So ugly !
         EntityGraph<SoapExchange> fetchGraph = em.createEntityGraph(SoapExchange.class);
         fetchGraph.addAttributeNodes(SOAP_EXCHANGE_FIELDS);
-
-        // The loadgraph if it worked
-        // EntityGraph<SoapExchange> loadGraph = em.createEntityGraph(SoapExchange.class);
-        // loadGraph.addAttributeNodes("request", "response", "requestHeaders", "responseHeaders");
-        // Map<String, Object> hints = new HashMap<String, Object>();
-        // hints.put("javax.persistence.loadgraph", loadGraph);
         SoapExchange exchange = em.createQuery("select s from SoapExchange s where s.id=:id", SoapExchange.class)
                 .setParameter("id", id)
                 .setHint("javax.persistence.fetchgraph", fetchGraph)
                 .getSingleResult();
-
-        //em.detach(exchange);
         LOGGER.debug("soap exchange {} loaded from db", id);
         return exchange;
     }
@@ -106,6 +110,18 @@ public class SoapExchangeJpaRepository extends SoapExchangeRepository {
         return this.get(id);
     }
 
+    /**
+     *
+     *
+     * // The loadgraph if it worked EntityGraph<SoapExchange> loadGraph =
+     * em.createEntityGraph(SoapExchange.class);
+     * loadGraph.addAttributeNodes("request", "response", "requestHeaders",
+     * "responseHeaders"); List<SoapExchange> exchanges = em.createQuery("select
+     * s from SoapExchange s ORDER BY s.time DESC", SoapExchange.class)
+     * .setHint("javax.persistence.loadgraph", loadGraph) .getResultList();
+     *
+     * @return
+     */
     @Override
     public List<SoapExchange> list() {
         LOGGER.debug("get soap exchanges from db");
@@ -120,13 +136,6 @@ public class SoapExchangeJpaRepository extends SoapExchangeRepository {
         List<SoapExchange> exchanges = em.createQuery("select s from SoapExchange s", SoapExchange.class)
                 .setHint("javax.persistence.fetchgraph", fetchGraph)
                 .getResultList();
-
-        // The loadgraph if it worked
-        // EntityGraph<SoapExchange> loadGraph = em.createEntityGraph(SoapExchange.class);
-        // loadGraph.addAttributeNodes("request", "response", "requestHeaders", "responseHeaders");
-        // List<SoapExchange> exchanges = em.createQuery("select s from SoapExchange s ORDER BY s.time DESC", SoapExchange.class)
-        //        .setHint("javax.persistence.loadgraph", loadGraph)
-        //        .getResultList();
         LOGGER.debug("get soap exchanges from db : {} ", exchanges.size());
         return exchanges;
     }
@@ -149,27 +158,13 @@ public class SoapExchangeJpaRepository extends SoapExchangeRepository {
             em.persist(exchange);
             em.getTransaction().commit();
             LOGGER.debug("exchange saved");
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-            LOGGER.debug("Persistence Exception Stack : ", e);
+        } catch (Exception ex) {
+            LOGGER.error(Messages.MSG_ERROR, ex.getMessage());
+            LOGGER.debug(Messages.MSG_ERROR_DETAILS, ex);
         } finally {
             closeTransaction(em);
         }
 
-    }
-
-    private String getRequestFilePath(SoapExchange exchange) {
-        String dirPath = ApplicationConfig.EXCHANGES_STORAGE_PATH + Dates.getFormattedDate(exchange.getTime(), Dates.YYYYMMDD_HH) + File.separator;
-        LOGGER.debug("Requests files path : {}", dirPath);
-        (new File(dirPath)).mkdirs();
-        return dirPath + exchange.getId() + "-request.xml";
-    }
-
-    private String getResponseFilePath(SoapExchange exchange) {
-        String dirPath = ApplicationConfig.EXCHANGES_STORAGE_PATH + Dates.getFormattedDate(exchange.getTime(), Dates.YYYYMMDD_HH) + File.separator;
-        LOGGER.debug("Response files path : {}", dirPath);
-        (new File(dirPath)).mkdirs();
-        return dirPath + exchange.getId() + "-response.xml";
     }
 
     @Override
@@ -184,17 +179,18 @@ public class SoapExchangeJpaRepository extends SoapExchangeRepository {
             String table = ((ManagedTypeImpl) emf.getMetamodel().managedType(SoapExchange.class)).getDescriptor().getTableName();
             em.getTransaction().begin();
             try {
-                em.createNativeQuery("truncate table " + table).executeUpdate();
+                em.createNativeQuery("TRUNCATE TABLE " + table).executeUpdate();
                 if (!xmlInDbs) {
                     Files.deleteDirectory(ApplicationConfig.EXCHANGES_STORAGE_PATH);
                 }
             } catch (Exception ex) {
-                LOGGER.warn("Error on TRUNCATE operation : {}", ex);
+                LOGGER.warn(Messages.MSG_ERROR_ON, " TRUNCATE operation", ex.getMessage());
+                LOGGER.debug(Messages.MSG_ERROR_DETAILS, ex);
                 em.createQuery("delete from SoapExchange").executeUpdate();
             }
             em.getTransaction().commit();
-        } catch (Exception e) {
-            LOGGER.error("Erorr details : {}", e);
+        } catch (Exception ex) {
+            LOGGER.error(Messages.MSG_ERROR_DETAILS, ex);
         } finally {
             closeTransaction(em);
         }
@@ -204,8 +200,8 @@ public class SoapExchangeJpaRepository extends SoapExchangeRepository {
     public void close() {
         try {
             emf.close();
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+        } catch (Exception ex) {
+            LOGGER.error(Messages.MSG_ERROR_DETAILS, ex);
         }
         try {
             // try shutdown DB, useful for some DB platforms (derby)
@@ -215,8 +211,8 @@ public class SoapExchangeJpaRepository extends SoapExchangeRepository {
             EntityManagerFactory emfClose = Persistence.createEntityManagerFactory(persistenceUnitName, connectionProps);
             emfClose.close();
             cleanupDb();
-        } catch (PersistenceException e) {
-            LOGGER.warn(e.getMessage(), e);
+        } catch (PersistenceException ex) {
+            LOGGER.warn(ex.getMessage(), ex);
         }
     }
 

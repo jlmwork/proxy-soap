@@ -50,6 +50,9 @@ public class SoapValidatorFactory {
          * Unique instance
          */
         private final static SoapValidatorFactory instance = new SoapValidatorFactory();
+
+        private SingletonHolder() {
+        }
     }
 
     /**
@@ -113,8 +116,8 @@ public class SoapValidatorFactory {
     }
 
     private SoapValidator createSoapValidator(String wsdlPath,
-            String key, String from) {
-        key = (key != null) ? key : wsdlPath;
+            String paramKey, String from) {
+        String key = (paramKey != null) ? paramKey : wsdlPath;
         LOGGER.debug("createSoapValidator for key : '{}'", key);
 
         SoapValidator validator = getValidator(key);
@@ -150,8 +153,8 @@ public class SoapValidatorFactory {
                     validatorsByQname.put(qName, validator);
                 }
                 LOGGER.debug("Saves the new WSDL Validator under key : {}", key);
-            } catch (NotFoundSoapException e) {
-                LOGGER.warn("Error : {}", e);
+            } catch (NotFoundSoapException ex) {
+                LOGGER.warn("Error : {}", ex);
                 return null;
             }
         }
@@ -159,6 +162,10 @@ public class SoapValidatorFactory {
     }
 
     /**
+     *
+     * TODO : normalize paths for os portability
+     * FileSystem.getFileSystem().normalize(path); or
+     * FilenameUtils.normalize(path);
      *
      * @param multiplePaths
      */
@@ -169,17 +176,14 @@ public class SoapValidatorFactory {
         boolean cachesCleared = false;
 
         for (String path : toScanPaths) {
-            // TODO : normalize paths for os portability
-            // FileSystem.getFileSystem().normalize(path); or FilenameUtils.normalize(path);
-
             // Direct access to a WSDL
             if (path.toUpperCase().endsWith(".WSDL")
                     || path.toUpperCase().endsWith("?WSDL")) {
                 LOGGER.debug("Create validator for wsdl : {}", path);
                 createSoapValidator(path,
                         Requests.resolveSoapServiceFromURL(path), path);
-            } // JARS or DIRS
-            else {
+            } else {
+                // JARS or DIRS
                 // For full archives import, cleanup of cache is required
                 // but once per import
                 if (!cachesCleared) {
@@ -199,8 +203,6 @@ public class SoapValidatorFactory {
                     LOGGER.debug("Unzipping Archive");
                     String unzippedPath = Files.unzip(localPath);
                     LOGGER.debug("Archive unzipped to : {}", unzippedPath);
-                    // createSoapValidator(path,
-                    // Requests.resolveSoapServiceFromURL(path));
                     dirPath = unzippedPath;
                 }
 
@@ -217,6 +219,5 @@ public class SoapValidatorFactory {
         }
         LOGGER.info("soap validators creation done");
         listValidators();
-        // return null;
     }
 }

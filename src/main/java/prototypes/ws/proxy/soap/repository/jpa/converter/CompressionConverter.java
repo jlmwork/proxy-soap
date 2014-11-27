@@ -18,6 +18,7 @@ package prototypes.ws.proxy.soap.repository.jpa.converter;
 import javax.persistence.AttributeConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import prototypes.ws.proxy.soap.constants.Messages;
 import prototypes.ws.proxy.soap.io.Strings;
 
 /**
@@ -39,7 +40,8 @@ public class CompressionConverter implements AttributeConverter<String, byte[]> 
                 LOGGER.trace("Compressed number of bytes : {}", bytes.length);
                 return bytes;
             } catch (Exception ex) {
-                LOGGER.warn("Error when compressing Column  : {}", ex);
+                LOGGER.warn(Messages.MSG_ERROR_ON, " Column compression", ex.getMessage());
+                LOGGER.debug(Messages.MSG_ERROR_DETAILS, ex);
             }
         }
         return new byte[0];
@@ -52,7 +54,8 @@ public class CompressionConverter implements AttributeConverter<String, byte[]> 
             try {
                 return Strings.uncompressString(bytes);
             } catch (Exception ex) {
-                LOGGER.warn("Error when uncompressing Column  : {}", ex);
+                LOGGER.warn(Messages.MSG_ERROR_ON, " Column uncompression", ex.getMessage());
+                LOGGER.debug(Messages.MSG_ERROR_DETAILS, ex);
                 return new String(bytes);
             }
         }

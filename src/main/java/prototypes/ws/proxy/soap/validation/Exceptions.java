@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 jlamande.
+ * Copyright 2014 JL06436S.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,11 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package prototypes.ws.proxy.soap.constantes;
+package prototypes.ws.proxy.soap.validation;
 
-public class SoapConstantes {
+import org.slf4j.Logger;
 
-    public final static String BODY = "Body";
+/**
+ *
+ * @author JL06436S
+ */
+public class Exceptions {
 
-    public final static String HEADER = "Header";
+    public static void process(Logger logger, Exception ex) {
+
+    }
 }

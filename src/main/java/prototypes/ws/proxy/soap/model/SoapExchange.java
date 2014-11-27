@@ -74,8 +74,6 @@ public class SoapExchange implements Serializable {
     @XmlJavaTypeAdapter(value = MapAdapter2.class)
     private Map<String, byte[]> capturedFields;
 
-    //
-    //private byte[] customFields;
     public BackendExchange createBackendExchange() {
         return new BackendExchange(to, frontEndRequest, frontEndRequestHeaders);
     }

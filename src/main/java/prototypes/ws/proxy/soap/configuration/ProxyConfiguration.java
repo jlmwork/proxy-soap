@@ -26,7 +26,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import prototypes.ws.proxy.soap.constantes.ApplicationConfig;
+import prototypes.ws.proxy.soap.constants.ApplicationConfig;
+import prototypes.ws.proxy.soap.constants.Messages;
 import prototypes.ws.proxy.soap.io.Files;
 import prototypes.ws.proxy.soap.io.Strings;
 import prototypes.ws.proxy.soap.validation.SoapValidatorFactory;
@@ -69,8 +70,8 @@ public final class ProxyConfiguration extends HashMap<String, Object> {
     public ProxyConfiguration() {
         try {
             Files.createDirectory(ApplicationConfig.DEFAULT_STORAGE_PATH_CONF);
-        } catch (IOException e) {
-            LOGGER.warn("Storage path for configuration incorrect : {}", e);
+        } catch (IOException ex) {
+            LOGGER.warn("Storage path for configuration incorrect", ex);
         }
     }
 
@@ -253,8 +254,8 @@ public final class ProxyConfiguration extends HashMap<String, Object> {
         try {
             this.runMode.set(Integer.parseInt(env));
             LOGGER.debug("Now run in mode : {}", this.runMode.get());
-        } catch (Exception e) {
-            LOGGER.warn("Error  : {}", e);
+        } catch (Exception ex) {
+            LOGGER.warn(Messages.MSG_ERROR_DETAILS, ex);
             this.runMode.set(ApplicationConfig.RUN_MODE_PROD);
         }
     }
@@ -298,7 +299,7 @@ public final class ProxyConfiguration extends HashMap<String, Object> {
     public void setNbMaxExchanges(String max) {
         try {
             nbMaxExchanges.set(Integer.valueOf(max));
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ex) {
             // previous value will be used
         }
     }
@@ -327,8 +328,8 @@ public final class ProxyConfiguration extends HashMap<String, Object> {
         }
         try {
             SoapValidatorFactory.getInstance().createSoapValidators(this.wsdlDirs);
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+        } catch (Exception ex) {
+            LOGGER.error(ex.getMessage(), ex);
         }
         // reactivation even if exceptions happened
         if (wasValidationActive) {
@@ -442,8 +443,8 @@ public final class ProxyConfiguration extends HashMap<String, Object> {
             if (fis != null) {
                 try {
                     fis.close();
-                } catch (IOException e) {
-                    LOGGER.warn("Fail on inputstream close : {}", e);
+                } catch (IOException ex) {
+                    LOGGER.warn("Fail on inputstream close : {}", ex);
                 }
             }
         }

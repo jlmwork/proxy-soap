@@ -25,6 +25,9 @@ import prototypes.ws.proxy.soap.model.SoapExchange;
  */
 public class RequestContext {
 
+    private RequestContext() {
+    }
+
     public static void setBackendExchange(HttpServletRequest request, BackendExchange backendExchange) {
         request.setAttribute(BackendExchange.UID, backendExchange);
     }

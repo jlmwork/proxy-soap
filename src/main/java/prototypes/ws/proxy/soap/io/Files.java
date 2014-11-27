@@ -34,23 +34,17 @@ import java.util.zip.ZipInputStream;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import prototypes.ws.proxy.soap.constants.Messages;
 
 public class Files {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Files.class);
 
-    /*
-     * public static String[] findFilesInDirByExt(final String path, final
-     * String ext) { File dir = new File(path); File[] files = dir.listFiles(new
-     * FilenameFilter() {
-     *
-     * @Override public boolean accept(File dir, String name) { return
-     * name.toUpperCase().endsWith(ext.toUpperCase()); } });
-     *
-     * if ((files != null) && (files.length > 0)) { String[] fileNames = new
-     * String[files.length]; int i = 0; for (File file : files) { fileNames[i++]
-     * = file.getAbsolutePath(); } return fileNames; } return new String[0]; }
-     */
+    private static final int BUFFER_SIZE = 4096;
+
+    private Files() {
+    }
+
     public static String[] findFilesInDirByExt(final String path,
             final String ext) {
         return findFilesInDirByExts(path, new String[]{ext});
@@ -101,8 +95,6 @@ public class Files {
         return (temp);
     }
 
-    private static final int BUFFER_SIZE = 4096;
-
     /**
      * Extracts a zip file specified by the zipFilePath to a directory specified
      * by destDirectory (will be created if does not exists)
@@ -136,10 +128,10 @@ public class Files {
             }
             zipIn.close();
             return folder.getAbsolutePath();
-        } catch (FileNotFoundException e) {
-            LOGGER.warn("Error  : {}", e);
-        } catch (IOException e) {
-            LOGGER.warn("Error  : {}", e);
+        } catch (FileNotFoundException ex) {
+            LOGGER.warn(Messages.MSG_ERROR_DETAILS, ex);
+        } catch (IOException ex) {
+            LOGGER.warn(Messages.MSG_ERROR_DETAILS, ex);
         }
         return null;
     }
@@ -172,7 +164,6 @@ public class Files {
         FileOutputStream fos = null;
         try {
             File folder = createTempDirectory();
-            // (new File()).mkdir();
             byte[] buffer = new byte[1024];
 
             // create output directory is not exists
@@ -219,8 +210,8 @@ public class Files {
             if (fos != null) {
                 try {
                     fos.close();
-                } catch (IOException e) {
-                    LOGGER.warn("Error on close : {}", e);
+                } catch (IOException ex) {
+                    LOGGER.warn(Messages.MSG_ERROR_DETAILS, ex);
                 }
             }
         }
@@ -365,8 +356,8 @@ public class Files {
         try {
             URL url = Files.class.getClassLoader().getResource(classpathPath);
             return url.toString();
-        } catch (Exception e) {
-            LOGGER.warn("Error  : {}", e);
+        } catch (Exception ex) {
+            LOGGER.warn(Messages.MSG_ERROR_DETAILS, ex);
             return "";
         }
 

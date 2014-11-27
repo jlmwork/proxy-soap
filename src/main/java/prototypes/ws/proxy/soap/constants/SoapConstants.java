@@ -13,20 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package prototypes.ws.proxy.soap.validation;
+package prototypes.ws.proxy.soap.constants;
 
-public class SoapException extends RuntimeException {
+public class SoapConstants {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -8863295767211314294L;
+    public final static String BODY = "Body";
 
-    public SoapException(String message) {
-        super(message);
-    }
+    public final static String HEADER = "Header";
 
-    public SoapException(String message, Exception ex) {
-        super(message, ex);
+    private SoapConstants() {
     }
 }

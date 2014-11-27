@@ -30,6 +30,9 @@ public class Dates {
 
     public static final String YYYYMMDD_HH = "yyyyMMdd-HH";
 
+    private Dates() {
+    }
+
     public static String getFormattedDate(String pattern) {
         DateTimeFormatter fmt = DateTimeFormat.forPattern(pattern);
         DateTime dt = new DateTime();

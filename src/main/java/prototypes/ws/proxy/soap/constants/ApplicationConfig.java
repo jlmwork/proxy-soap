@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package prototypes.ws.proxy.soap.constantes;
+package prototypes.ws.proxy.soap.constants;
 
 import java.io.File;
 import org.apache.commons.io.FilenameUtils;
@@ -31,9 +31,7 @@ public class ApplicationConfig {
     // on preivous installed proxies
     public static final String PROP_WSDL_DIRS = "proxy.soap.wsdls";
     public static final String PROP_MAX_EXCHANGES = "proxy.soap.maxexchanges";
-    /**
-     * @deprecated
-     */
+
     public static final String PROP_IGNORE_VALID_EXCHANGES = "proxy.soap.ignore.exchanges.valid";
 
     public static final String PROP_RUN_MODE = "proxy.soap.run.mode";
@@ -68,4 +66,7 @@ public class ApplicationConfig {
 
     public static final String PROP_EXPRESSIONS_IGNORE = "proxy.soap.expressions.ignore";
     public static final String PROP_EXPRESSIONS_CAPTURE = "proxy.soap.expressions.capture";
+
+    private ApplicationConfig() {
+    }
 }

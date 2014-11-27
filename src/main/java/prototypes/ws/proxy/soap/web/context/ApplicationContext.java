@@ -25,6 +25,9 @@ import prototypes.ws.proxy.soap.repository.SoapExchangeRepository;
  */
 public class ApplicationContext {
 
+    private ApplicationContext() {
+    }
+
     public static void setProxyConfiguration(ServletContext servletContext, ProxyConfiguration proxyConfig) {
         servletContext.setAttribute(ProxyConfiguration.UID, proxyConfig);
     }

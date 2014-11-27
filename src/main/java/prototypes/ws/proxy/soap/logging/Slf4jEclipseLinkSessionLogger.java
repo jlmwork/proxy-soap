@@ -176,12 +176,13 @@ public class Slf4jEclipseLinkSessionLogger extends AbstractSessionLog {
      * INTERNAL: Return the Logger for the given category
      */
     private Logger getLogger(String category) {
-        if (Strings.isNullOrEmpty(category)
+        String localCategory = category;
+        if (Strings.isNullOrEmpty(localCategory)
                 || !this.categoryLoggers.containsKey(category)) {
-            category = DEFAULT_CATEGORY;
+            localCategory = DEFAULT_CATEGORY;
         }
 
-        return categoryLoggers.get(category);
+        return categoryLoggers.get(localCategory);
 
     }
 

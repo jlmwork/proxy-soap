@@ -20,7 +20,7 @@ import java.io.File;
 import javax.persistence.AttributeConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import prototypes.ws.proxy.soap.constantes.ApplicationConfig;
+import prototypes.ws.proxy.soap.constants.ApplicationConfig;
 import prototypes.ws.proxy.soap.io.Files;
 import prototypes.ws.proxy.soap.io.Strings;
 import prototypes.ws.proxy.soap.time.Dates;

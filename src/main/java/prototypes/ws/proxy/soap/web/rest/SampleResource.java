@@ -85,17 +85,11 @@ public class SampleResource {
 
     @GET
     @Path("/{name: [a-zA-Z][a-zA-Z_\\-0-9]*}/content")
-    @Produces({MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_XML + ";charset=utf-8"})
     public String getRawSampleContent(@PathParam("name") String sampleName) {
         controlAccess();
         LOGGER.debug("Get raw sample");
         Sample sample = this.getSample(sampleName);
-//        Response response
-//                = Response.status(200)
-//                .header("Content-Type", "text/xml; charset=UTF-8")
-//                .entity(sample.getContent())
-//                .build();
-//        return response;
         return sample.getContent();
     }
 
@@ -106,9 +100,8 @@ public class SampleResource {
         LOGGER.debug("Act as a get raw sample");
         Sample sample = this.getSample(sampleName);
         // mimic the response code
-        Response response = Response.status(sample.getCode())
+        return Response.status(sample.getCode())
                 .entity(sample.getContent()).build();
-        return response;
     }
 
     @POST
@@ -120,7 +113,7 @@ public class SampleResource {
         if (sample != null) {
             LOGGER.debug("Create Sample [{}]", sample.getName());
             this.samples.put(sample.getName(), sample);
-            //LOGGER.debug("Samples : {}", samples);
+
             response = Response.status(201)
                     .header(
                             "Location",

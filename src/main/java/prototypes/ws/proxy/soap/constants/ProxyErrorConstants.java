@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package prototypes.ws.proxy.soap.constantes;
+package prototypes.ws.proxy.soap.constants;
 
-public class ProxyErrorConstantes {
+public class ProxyErrorConstants {
 
     public static final String INVALID_CLIENT_CONTENT = "Invalid SOAP content received from client";
     public static final String WSDL_NOT_FOUND = "Proxy: WSDL not found";
@@ -25,4 +25,7 @@ public class ProxyErrorConstantes {
     public static final String INVALID_TARGET = "Invalid target uri %s";
     public static final String NOT_FOUND = "Not found : %s";
     public static final String INVALID_RESPONSE = "Invalid response received from server : %s";
+
+    private ProxyErrorConstants() {
+    }
 }

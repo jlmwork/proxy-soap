@@ -143,8 +143,8 @@ public class ProxyTestsIT {
             System.out.println("IP Address: " + ipAddr);
             System.out.println("Hostname: " + hostname);
             return hostname;
-        } catch (UnknownHostException e) {
-            logger.error("Host not found : {}", e);
+        } catch (UnknownHostException ex) {
+            logger.error("Host not found : {}", ex);
             return "localhost";
         }
     }

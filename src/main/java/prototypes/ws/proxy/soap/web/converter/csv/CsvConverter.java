@@ -61,8 +61,7 @@ public class CsvConverter {
     }
 
     private String cleanupField(String field) {
-        String cleanField = field.replaceAll(separator, "#");
-        return cleanField;
+        return field.replaceAll(separator, "#");
     }
 
     public CsvConverter append(String field) {

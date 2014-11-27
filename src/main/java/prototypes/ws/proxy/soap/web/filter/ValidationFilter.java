@@ -43,6 +43,8 @@ import prototypes.ws.proxy.soap.xml.XmlStrings;
  */
 public class ValidationFilter extends HttpServletFilter {
 
+    private static final String REQUEST_MESSAGE = "requestMessage";
+    private static final String REQUEST_SOAP_VALIDATOR = "soapValidator";
     private ProxyConfiguration proxyConfig;
 
     /**
@@ -132,14 +134,14 @@ public class ValidationFilter extends HttpServletFilter {
         // TODO : take care on the validator object as a configuration
         // request could destroy it during process of this exchange
         SoapValidator soapValidator = findSoapValidator(request, requestBodyContent);
-        request.setAttribute("soapValidator", soapValidator);
+        request.setAttribute(REQUEST_SOAP_VALIDATOR, soapValidator);
 
         // 2] Soap Valid ?
         if (valid && (soapValidator != null)) {
             soapExchange.setValidatorId(soapValidator.getId());
             SoapMessage message = soapValidator
                     .newRequestMessage(requestBodyContent);
-            request.setAttribute("requestMessage", message);
+            request.setAttribute(REQUEST_MESSAGE, message);
             soapExchange.setOperation(message.getOperation().getBindingOperationName());
             List<String> soapErrors = new ArrayList<String>();
             valid = valid && soapValidator.validateRequest(message, soapErrors);

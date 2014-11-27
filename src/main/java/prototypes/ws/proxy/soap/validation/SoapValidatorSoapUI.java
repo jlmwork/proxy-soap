@@ -37,7 +37,7 @@ import javax.xml.namespace.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-import prototypes.ws.proxy.soap.constantes.SoapErrorConstantes;
+import prototypes.ws.proxy.soap.constants.SoapErrorConstants;
 import prototypes.ws.proxy.soap.reflect.Classes;
 import prototypes.ws.proxy.soap.web.io.Requests;
 import prototypes.ws.proxy.soap.xml.XmlStrings;
@@ -88,7 +88,7 @@ public class SoapValidatorSoapUI implements SoapValidator {
         if (!Requests.isHttpPath(schemaPath) && !new File(schemaPath).exists()) {
             LOGGER.debug("File does not exists : {}", schemaPath);
             throw new NotFoundSoapException(String.format(
-                    SoapErrorConstantes.WSDL_NOT_FOUND, schemaPath));
+                    SoapErrorConstants.WSDL_NOT_FOUND, schemaPath));
         }
 
         try {
@@ -118,15 +118,12 @@ public class SoapValidatorSoapUI implements SoapValidator {
                     LOGGER.debug("WSDL contains Part {}", qNamePart.getElementName());
                 }
             }
-
-            // destroy timer
-            // SoapUI.getSoapUITimer().cancel();
-        } catch (Exception e) {
+        } catch (Exception ex) {
             LOGGER.error("WSDL: Load definition fail. Schema path : "
-                    + schemaPath, e);
+                    + schemaPath, ex);
             throw new SoapException(
                     "WSDL: Load definition fail. Schema path : " + schemaPath,
-                    e);
+                    ex);
         }
     }
 
@@ -160,8 +157,8 @@ public class SoapValidatorSoapUI implements SoapValidator {
             Classes.setStaticField(WsdlInterfaceDefinition.class, "wsdlReader",
                     null);
 
-        } catch (Exception e) {
-            LOGGER.warn("Error while clearing Cache", e);
+        } catch (Exception ex) {
+            LOGGER.warn("Error while clearing Cache", ex);
         }
     }
 
@@ -253,12 +250,12 @@ public class SoapValidatorSoapUI implements SoapValidator {
     public SoapMessage newRequestMessage(String message) {
         try {
             return new SoapMessage(message, wsdlInterface);
-        } catch (SoapException e) {
-            throw e;
-        } catch (IOException e) {
-            throw new SoapException("Make request message fail", e);
-        } catch (SAXException e) {
-            throw new SoapException("Make request message fail", e);
+        } catch (SoapException ex) {
+            throw ex;
+        } catch (IOException ex) {
+            throw new SoapException("Make request message fail", ex);
+        } catch (SAXException ex) {
+            throw new SoapException("Make request message fail", ex);
         }
     }
 

@@ -22,10 +22,14 @@ import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import prototypes.ws.proxy.soap.constants.Messages;
 
 public class Classes {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Classes.class);
+
+    private Classes() {
+    }
 
     public static Object callPrivateMethod(Class<? extends Object> clazz,
             String methodName, Object calledObject,
@@ -37,16 +41,16 @@ public class Classes {
                 method.setAccessible(true);
             }
             return method.invoke(calledObject, paramArrayOfObject);
-        } catch (SecurityException e) {
-            LOGGER.warn("Error  : {}", e);
-        } catch (IllegalArgumentException e) {
-            LOGGER.warn("Error  : {}", e);
-        } catch (IllegalAccessException e) {
-            LOGGER.warn("Error  : {}", e);
-        } catch (InvocationTargetException e) {
-            LOGGER.warn("Error  : {}", e);
-        } catch (NoSuchMethodException e) {
-            LOGGER.warn("Error  : {}", e);
+        } catch (SecurityException ex) {
+            LOGGER.warn(Messages.MSG_ERROR_DETAILS, ex);
+        } catch (IllegalArgumentException ex) {
+            LOGGER.warn(Messages.MSG_ERROR_DETAILS, ex);
+        } catch (IllegalAccessException ex) {
+            LOGGER.warn(Messages.MSG_ERROR_DETAILS, ex);
+        } catch (InvocationTargetException ex) {
+            LOGGER.warn(Messages.MSG_ERROR_DETAILS, ex);
+        } catch (NoSuchMethodException ex) {
+            LOGGER.warn(Messages.MSG_ERROR_DETAILS, ex);
         }
         return null;
     }
@@ -59,12 +63,12 @@ public class Classes {
             if (!method.isAccessible()) {
                 method.setAccessible(true);
             }
-        } catch (SecurityException e) {
-            LOGGER.warn("Error  : {}", e);
-        } catch (IllegalArgumentException e) {
-            LOGGER.warn("Error : {}", e);
-        } catch (NoSuchMethodException e) {
-            LOGGER.warn("Error  : {}", e);
+        } catch (SecurityException ex) {
+            LOGGER.warn(Messages.MSG_ERROR_DETAILS, ex);
+        } catch (IllegalArgumentException ex) {
+            LOGGER.warn("Error : {}", ex);
+        } catch (NoSuchMethodException ex) {
+            LOGGER.warn(Messages.MSG_ERROR_DETAILS, ex);
         }
     }
 
@@ -78,12 +82,12 @@ public class Classes {
                 field.setAccessible(true);
             }
             field.set(targetObj, newValue);
-        } catch (SecurityException e) {
-            LOGGER.error(e.getMessage(), e);
-        } catch (IllegalAccessException e) {
-            LOGGER.error(e.getMessage(), e);
-        } catch (NoSuchFieldException e) {
-            LOGGER.error(e.getMessage(), e);
+        } catch (SecurityException ex) {
+            LOGGER.error(ex.getMessage(), ex);
+        } catch (IllegalAccessException ex) {
+            LOGGER.error(ex.getMessage(), ex);
+        } catch (NoSuchFieldException ex) {
+            LOGGER.error(ex.getMessage(), ex);
             if (LOGGER.isDebugEnabled()) {
                 Field[] fields = clazz.getDeclaredFields();
                 LOGGER.debug("Fields of class : {}", clazz);
@@ -104,12 +108,12 @@ public class Classes {
                 field.setAccessible(true);
             }
             field.set(null, newValue);
-        } catch (SecurityException e) {
-            LOGGER.error(e.getMessage(), e);
-        } catch (IllegalAccessException e) {
-            LOGGER.error(e.getMessage(), e);
-        } catch (NoSuchFieldException e) {
-            LOGGER.error(e.getMessage(), e);
+        } catch (SecurityException ex) {
+            LOGGER.error(ex.getMessage(), ex);
+        } catch (IllegalAccessException ex) {
+            LOGGER.error(ex.getMessage(), ex);
+        } catch (NoSuchFieldException ex) {
+            LOGGER.error(ex.getMessage(), ex);
             if (LOGGER.isDebugEnabled()) {
                 Field[] fields = clazz.getDeclaredFields();
                 LOGGER.debug("Fields of class : {}", clazz);
@@ -135,8 +139,8 @@ public class Classes {
                     arList.add(field.getName());
                 }
             }
-        } catch (SecurityException e) {
-            LOGGER.error(e.getMessage(), e);
+        } catch (SecurityException ex) {
+            LOGGER.error(ex.getMessage(), ex);
         }
         return arList.toArray(new String[arList.size()]);
     }

@@ -19,6 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import prototypes.ws.proxy.soap.constants.Messages;
 
 /**
  *
@@ -27,6 +28,10 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 public class CaptureExpression extends Expression {
 
     private static final Pattern CAPTURE_REGEX_FORMAT = Pattern.compile(".*\\([^\\(]+\\).*");
+    private static final String MUST_PROVIDE_AT_LEAST_ONE_GROUP = "' is not correct. Must provide at least one capture group.";
+    private static final String FORMAT_OF_CAPTURE_EXPRESSION = "Format of capture expression '";
+    private static final String CANT_ACCESS_FIELD_OF_CLASS_2P = "Cant access field {} on object of class {}";
+    private static final String UNKNOWN_FIELD_OF_CLASS_2P = "Unknown field {} on object of class {}";
 
     protected Pattern regexCompiled;
 
@@ -51,8 +56,8 @@ public class CaptureExpression extends Expression {
         checkRegexFormat(body);
         try {
             this.regexCompiled = Pattern.compile(body);
-        } catch (PatternSyntaxException e) {
-            logger.warn("Error : {}", e);
+        } catch (PatternSyntaxException ex) {
+            logger.warn(Messages.MSG_ERROR_DETAILS, ex);
             throw new IllegalArgumentException("Format of capture expression '" + body + "' is not correct. Must provide a correct regular expression.");
         }
     }
@@ -64,10 +69,10 @@ public class CaptureExpression extends Expression {
     protected final void checkRegexFormat(String regex) {
         Matcher m = CAPTURE_REGEX_FORMAT.matcher(regex);
         if (!m.find()) {
-            throw new IllegalArgumentException("Format of capture expression '" + regex + "' is not correct. Must provide at least one capture group.");
+            throw new IllegalArgumentException(FORMAT_OF_CAPTURE_EXPRESSION + regex + MUST_PROVIDE_AT_LEAST_ONE_GROUP);
         }
         if (m.groupCount() > 1) {
-            throw new IllegalArgumentException("Format of capture expression '" + regex + "' is not correct. Must provide at least one capture group.");
+            throw new IllegalArgumentException(FORMAT_OF_CAPTURE_EXPRESSION + regex + MUST_PROVIDE_AT_LEAST_ONE_GROUP);
         }
     }
 
@@ -77,8 +82,8 @@ public class CaptureExpression extends Expression {
         if (m.find()) {
             try {
                 captured = m.group(1);
-            } catch (IllegalStateException e) {
-                logger.warn("Matching error on {} : {}", content, e);
+            } catch (IllegalStateException ex) {
+                logger.warn("Matching error on {} : {}", content, ex);
             }
         }
         return captured;
@@ -94,11 +99,11 @@ public class CaptureExpression extends Expression {
                 return capture(targetField.toString());
             }
         } catch (IllegalArgumentException ex) {
-            logger.warn("Error : {}", ex);
-            logger.warn("Unknown field {} on object of class {}", this.objectField, object.getClass().getName());
+            logger.warn(UNKNOWN_FIELD_OF_CLASS_2P, this.objectField, object.getClass().getName());
+            logger.debug(Messages.MSG_ERROR_DETAILS, ex);
         } catch (IllegalAccessException ex) {
-            logger.warn("Error : {}", ex);
-            logger.warn("Cant access field {} on object of class {}", this.objectField, object.getClass().getName());
+            logger.warn(CANT_ACCESS_FIELD_OF_CLASS_2P, this.objectField, object.getClass().getName());
+            logger.debug(Messages.MSG_ERROR_DETAILS, ex);
         }
         return "";
     }
@@ -121,9 +126,11 @@ public class CaptureExpression extends Expression {
                 return match(targetField.toString());
             }
         } catch (IllegalArgumentException ex) {
-            logger.warn("Unknown field {} on object of class {} - Details : {}", this.objectField, object.getClass().getName(), ex);
+            logger.warn(UNKNOWN_FIELD_OF_CLASS_2P, this.objectField, object.getClass().getName());
+            logger.debug(Messages.MSG_ERROR_DETAILS, ex);
         } catch (IllegalAccessException ex) {
-            logger.warn("Cant access field {} on object of class {} - Details : {}", this.objectField, object.getClass().getName(), ex);
+            logger.warn(CANT_ACCESS_FIELD_OF_CLASS_2P, this.objectField, object.getClass().getName());
+            logger.debug(Messages.MSG_ERROR_DETAILS, ex);
         }
         return false;
     }

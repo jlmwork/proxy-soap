@@ -68,7 +68,6 @@ public class ZipOut {
         try {
             if (currentWriter != null) {
                 currentWriter.flush();
-                //currentWriter.close();
                 currentWriter = null;
             }
             if (zipOut != null) {
@@ -82,8 +81,8 @@ public class ZipOut {
 
     }
 
-    public void addDirToZipStream(String dirPath, String[] extensions) {
-        dirPath = FilenameUtils.normalize(dirPath);
+    public void addDirToZipStream(String paramDirPath, String[] extensions) {
+        String dirPath = FilenameUtils.normalize(paramDirPath);
         // Files entries
         File dir = new File(dirPath);
         if (!dir.exists()) {
@@ -99,7 +98,7 @@ public class ZipOut {
 
             List<File> files = (List<File>) FileUtils.listFiles(dir, extensions, true);
             for (File file : files) {
-                //LOGGER.debug("File {} to add to zip", file.getAbsolutePath());
+
                 filename = file.getCanonicalPath().replace(dirPath, "");
                 //Initialize inputstream
                 inputStream = new FileInputStream(file);
@@ -114,8 +113,6 @@ public class ZipOut {
                 LOGGER.debug("Folder in zip {}", folderInZip);
                 parameters.setRootFolderInZip(folderInZip);
                 zipOut.putNextEntry(file, parameters);
-                //Read the file content and write it to the OutputStream
-                //zipOut.write(Files.read(file.getAbsolutePath()).getBytes());
                 while ((readLen = inputStream.read(readBuff)) != -1) {
                     zipOut.write(readBuff, 0, readLen);
                 }
@@ -123,16 +120,16 @@ public class ZipOut {
 
                 inputStream.close();
             }
-        } catch (ZipException e) {
-            LOGGER.warn("Error while adding file {} : {}", filename, e);
-        } catch (IOException e) {
-            LOGGER.warn("Error while opening file {} : {}", filename, e);
+        } catch (ZipException ex) {
+            LOGGER.warn("Error while adding file {} : {}", filename, ex);
+        } catch (IOException ex) {
+            LOGGER.warn("Error while opening file {} : {}", filename, ex);
         } finally {
             if (inputStream != null) {
                 try {
                     inputStream.close();
-                } catch (IOException e) {
-                    LOGGER.error("Error on inputStream close : {} ", e);
+                } catch (IOException ex) {
+                    LOGGER.error("Error on inputStream close : {} ", ex);
                 }
             }
         }

@@ -13,20 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package prototypes.ws.proxy.soap.validation;
+package prototypes.ws.proxy.soap.constants;
 
-public class SoapException extends RuntimeException {
+public class SoapErrorConstants {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -8863295767211314294L;
+    public static final String WSDL_NOT_FOUND = "WSDL: file not exists. Schema path : %s";
 
-    public SoapException(String message) {
-        super(message);
-    }
-
-    public SoapException(String message, Exception ex) {
-        super(message, ex);
+    private SoapErrorConstants() {
     }
 }

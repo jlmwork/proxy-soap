@@ -19,7 +19,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import org.junit.Assert;
 import org.junit.Test;
-import prototypes.ws.proxy.soap.constantes.ApplicationConfig;
+import prototypes.ws.proxy.soap.constants.ApplicationConfig;
 
 /**
  *

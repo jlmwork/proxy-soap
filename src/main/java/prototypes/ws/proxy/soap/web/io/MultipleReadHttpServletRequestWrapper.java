@@ -74,12 +74,10 @@ public class MultipleReadHttpServletRequestWrapper extends HttpServletRequestWra
     public ServletInputStream getInputStream() throws IOException {
         final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(body.getBytes());
 
-        ServletInputStream inputStream = new ServletInputStream() {
+        return new ServletInputStream() {
             public int read() throws IOException {
                 return byteArrayInputStream.read();
             }
         };
-
-        return inputStream;
     }
 }

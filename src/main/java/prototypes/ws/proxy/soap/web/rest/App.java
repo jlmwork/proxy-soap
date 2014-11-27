@@ -26,11 +26,14 @@ import org.glassfish.jersey.server.ResourceConfig;
  */
 public class App extends ResourceConfig {
 
+    /**
+     *
+     * Tried to use singleton with hk2 but didn't work : Entity Inspector.
+     * bind(EntityInspectorImpl.class) .to(EntityInspector.class)
+     * .in(Singleton.class);
+     *
+     */
     public App() {
-        // Entity Inspector.
-//        bind(EntityInspectorImpl.class)
-//                .to(EntityInspector.class)
-//                .in(Singleton.class);
         // Register all resources present under the package.
         packages("prototypes.ws.proxy.soap.web.rest");
         // Register entity-filtering selectable feature.

@@ -23,6 +23,9 @@ public class Strings {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Strings.class);
 
+    private Strings() {
+    }
+
     /**
      * Get first part of string str, where string part is separated by regex.
      *
@@ -86,7 +89,6 @@ public class Strings {
     }
 
     public static byte[] compressString(String input) {
-        //ByteArrayInputStream bAIS = new ByteArrayInputStream(input.getBytes());
         return Streams.compressString(input);
     }
 

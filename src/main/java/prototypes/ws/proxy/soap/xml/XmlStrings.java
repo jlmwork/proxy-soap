@@ -42,17 +42,20 @@ import org.apache.xmlbeans.XmlOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import prototypes.ws.proxy.soap.constants.Messages;
 
 public class XmlStrings {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XmlStrings.class);
 
     private static String SOAP_SCHEMA = "http://schemas.xmlsoap.org/soap/envelope/";
+
+    private XmlStrings() {
+    }
 
     /**
      * Removes blanks between tags.
@@ -83,8 +86,7 @@ public class XmlStrings {
         StreamResult result = new StreamResult(sw);
         DOMSource source = new DOMSource(node);
         trans.transform(source, result);
-        String content = sw.toString();
-        return content;
+        return sw.toString();
     }
 
     /**
@@ -106,14 +108,13 @@ public class XmlStrings {
 
         try {
             docBuilder = factory.newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
+        } catch (ParserConfigurationException ex) {
             throw new IllegalStateException(
-                    "Failed to initialize XML document builder", e);
+                    "Failed to initialize XML document builder", ex);
         }
 
         Document document = docBuilder.parse(bAIS);
-        Element root = document.getDocumentElement();
-        return root;
+        return document.getDocumentElement();
     }
 
     /**
@@ -125,10 +126,10 @@ public class XmlStrings {
      * @throws SAXException
      * @throws IOException
      */
-    public static Node first(String xmlContent, String tagName)
+    public static Node first(String paramXmlContent, String tagName)
             throws SAXException, IOException {
 
-        xmlContent = XmlStrings.cleanXmlRequest(xmlContent);
+        String xmlContent = XmlStrings.cleanXmlRequest(paramXmlContent);
         Node xml = XmlStrings.parseXML(xmlContent);
 
         Document root = xml.getOwnerDocument();
@@ -141,9 +142,9 @@ public class XmlStrings {
         return bodyNodes.item(0);
     }
 
-    public static NodeList children(String xmlContent, String tagName)
+    public static NodeList children(String paramXmlContent, String tagName)
             throws SAXException, IOException {
-        xmlContent = XmlStrings.cleanXmlRequest(xmlContent);
+        String xmlContent = XmlStrings.cleanXmlRequest(paramXmlContent);
         Node xml = XmlStrings.parseXML(xmlContent);
 
         Document root = xml.getOwnerDocument();
@@ -180,14 +181,14 @@ public class XmlStrings {
     /**
      * Format XML.
      *
-     * @param unformattedXml
+     * @param xml
      * @return
      */
     public static String format(String xml) {
         try {
             return new String(format(xml.getBytes("UTF-8")), "UTF-8");
         } catch (UnsupportedEncodingException ex) {
-            LOGGER.debug("XmlUtils.format Error : {}", ex);
+            LOGGER.debug(Messages.MSG_ERROR_DETAILS, ex);
         }
         return xml;
     }
@@ -198,7 +199,6 @@ public class XmlStrings {
         }
 
         try {
-            //xml = cleanXmlRequest(xml);
             LOGGER.trace("create sax transformer");
             Transformer serializer = SAXTransformerFactory.newInstance()
                     .newTransformer();
@@ -208,28 +208,25 @@ public class XmlStrings {
 
                 @Override
                 public void warning(TransformerException exception) throws TransformerException {
-                    LOGGER.warn("Error : {}", exception);
+                    LOGGER.warn(Messages.MSG_ERROR_DETAILS, exception);
                 }
 
                 @Override
                 public void error(TransformerException exception) throws TransformerException {
-                    LOGGER.error("Error : {}", exception);
+                    LOGGER.error(Messages.MSG_ERROR_DETAILS, exception);
                 }
 
                 @Override
                 public void fatalError(TransformerException exception) throws TransformerException {
-                    LOGGER.error("Error : {}", exception);
+                    LOGGER.error(Messages.MSG_ERROR_DETAILS, exception);
                 }
             });
             serializer.setOutputProperty(OutputKeys.INDENT, "yes");
-            // serializer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,
-            // "yes");
+            // can use OMIT_XML_DECLARATION at yes
 
             LOGGER.trace("set output prop");
             serializer.setOutputProperty(
                     "{http://xml.apache.org/xslt}indent-amount", "4");
-            // serializer.setOutputProperty("{http://xml.customer.org/xslt}indent-amount",
-            // "2");
 
             LOGGER.trace("create sax source");
             Source xmlSource = new SAXSource(new InputSource(
@@ -243,9 +240,9 @@ public class XmlStrings {
             return ((ByteArrayOutputStream) res.getOutputStream())
                     .toByteArray();
         } catch (IllegalArgumentException ex) {
-            LOGGER.debug("XmlUtils.format Error : {}", ex);
+            LOGGER.debug(Messages.MSG_ERROR_DETAILS, ex);
         } catch (TransformerException ex) {
-            LOGGER.debug("XmlUtils.format Error : " + ex);
+            LOGGER.debug(Messages.MSG_ERROR_DETAILS, ex);
             LOGGER.debug("XML Message was : {}", xml);
         }
         return xml;
@@ -264,22 +261,28 @@ public class XmlStrings {
             xmlOptions.setErrorListener(errs);
             xmlOptions
                     .setLoadLineNumbers(XmlOptions.LOAD_LINE_NUMBERS_END_ELEMENT);
-            // XmlObject.Factory.parse( request, xmlOptions );
             XmlStrings.parseXml(xml, xmlOptions);
-        } catch (XmlException e) {
-            LOGGER.warn("Error occured : {}", e);
-            if (e.getErrors() != null) {
-                LOGGER.debug("XML errors found : {}", e.getErrors());
-                for (Object error : e.getErrors()) {
+        } catch (XmlException ex) {
+            LOGGER.warn(Messages.MSG_ERROR_DETAILS, ex);
+            if (ex.getErrors() != null) {
+                LOGGER.debug("XML errors found : {}", ex.getErrors());
+                for (Object error : ex.getErrors()) {
                     errs.add(error.toString());
                 }
             }
-            errs.add(XmlError.forMessage(e.getMessage()).toString());
-        } catch (Exception e) {
-            LOGGER.warn("Error occured : {}", e);
-            errs.add(XmlError.forMessage(e.getMessage()).toString());
+            errs.add(XmlError.forMessage(ex.getMessage()).toString());
+        } catch (Exception ex) {
+            LOGGER.warn(Messages.MSG_ERROR_DETAILS, ex);
+            errs.add(XmlError.forMessage(ex.getMessage()).toString());
         }
 
         return errs;
+    }
+
+    public static Document loadDocumentFromString(String xml) throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        return builder.parse(new ByteArrayInputStream(xml.getBytes()));
     }
 }

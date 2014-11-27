@@ -29,6 +29,7 @@ import javax.json.JsonValue;
 import javax.persistence.AttributeConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import prototypes.ws.proxy.soap.constants.Messages;
 
 /**
  *
@@ -53,8 +54,7 @@ public class HeadersConverter implements AttributeConverter<Map<String, List<Str
                 oBuilder.add(compatKey, aBuilder.build());
             }
             String finalColumnContent = oBuilder.build().toString();
-            byte[] bytes = (new CompressionConverter()).convertToDatabaseColumn(finalColumnContent);
-            return bytes;
+            return (new CompressionConverter()).convertToDatabaseColumn(finalColumnContent);
         } else {
             return new byte[0];
         }
@@ -68,25 +68,19 @@ public class HeadersConverter implements AttributeConverter<Map<String, List<Str
             String dbDataString = (new CompressionConverter()).convertToEntityAttribute(dbData);
             JsonReader reader = Json.createReader(new StringReader(dbDataString));
             JsonStructure jsonst = reader.read();
-
             try {
                 Map<String, JsonValue> jsonMap = (Map<String, JsonValue>) jsonst;
                 for (Map.Entry<String, JsonValue> entry : jsonMap.entrySet()) {
                     List<String> list = new ArrayList<String>();
                     list.addAll((List) entry.getValue());
                     outMap.put(entry.getKey(), list);
-                }/*
-                 Map<String, JsonValue> jsonMap = (Map<String, JsonValue>) jsonst;
-                 for (String key : jsonMap.keySet()) {
-                 List<String> list = new ArrayList<String>();
-                 list.addAll((List) jsonMap.get(key));
-                 outMap.put(key, list);
-                 }*/
-
+                }
             } catch (ClassCastException ex) {
-                LOGGER.warn("Bad class found while converting from db : {}", ex);
+                LOGGER.warn(Messages.MSG_ERROR_ON, " DB column conversion - Bad class found ");
+                LOGGER.debug(Messages.MSG_ERROR_DETAILS, ex);
             } catch (NullPointerException ex) {
-                LOGGER.warn("Null found while converting from db : {}", ex);
+                LOGGER.warn(Messages.MSG_ERROR_ON, " DB column conversion - Null found ");
+                LOGGER.debug(Messages.MSG_ERROR_DETAILS, ex);
             }
         }
         return outMap;

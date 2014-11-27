@@ -18,7 +18,8 @@ package prototypes.ws.proxy.soap.repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
-import prototypes.ws.proxy.soap.constantes.ApplicationConfig;
+import prototypes.ws.proxy.soap.constants.ApplicationConfig;
+import prototypes.ws.proxy.soap.constants.Messages;
 import prototypes.ws.proxy.soap.repository.jpa.SoapExchangeJpaRepository;
 import prototypes.ws.proxy.soap.repository.memory.SoapExchangeInMemoryRepository;
 
@@ -46,6 +47,9 @@ public class SoapExchangeRepositoryFactory {
          * Unique instance
          */
         private final static SoapExchangeRepositoryFactory instance = new SoapExchangeRepositoryFactory();
+
+        private SingletonHolder() {
+        }
     }
 
     /**
@@ -60,7 +64,8 @@ public class SoapExchangeRepositoryFactory {
             try {
                 return new SoapExchangeJpaRepository(proxyConfig);
             } catch (RuntimeException ex) {
-                LOGGER.error("Error creating JPA Repository. Failover to InMemory implementation. Error details : {}", ex);
+                LOGGER.error("Error creating JPA Repository. Failover to InMemory implementation. Error details : {}", ex.getMessage());
+                LOGGER.warn(Messages.MSG_ERROR_DETAILS, ex);
                 // fall back to a in-memory implementation
                 return new SoapExchangeInMemoryRepository(proxyConfig);
             }

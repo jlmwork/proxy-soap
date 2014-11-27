@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package prototypes.ws.proxy.soap.wss.saml.asserter;
+package prototypes.ws.proxy.soap.security.saml;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

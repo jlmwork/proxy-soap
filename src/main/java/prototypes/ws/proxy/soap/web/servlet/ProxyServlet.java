@@ -29,7 +29,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
-import prototypes.ws.proxy.soap.constantes.ProxyErrorConstantes;
+import prototypes.ws.proxy.soap.constants.ProxyErrorConstants;
 import prototypes.ws.proxy.soap.io.Streams;
 import prototypes.ws.proxy.soap.io.Strings;
 import prototypes.ws.proxy.soap.model.BackendExchange;
@@ -101,8 +101,8 @@ public class ProxyServlet extends AbstractServlet {
                 backendExchange.setResponseBody(Streams.getBytes(httpConn.getInputStream(), gzipped));
             } catch (java.net.SocketTimeoutException ex) {
                 throw new IOException("Time out : " + ex.getMessage(), ex);
-            } catch (IOException e) {
-                LOGGER.warn("Failed to read target response body {}", e);
+            } catch (IOException ex) {
+                LOGGER.warn("Failed to read target response body {}", ex);
                 backendExchange.setResponseBody(Streams.getBytes(httpConn.getErrorStream(), gzipped));
             } finally {
                 backendExchange.stop();
@@ -118,15 +118,17 @@ public class ProxyServlet extends AbstractServlet {
                     // No response
                     LOGGER.debug("ResponseCode =  0 !!!");
                     Requests.sendErrorServer(request, response, String
-                            .format(ProxyErrorConstantes.EMPTY_RESPONSE,
+                            .format(ProxyErrorConstants.EMPTY_RESPONSE,
                                     targetUrl.toString()));
                     return;
                 case 404:
                     LOGGER.debug("404 returned");
                     Requests.sendErrorServer(request, response,
-                            String.format(ProxyErrorConstantes.NOT_FOUND,
+                            String.format(ProxyErrorConstants.NOT_FOUND,
                                     targetUrl.toString()), 404);
                     return;
+                default:
+                    break;
             }
 
             // return response with filtered headers
@@ -143,24 +145,24 @@ public class ProxyServlet extends AbstractServlet {
             // bad url
             Requests.sendErrorClient(request, response,
                     ex.getMessage());
-        } catch (IOException e) {
+        } catch (IOException ex) {
             LOGGER.error("Backend call in ERROR");
             // bad call
             Requests.sendErrorServer(request, response,
-                    e.getMessage());
-        } catch (Exception e) {
-            LOGGER.error("Error during proxying : {}", e);
+                    ex.getMessage());
+        } catch (Exception ex) {
+            LOGGER.error("Error during proxying : {}", ex);
             // protect from all exceptions
             Requests.sendInternalErrorServer(request, response,
-                    e.getMessage());
+                    ex.getMessage());
         } finally {
             LOGGER.trace("BackendExchange Hashcode : {}", Integer.toHexString(backendExchange.hashCode()));
             LOGGER.debug("BackendExchange : {}", backendExchange);
             if (httpConn != null) {
                 try {
                     httpConn.disconnect();
-                } catch (Exception e) {
-                    LOGGER.warn("Error on disconnect {}", e);
+                } catch (Exception ex) {
+                    LOGGER.warn("Error on disconnect {}", ex);
                 }
             }
         }
@@ -188,8 +190,8 @@ public class ProxyServlet extends AbstractServlet {
         String reqContentType = (!Strings.isNullOrEmpty(request.getContentType()))
                 ? request.getContentType()
                 : (!Strings.isNullOrEmpty(request.getHeader("Content-Type"))
-                        ? request.getHeader("Content-Type")
-                        : "text/xml");
+                ? request.getHeader("Content-Type")
+                : "text/xml");
         httpConn.setRequestProperty("Content-Type", reqContentType);
 
         return httpConn;

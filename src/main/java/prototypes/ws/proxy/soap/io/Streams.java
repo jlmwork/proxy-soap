@@ -25,6 +25,7 @@ import java.util.zip.GZIPOutputStream;
 import org.mozilla.universalchardet.UniversalDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import prototypes.ws.proxy.soap.constants.Messages;
 
 /**
  *
@@ -33,6 +34,9 @@ import org.slf4j.LoggerFactory;
 public class Streams {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Streams.class);
+
+    private Streams() {
+    }
 
     public static void putStringAndClose(OutputStream os, String data)
             throws IOException {
@@ -48,14 +52,16 @@ public class Streams {
             return os;
         }
 
+        OutputStream localOs;
         if (zipped) {
-            os = new java.util.zip.GZIPOutputStream(os);
-            os.write(data.getBytes());
+            localOs = new java.util.zip.GZIPOutputStream(os);
+            localOs.write(data.getBytes());
         } else {
-            os.write(data.getBytes());
+            localOs = os;
+            localOs.write(data.getBytes());
         }
 
-        return os;
+        return localOs;
     }
 
     public static void writeStringAndClose(Writer w, String data)
@@ -83,8 +89,8 @@ public class Streams {
         if (zipped) {
             try {
                 finalIS = new java.util.zip.GZIPInputStream(is);
-            } catch (IOException e) {
-                LOGGER.warn("Error  : {}", e);
+            } catch (IOException ex) {
+                LOGGER.warn(Messages.MSG_ERROR_DETAILS, ex);
             }
         }
         return getString(finalIS);
@@ -98,14 +104,14 @@ public class Streams {
             finalOS.write(toCompress.getBytes());
             finalOS.close();
             return bAOS.toByteArray();
-        } catch (IOException e) {
-            LOGGER.warn("Error on compressing {} ", e.getMessage());
+        } catch (IOException ex) {
+            LOGGER.warn("Error on compressing {} ", ex.getMessage());
         } finally {
             if (finalOS != null) {
                 try {
                     finalOS.close();
-                } catch (Exception e) {
-                    LOGGER.warn("Error  : {}", e);
+                } catch (Exception ex) {
+                    LOGGER.warn(Messages.MSG_ERROR_DETAILS, ex);
                 }
             }
         }
@@ -142,8 +148,8 @@ public class Streams {
         if (zipped) {
             try {
                 finalIS = new java.util.zip.GZIPInputStream(is);
-            } catch (IOException e) {
-                LOGGER.warn("Error  : {}", e);
+            } catch (IOException ex) {
+                LOGGER.warn(Messages.MSG_ERROR_DETAILS, ex);
             }
         }
         return getBytes(finalIS);
@@ -162,19 +168,19 @@ public class Streams {
             while ((readed = iS.read()) != -1) {
                 oS.write(readed);
             }
-        } catch (IOException e) {
-            LOGGER.warn("Error  : {}", e);
+        } catch (IOException ex) {
+            LOGGER.warn(Messages.MSG_ERROR_DETAILS, ex);
         } finally {
             try {
                 oS.close();
-            } catch (IOException e) {
-                LOGGER.warn("Error  : {}", e);
+            } catch (IOException ex) {
+                LOGGER.warn(Messages.MSG_ERROR_DETAILS, ex);
             }
             if (iS != null) {
                 try {
                     iS.close();
-                } catch (IOException e) {
-                    LOGGER.warn("Error  : {}", e);
+                } catch (IOException ex) {
+                    LOGGER.warn(Messages.MSG_ERROR_DETAILS, ex);
                 }
             }
         }

@@ -26,6 +26,7 @@ import javax.script.CompiledScript;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import prototypes.ws.proxy.soap.constants.Messages;
 import prototypes.ws.proxy.soap.reflect.Classes;
 
 /**
@@ -50,20 +51,19 @@ public class BooleanExecutableExpression extends Expression {
     }
 
     protected final void setBody(String body) {
+        this.body = body;
         try {
             if (engine instanceof Compilable) {
-                //script = m.get("fib");
                 if (script == null) {
                     Compilable compilingEngine = (Compilable) engine;
                     script = compilingEngine.compile(body);
-                    //m.put("fib", script);
                 }
             } else {
                 logger.warn("Engine {}-{} cannot compile scripts", engine.getFactory().getEngineName(), engine.getFactory().getEngineVersion());
             }
-        } catch (ScriptException e) {
-            logger.warn("Error : {}", e);
-            throw new IllegalArgumentException("Script expression '" + body + "' is not correct.", e);
+        } catch (ScriptException ex) {
+            logger.warn(Messages.MSG_ERROR_DETAILS, ex);
+            throw new IllegalArgumentException("Script expression '" + body + "' is not correct.", ex);
         }
     }
 
@@ -80,12 +80,12 @@ public class BooleanExecutableExpression extends Expression {
                 for (Map.Entry<String, Method> entry : fieldMethods.entrySet()) {
                     try {
                         bindings.put(entry.getKey(), entry.getValue().invoke(o, new Object[0]));
-                    } catch (InvocationTargetException e) {
-                        logger.warn("Error : {}", e);
-                        throw new IllegalArgumentException("Error with given object class '" + o.getClass() + "'.", e);
-                    } catch (IllegalAccessException e) {
-                        logger.warn("Error : {}", e);
-                        throw new IllegalArgumentException("Error with given object class '" + o.getClass() + "'.", e);
+                    } catch (InvocationTargetException ex) {
+                        logger.warn(Messages.MSG_ERROR_DETAILS, ex);
+                        throw new IllegalArgumentException("Error with given object class '" + o.getClass() + "'.", ex);
+                    } catch (IllegalAccessException ex) {
+                        logger.warn(Messages.MSG_ERROR_DETAILS, ex);
+                        throw new IllegalArgumentException("Error with given object class '" + o.getClass() + "'.", ex);
                     }
                 }
                 Object result;
@@ -95,11 +95,10 @@ public class BooleanExecutableExpression extends Expression {
                     result = engine.eval(body, bindings);
                 }
                 return (Boolean) result;
-            } catch (ScriptException e) {
-                logger.warn("Error on script", e);
-                //throw new IllegalArgumentException("Script expression '" + body + "' is not correct.", e);
-            } catch (java.lang.IllegalArgumentException e) {
-                logger.warn("Error on script execution", e);
+            } catch (ScriptException ex) {
+                logger.warn("Error on script", ex);
+            } catch (java.lang.IllegalArgumentException ex) {
+                logger.warn("Error on script execution", ex);
             }
         }
         return null;

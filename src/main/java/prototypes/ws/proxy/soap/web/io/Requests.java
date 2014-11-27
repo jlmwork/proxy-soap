@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import prototypes.ws.proxy.soap.constantes.ProxyErrorConstantes;
+import prototypes.ws.proxy.soap.constants.ProxyErrorConstants;
 import prototypes.ws.proxy.soap.io.Strings;
 
 public class Requests {
@@ -40,8 +40,17 @@ public class Requests {
             .getLogger(Requests.class);
 
     public static final String HEADER_AUTH = "Authorization";
+    private static final String CONTENT_TYPE_MIN = "content-type";
+    private static final String CONTENT_TYPE_FIRST_UPS = "Content-Type";
+    private static final String CONTENT_TYPE_FIRST_UP = "Content-type";
+    private static final String SOAP_FAULT_SERVER_JSP = "/WEB-INF/views/jsp/soap-fault-server.jsp";
+    private static final String SOAP_FAULT_CLIENT_JSP = "/WEB-INF/views/jsp/soap-fault-client.jsp";
+    private static final String ERROR_MESSAGE = "javax.servlet.error.message";
 
     private static final Pattern charsetPattern = Pattern.compile(".*charset=(.*)\\W?$");
+
+    private Requests() {
+    }
 
     /**
      * Get complete host, e.g. <scheme>://<serverName>:<port>
@@ -67,10 +76,11 @@ public class Requests {
         return target;
     }
 
-    public static URL resolveTargetUrl(HttpServletRequest request, String uri) {
+    public static URL resolveTargetUrl(HttpServletRequest request, String paramUri) {
+        String uri = paramUri;
         if (Strings.isNullOrEmpty(uri)) {
             throw new IllegalStateException(
-                    ProxyErrorConstantes.TARGET_IS_EMPTY);
+                    ProxyErrorConstants.TARGET_IS_EMPTY);
         }
         if (!uri.matches("^\\w+://.*")) {
             LOGGER.debug("URI doesnt match URL pattern. So add current request host");
@@ -81,9 +91,9 @@ public class Requests {
         URL targetUrl;
         try {
             targetUrl = new URL(uri);
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException ex) {
             throw new IllegalStateException(String.format(
-                    ProxyErrorConstantes.INVALID_TARGET, uri));
+                    ProxyErrorConstants.INVALID_TARGET, uri));
         }
         return targetUrl;
     }
@@ -111,11 +121,11 @@ public class Requests {
         return service;
     }
 
-    public static boolean isHttpPath(String str) {
-        if (Strings.isNullOrEmpty(str)) {
+    public static boolean isHttpPath(String paramStr) {
+        if (Strings.isNullOrEmpty(paramStr)) {
             return false;
         }
-        str = str.toLowerCase();
+        String str = paramStr.toLowerCase();
 
         return str.startsWith("http:/") || str.startsWith("https:/");
     }
@@ -166,8 +176,8 @@ public class Requests {
      */
     public static void sendErrorClient(HttpServletRequest request, HttpServletResponse response, String message) throws IOException, ServletException {
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        request.setAttribute("javax.servlet.error.message", message);
-        request.getRequestDispatcher("/WEB-INF/views/jsp/soap-fault-client.jsp").forward(request, response);
+        request.setAttribute(ERROR_MESSAGE, message);
+        request.getRequestDispatcher(SOAP_FAULT_CLIENT_JSP).forward(request, response);
     }
 
     /**
@@ -183,8 +193,8 @@ public class Requests {
      */
     public static void sendErrorServer(HttpServletRequest request, HttpServletResponse response, String message, int returnCode) throws IOException, ServletException {
         response.setStatus(returnCode);
-        request.setAttribute("javax.servlet.error.message", message);
-        request.getRequestDispatcher("/WEB-INF/views/jsp/soap-fault-server.jsp").forward(request, response);
+        request.setAttribute(ERROR_MESSAGE, message);
+        request.getRequestDispatcher(SOAP_FAULT_SERVER_JSP).forward(request, response);
     }
 
     /**
@@ -199,8 +209,8 @@ public class Requests {
      */
     public static void sendErrorServer(HttpServletRequest request, HttpServletResponse response, String message) throws IOException, ServletException {
         response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
-        request.setAttribute("javax.servlet.error.message", message);
-        request.getRequestDispatcher("/WEB-INF/views/jsp/soap-fault-server.jsp").forward(request, response);
+        request.setAttribute(ERROR_MESSAGE, message);
+        request.getRequestDispatcher(SOAP_FAULT_SERVER_JSP).forward(request, response);
     }
 
     /**
@@ -215,8 +225,8 @@ public class Requests {
      */
     public static void sendInternalErrorServer(HttpServletRequest request, HttpServletResponse response, String message) throws IOException, ServletException {
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        request.setAttribute("javax.servlet.error.message", message);
-        request.getRequestDispatcher("/WEB-INF/views/jsp/soap-fault-server.jsp").forward(request, response);
+        request.setAttribute(ERROR_MESSAGE, message);
+        request.getRequestDispatcher(SOAP_FAULT_SERVER_JSP).forward(request, response);
     }
 
     /**
@@ -260,14 +270,14 @@ public class Requests {
         String charset = null;
         if (map != null) {
             String contentType = null;
-            if (map.get("Content-type") != null && !map.get("Content-type").isEmpty()) {
-                contentType = map.get("Content-type").get(0);
+            if (map.get(CONTENT_TYPE_FIRST_UP) != null && !map.get(CONTENT_TYPE_FIRST_UP).isEmpty()) {
+                contentType = map.get(CONTENT_TYPE_FIRST_UP).get(0);
             }
-            if (map.get("Content-Type") != null && !map.get("Content-Type").isEmpty()) {
-                contentType = map.get("Content-type").get(0);
+            if (map.get(CONTENT_TYPE_FIRST_UPS) != null && !map.get(CONTENT_TYPE_FIRST_UPS).isEmpty()) {
+                contentType = map.get(CONTENT_TYPE_FIRST_UP).get(0);
             }
-            if (map.get("content-type") != null && !map.get("content-type").isEmpty()) {
-                contentType = map.get("Content-type").get(0);
+            if (map.get(CONTENT_TYPE_MIN) != null && !map.get(CONTENT_TYPE_MIN).isEmpty()) {
+                contentType = map.get(CONTENT_TYPE_FIRST_UP).get(0);
             }
             charset = getCharset(contentType);
         }

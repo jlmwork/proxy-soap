@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package prototypes.ws.proxy.soap.wss.saml.asserter;
+package prototypes.ws.proxy.soap.security.saml;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -49,9 +49,9 @@ public class SamlTokenAssertionGenerator {
         SAMLAssertion assertion = new SAMLAssertion(issuer, null, null, null, null, null);
         assertion.setNotBefore(currentDate);
         // default to 1 hour
-        timeInSeconds = (timeInSeconds == null) ? 3600 : timeInSeconds;
+        Long newTimeInSeconds = (timeInSeconds == null) ? 3600 : timeInSeconds;
         assertion.setNotOnOrAfter(new Date(currentDate.getTime()
-                + timeInSeconds * 1000));
+                + newTimeInSeconds * 1000));
         // Create the subject
         SAMLSubject subject = new SAMLSubject(new SAMLNameIdentifier(login, "", SAMLNameIdentifier.FORMAT_UNSPECIFIED), null, null, null);
 
@@ -65,9 +65,9 @@ public class SamlTokenAssertionGenerator {
         // needs to check for validity before returning
         try {
             assertion.checkValidity();
-        } catch (org.opensaml.MalformedException e) {
-            LOGGER.error("Assertion invalid " + e.getMessage());
-            throw new IllegalArgumentException(e);
+        } catch (org.opensaml.MalformedException ex) {
+            LOGGER.error("Assertion invalid " + ex.getMessage());
+            throw new IllegalArgumentException(ex);
         }
         traceAssertion(assertion);
 

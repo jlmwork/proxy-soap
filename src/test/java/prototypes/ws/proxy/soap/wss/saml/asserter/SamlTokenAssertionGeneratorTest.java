@@ -15,6 +15,7 @@
  */
 package prototypes.ws.proxy.soap.wss.saml.asserter;
 
+import prototypes.ws.proxy.soap.security.saml.SamlTokenAssertionGenerator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.joda.time.DateTime;
