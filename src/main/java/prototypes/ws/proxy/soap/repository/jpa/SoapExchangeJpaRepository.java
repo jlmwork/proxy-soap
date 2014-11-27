@@ -143,20 +143,19 @@ public class SoapExchangeJpaRepository extends SoapExchangeRepository {
     @Override
     public void save(SoapExchange exchange) {
         EntityManager em = null;
-        if (!ignoreExchange(exchange)) {
-            em = emf.createEntityManager();
-            try {
-                em.getTransaction().begin();
-                em.persist(exchange);
-                em.getTransaction().commit();
-                LOGGER.debug("exchange saved");
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage());
-                LOGGER.debug("Persistence Exception Stack : ", e);
-            } finally {
-                closeTransaction(em);
-            }
+        em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+            em.persist(exchange);
+            em.getTransaction().commit();
+            LOGGER.debug("exchange saved");
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            LOGGER.debug("Persistence Exception Stack : ", e);
+        } finally {
+            closeTransaction(em);
         }
+
     }
 
     private String getRequestFilePath(SoapExchange exchange) {

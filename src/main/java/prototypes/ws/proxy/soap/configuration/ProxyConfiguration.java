@@ -47,10 +47,6 @@ public final class ProxyConfiguration extends HashMap<String, Object> {
     private final AtomicInteger nbMaxExchanges = new AtomicInteger(50);
     private String wsdlDirs = "";
     private final AtomicBoolean isPersistedConf = new AtomicBoolean(false);
-    /**
-     * @deprecated use ignoreExpressions instead
-     */
-    private final AtomicBoolean ignoreValidExchanges = new AtomicBoolean(false);
     private final String persistedConfPath = ApplicationConfig.DEFAULT_STORAGE_PATH_CONF + "proxy-soap.properties";
     private final AtomicInteger runMode = new AtomicInteger(ApplicationConfig.RUN_MODE_PROD);
     private final AtomicInteger connectTimeout = new AtomicInteger(2000);
@@ -64,6 +60,7 @@ public final class ProxyConfiguration extends HashMap<String, Object> {
     private String persistenceDbProperties = "create=true";
     // ignore expressions will replace the ignoreValid exchanges
     private final List<CaptureExpression> captureExpressions = new ArrayList<CaptureExpression>();
+    private final AtomicBoolean ignoreValidExchanges = new AtomicBoolean(false);
     private final List<BooleanExecutableExpression> ignoreExpressions = new ArrayList<BooleanExecutableExpression>();
 
     /**
@@ -340,14 +337,14 @@ public final class ProxyConfiguration extends HashMap<String, Object> {
     }
 
     /**
-     * @deprecated @return
+     * @return
      */
     public boolean isIgnoreValidExchanges() {
         return this.ignoreValidExchanges.get();
     }
 
     /**
-     * @deprecated
+     *
      */
     public void setIgnoreValidExchanges(boolean ignore) {
         this.ignoreValidExchanges.set(ignore);

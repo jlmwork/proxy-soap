@@ -114,36 +114,40 @@ public class ExchangeTracerFilter extends HttpServletFilter {
             start = start + backendExchange.getResponseTime();
         }
 
-        // final return of the proxy
-        soapExchange.setProxyResponse(wrappedResponse.getBuffer());
-        soapExchange.setProxyResponseHeaders(wrappedResponse.getHeaders());
-        soapExchange.setProxyResponseCode(wrappedResponse.getStatus());
+        if (proxyConfig.isIgnoreValidExchanges() && soapExchange.getRequestValid() && soapExchange.getResponseValid()) {
+            logger.debug("Valid Exchange ignored");
+        } else {
+            // final return of the proxy
+            soapExchange.setProxyResponse(wrappedResponse.getBuffer());
+            soapExchange.setProxyResponseHeaders(wrappedResponse.getHeaders());
+            soapExchange.setProxyResponseCode(wrappedResponse.getStatus());
 
-        // all fields of soap exchange have been set
-        // apply ignore Filters and if one matches, the exchange wont be saved
-        for (BooleanExecutableExpression ce : proxyConfig.getIgnoreExpressions()) {
-            Boolean execution = ce.execute(soapExchange);
-            if (execution != null && execution) {
-                logger.info("Ignore expression returned true '{}' : {}", ce.getName(), ce.getBody());
-                // ignore current exchange
-                return;
+            // all fields of soap exchange have been set
+            // apply ignore Filters and if one matches, the exchange wont be saved
+            for (BooleanExecutableExpression ce : proxyConfig.getIgnoreExpressions()) {
+                Boolean execution = ce.execute(soapExchange);
+                if (execution != null && execution) {
+                    logger.info("Ignore expression returned true '{}' : {}", ce.getName(), ce.getBody());
+                    // ignore current exchange
+                    return;
+                }
             }
-        }
-        // captures on the fly
-        for (CaptureExpression ce : proxyConfig.getCaptureExpressions()) {
-            String capturedContent = ce.capture(soapExchange);
-            logger.debug("Captured expression '{}' : {}", ce.getName(), capturedContent);
-            if (capturedContent != null) {
-                soapExchange.addCapturedField(ce.getName(), capturedContent);
+            // captures on the fly
+            for (CaptureExpression ce : proxyConfig.getCaptureExpressions()) {
+                String capturedContent = ce.capture(soapExchange);
+                logger.debug("Captured expression '{}' : {}", ce.getName(), capturedContent);
+                if (capturedContent != null) {
+                    soapExchange.addCapturedField(ce.getName(), capturedContent);
+                }
             }
-        }
 
-        // save exchange after response has been sent back to client
-        long stop = System.currentTimeMillis();
-        soapExchange.setProxyInternalTime(stop - start);
-        logger.debug("SoapExchange : {}", soapExchange);
-        exchangeRepository.save(soapExchange);
-        logger.debug("response saved");
+            // save exchange after response has been sent back to client
+            long stop = System.currentTimeMillis();
+            soapExchange.setProxyInternalTime(stop - start);
+            logger.debug("SoapExchange : {}", soapExchange);
+            exchangeRepository.save(soapExchange);
+            logger.debug("response saved");
+        }
     }
 
 }

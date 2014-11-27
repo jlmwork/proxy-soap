@@ -33,10 +33,6 @@ public abstract class SoapExchangeRepository {
         this.proxyConfig = proxyConfig;
     }
 
-    public boolean ignoreExchange(SoapExchange exchange) {
-        return (proxyConfig.isIgnoreValidExchanges() && exchange.getRequestValid() && exchange.getResponseValid());
-    }
-
     public abstract SoapExchange get(String id);
 
     public abstract SoapExchange get(String id, String[] fields);

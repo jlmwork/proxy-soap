@@ -56,9 +56,10 @@ public class BooleanExecutableExpressionTest {
         Assert.assertNotNull(result);
         Assert.assertTrue(result);
 
-        e.setBody("requestValid === true && responseValid == true");
+        //e.setBody("requestValid === true && responseValid == true");
+        e.setBody("requestXmlValid === true && requestSoapValid == true && responseXmlValid == true && responseSoapValid == true");
         SoapExchange s = new SoapExchange();
-        s.setRequestXmlValid(true);
+        s.setRequestXmlValid(null);
         s.setRequestSoapValid(true);
         s.setResponseXmlValid(true);
         s.setResponseSoapValid(true);

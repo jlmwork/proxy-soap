@@ -66,13 +66,7 @@ public class SoapExchangeInMemoryRepository extends SoapExchangeRepository {
 
     @Override
     public synchronized void save(SoapExchange exchange) {
-        if (!ignoreExchange(exchange)) {
-            /*exchanges.addFirst(exchange);
-             if (exchanges.size() > proxyConfig.getNbMaxExchanges()) {
-             exchanges.removeLast();
-             }*/
-            exchangesMap.put(exchange.getId(), exchange);
-        }
+        exchangesMap.put(exchange.getId(), exchange);
     }
 
     @Override
