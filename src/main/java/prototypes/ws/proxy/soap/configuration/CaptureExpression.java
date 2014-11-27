@@ -19,7 +19,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import static prototypes.ws.proxy.soap.configuration.Expression.LOGGER;
 
 /**
  *
@@ -39,13 +38,7 @@ public class CaptureExpression extends Expression {
 
     public CaptureExpression(String name, String body) {
         super(name, body);
-        checkRegexFormat(body);
-        try {
-            this.regexCompiled = Pattern.compile(body);
-        } catch (PatternSyntaxException e) {
-            LOGGER.warn("Error : {}", e);
-            throw new IllegalArgumentException("Format of capture expression '" + body + "' is not correct. Must provide a correct regular expression.");
-        }
+        validate();
     }
 
     public CaptureExpression(String name, String objectField, String regex) {
@@ -54,8 +47,14 @@ public class CaptureExpression extends Expression {
     }
 
     @Override
-    public void validate() {
+    public final void validate() {
         checkRegexFormat(body);
+        try {
+            this.regexCompiled = Pattern.compile(body);
+        } catch (PatternSyntaxException e) {
+            logger.warn("Error : {}", e);
+            throw new IllegalArgumentException("Format of capture expression '" + body + "' is not correct. Must provide a correct regular expression.");
+        }
     }
 
     public String getObjectField() {
@@ -79,7 +78,7 @@ public class CaptureExpression extends Expression {
             try {
                 captured = m.group(1);
             } catch (IllegalStateException e) {
-                LOGGER.warn("Matching error on {} : {}", content, e);
+                logger.warn("Matching error on {} : {}", content, e);
             }
         }
         return captured;
@@ -95,11 +94,11 @@ public class CaptureExpression extends Expression {
                 return capture(targetField.toString());
             }
         } catch (IllegalArgumentException ex) {
-            LOGGER.warn("Error : {}", ex);
-            LOGGER.warn("Unknown field {} on object of class {}", this.objectField, object.getClass().getName());
+            logger.warn("Error : {}", ex);
+            logger.warn("Unknown field {} on object of class {}", this.objectField, object.getClass().getName());
         } catch (IllegalAccessException ex) {
-            LOGGER.warn("Error : {}", ex);
-            LOGGER.warn("Cant access field {} on object of class {}", this.objectField, object.getClass().getName());
+            logger.warn("Error : {}", ex);
+            logger.warn("Cant access field {} on object of class {}", this.objectField, object.getClass().getName());
         }
         return "";
     }
@@ -122,9 +121,9 @@ public class CaptureExpression extends Expression {
                 return match(targetField.toString());
             }
         } catch (IllegalArgumentException ex) {
-            LOGGER.warn("Unknown field {} on object of class {} - Details : {}", this.objectField, object.getClass().getName(), ex);
+            logger.warn("Unknown field {} on object of class {} - Details : {}", this.objectField, object.getClass().getName(), ex);
         } catch (IllegalAccessException ex) {
-            LOGGER.warn("Cant access field {} on object of class {} - Details : {}", this.objectField, object.getClass().getName(), ex);
+            logger.warn("Cant access field {} on object of class {} - Details : {}", this.objectField, object.getClass().getName(), ex);
         }
         return false;
     }

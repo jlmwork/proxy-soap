@@ -15,7 +15,6 @@
  */
 package prototypes.ws.proxy.soap.configuration;
 
-import prototypes.ws.proxy.soap.configuration.CaptureExpression;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import org.junit.Assert;

@@ -22,6 +22,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import prototypes.ws.proxy.soap.configuration.BooleanExecutableExpression;
 import prototypes.ws.proxy.soap.configuration.CaptureExpression;
 import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
 import prototypes.ws.proxy.soap.io.Streams;
@@ -120,13 +121,14 @@ public class ExchangeTracerFilter extends HttpServletFilter {
 
         // all fields of soap exchange have been set
         // apply ignore Filters and if one matches, the exchange wont be saved
-        /*for (Expression ce : proxyConfig.getIgnoreExpressions()) {
-         if (ce.match(soapExchange)) {
-         logger.info("Ignore pattern found '{}' : {}", ce.getName());
-         // ignore current exchange
-         return;
-         }
-         }*/
+        for (BooleanExecutableExpression ce : proxyConfig.getIgnoreExpressions()) {
+            Boolean execution = ce.execute(soapExchange);
+            if (execution != null && execution) {
+                logger.info("Ignore expression returned true '{}' : {}", ce.getName(), ce.getBody());
+                // ignore current exchange
+                return;
+            }
+        }
         // captures on the fly
         for (CaptureExpression ce : proxyConfig.getCaptureExpressions()) {
             String capturedContent = ce.capture(soapExchange);

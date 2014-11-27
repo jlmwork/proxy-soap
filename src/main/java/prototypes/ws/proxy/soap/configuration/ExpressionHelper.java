@@ -63,8 +63,17 @@ public class ExpressionHelper {
         return null;
     }
 
+    protected List<BooleanExecutableExpression> parseBooleanExecutableExpressions(String expressions) {
+        List<BooleanExecutableExpression> expressionsList = (List<BooleanExecutableExpression>) parseJsonExpressions(expressions, BooleanExecutableExpression.class);
+        if (validateExpressions(expressionsList)) {
+            LOGGER.debug("BooleanExecutable expressions : {}", expressions);
+            return expressionsList;
+        }
+        return new ArrayList<BooleanExecutableExpression>(0);
+    }
+
     protected List<CaptureExpression> parseCaptureExpressions(String expressions) {
-        List<CaptureExpression> expressionsList = (List<CaptureExpression>) parseExpressions(expressions, CaptureExpression.class);
+        List<CaptureExpression> expressionsList = (List<CaptureExpression>) parseJsonExpressions(expressions, CaptureExpression.class);
         if (validateExpressions(expressionsList)) {
             LOGGER.debug("Capture expressions : {}", expressions);
             return expressionsList;
@@ -73,7 +82,7 @@ public class ExpressionHelper {
     }
 
     protected List<Expression> parseExpressions(String expressions) {
-        List<Expression> expressionsList = (List<Expression>) parseExpressions(expressions, Expression.class);
+        List<Expression> expressionsList = (List<Expression>) parseJsonExpressions(expressions, Expression.class);
         if (validateExpressions(expressionsList)) {
             LOGGER.debug("Capture expressions : {}", expressions);
             return expressionsList;
@@ -99,7 +108,7 @@ public class ExpressionHelper {
         return true;
     }
 
-    private Object parseExpressions(String expressions, Class<?> clazz) {
+    private Object parseJsonExpressions(String expressions, Class<?> clazz) {
         try {
             Map<String, Object> properties = new HashMap<String, Object>(1);
             properties.put(JAXBContextProperties.MEDIA_TYPE, "application/json");

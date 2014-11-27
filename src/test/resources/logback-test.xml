@@ -6,6 +6,7 @@
         </encoder>
     </appender>
     <logger name="prototypes" level="info"/>
+    <logger name="prototypes.ws.proxy.soap.configuration" level="debug"/>
     <logger name="prototypes.ws.proxy.soap.xml" level="info"/>
     <logger name="prototypes.ws.proxy.soap.web" level="info"/>
     <logger name="prototypes.ws.proxy.soap.repository" level="info"/>

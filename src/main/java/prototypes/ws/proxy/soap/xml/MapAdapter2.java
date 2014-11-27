@@ -65,19 +65,21 @@ public class MapAdapter2 extends XmlAdapter<MapAdapter2.AdaptedMap2, Map<String,
         AdaptedMap2 adaptedMap = new AdaptedMap2();
         try {
             LOGGER.debug("Marshall : {}", map);
-            for (Map.Entry<String, byte[]> entry : map.entrySet()) {
-                AdaptedEntry2 adaptedEntry = new AdaptedEntry2();
-                if (entry.getKey() != null) {
-                    adaptedEntry.key = entry.getKey();
-                } else {
-                    adaptedEntry.key = "";
+            if (map != null) {
+                for (Map.Entry<String, byte[]> entry : map.entrySet()) {
+                    AdaptedEntry2 adaptedEntry = new AdaptedEntry2();
+                    if (entry.getKey() != null) {
+                        adaptedEntry.key = entry.getKey();
+                    } else {
+                        adaptedEntry.key = "";
+                    }
+                    if (map.get(entry.getKey()) != null) {
+                        adaptedEntry.value = new String(map.get(entry.getKey()));
+                    } else {
+                        adaptedEntry.value = null;
+                    }
+                    adaptedMap.entries.add(adaptedEntry);
                 }
-                if (map.get(entry.getKey()) != null) {
-                    adaptedEntry.value = new String(map.get(entry.getKey()));
-                } else {
-                    adaptedEntry.value = null;
-                }
-                adaptedMap.entries.add(adaptedEntry);
             }
         } catch (Exception e) {
             LOGGER.warn("Error occured : {}", e);

@@ -25,14 +25,15 @@ import prototypes.ws.proxy.soap.io.Strings;
  */
 public class Expression {
 
-    protected static final Logger LOGGER = LoggerFactory
-            .getLogger(Expression.class);
+    protected Logger logger;
 
     protected String name;
 
     protected String body;
 
     protected Expression() {
+        logger = LoggerFactory
+                .getLogger(this.getClass());
     }
 
     /**
@@ -43,8 +44,9 @@ public class Expression {
      * @param regex
      */
     public Expression(String name, String regex) {
+        this();
         if (Strings.isNullOrEmpty(name)) {
-            throw new IllegalArgumentException("Capture expression has no name.");
+            throw new IllegalArgumentException("Expression has no name.");
         }
         this.name = name;
     }

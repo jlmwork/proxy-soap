@@ -64,7 +64,7 @@ public final class ProxyConfiguration extends HashMap<String, Object> {
     private String persistenceDbProperties = "create=true";
     // ignore expressions will replace the ignoreValid exchanges
     private final List<CaptureExpression> captureExpressions = new ArrayList<CaptureExpression>();
-    private final List<Expression> ignoreExpressions = new ArrayList<Expression>();
+    private final List<BooleanExecutableExpression> ignoreExpressions = new ArrayList<BooleanExecutableExpression>();
 
     /**
      * Load default configuration from system properties
@@ -246,7 +246,7 @@ public final class ProxyConfiguration extends HashMap<String, Object> {
             } else if (ApplicationConfig.PROP_EXPRESSIONS_IGNORE.equals(key)) {
                 if (!Strings.isNullOrEmpty(value)) {
                     // TODO : load ignore expressions
-                    this.ignoreExpressions.addAll(expressionHelper.parseExpressions(value));
+                    this.ignoreExpressions.addAll(expressionHelper.parseBooleanExecutableExpressions(value));
                 }
             }
         }
@@ -373,7 +373,7 @@ public final class ProxyConfiguration extends HashMap<String, Object> {
         return captureExpressions;
     }
 
-    public final List<Expression> getIgnoreExpressions() {
+    public final List<BooleanExecutableExpression> getIgnoreExpressions() {
         return ignoreExpressions;
     }
 
