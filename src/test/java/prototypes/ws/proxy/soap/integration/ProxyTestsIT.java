@@ -303,11 +303,12 @@ public class ProxyTestsIT {
 
     @Test
     public void otherTests() {
+        configureProxyDefaultMode();
         // check behavior of bad url provided
         checkWithCustomUrl("operation1-req_OK", "http://test:test:test:port/", 400);
         checkWithCustomUrl("operation1-req_OK", "file://local/file", 400);
         // unresolvable IP
-        checkWithCustomUrl("operation1-req_OK", "http://136.23.47.56/bad_ip", 502);
+        checkWithCustomUrl("operation1-req_OK", "http://0.0.0.1/bad_ip", 502);
     }
 
     @AfterClass

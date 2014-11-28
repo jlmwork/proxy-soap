@@ -144,15 +144,18 @@ public class Streams {
     }
 
     public static byte[] getBytes(InputStream is, boolean zipped) {
-        InputStream finalIS = is;
-        if (zipped) {
-            try {
-                finalIS = new java.util.zip.GZIPInputStream(is);
-            } catch (IOException ex) {
-                LOGGER.warn(Messages.MSG_ERROR_DETAILS, ex);
+        if (is != null) {
+            InputStream finalIS = is;
+            if (zipped) {
+                try {
+                    finalIS = new java.util.zip.GZIPInputStream(is);
+                } catch (IOException ex) {
+                    LOGGER.warn(Messages.MSG_ERROR_DETAILS, ex);
+                }
             }
+            return getBytes(finalIS);
         }
-        return getBytes(finalIS);
+        return new byte[0];
     }
 
     public static byte[] getBytes(InputStream iS) {

@@ -252,7 +252,7 @@ public final class ProxyConfiguration extends HashMap<String, Object> {
         try {
             this.runMode.set(Integer.parseInt(env));
             LOGGER.debug("Now run in mode : {}", this.runMode.get());
-        } catch (Exception ex) {
+        } catch (NumberFormatException ex) {
             LOGGER.warn(Messages.MSG_ERROR_DETAILS, ex);
             this.runMode.set(ApplicationConfig.RUN_MODE_PROD);
         }
