@@ -78,6 +78,12 @@ public class SoapExchangeJpaRepository extends SoapExchangeRepository {
     }
 
     /**
+     *
+     * TODO : as long as loadgraph doesnt work in EclipseLink EclipseLink
+     * produces 2 queries ! One for normal graph and one for added nodes. Too
+     * bad So we need to use a fetch graph and to add all attributes to use a
+     * fetch graph ! So ugly !
+     *
      * the loadgraph version if it had worked : EntityGraph<SoapExchange>
      * loadGraph = em.createEntityGraph(SoapExchange.class);
      * loadGraph.addAttributeNodes("request", "response", "requestHeaders",
@@ -92,9 +98,6 @@ public class SoapExchangeJpaRepository extends SoapExchangeRepository {
         LOGGER.debug("get soap exchange {} from db", id);
         EntityManager em = emf.createEntityManager();
 
-        // TODO : as long as loadgraph doesnt work in EclipseLink
-        // EclipseLink produces 2 queries ! One for normal graph and one for added nodes. Too bad
-        // So we need to use a fetch graph and to add all attributes to use a fetch graph ! So ugly !
         EntityGraph<SoapExchange> fetchGraph = em.createEntityGraph(SoapExchange.class);
         fetchGraph.addAttributeNodes(SOAP_EXCHANGE_FIELDS);
         SoapExchange exchange = em.createQuery("select s from SoapExchange s where s.id=:id", SoapExchange.class)
@@ -112,6 +115,10 @@ public class SoapExchangeJpaRepository extends SoapExchangeRepository {
 
     /**
      *
+     * TODO : as long as loadgraph doesnt work in EclipseLink EclipseLink
+     * produces 2 queries ! One for normal graph and one for added nodes. Too
+     * bad So we need to use a fetch graph and to add all attributes to use a
+     * fetch graph ! So ugly !
      *
      * // The loadgraph if it worked EntityGraph<SoapExchange> loadGraph =
      * em.createEntityGraph(SoapExchange.class);
@@ -127,9 +134,6 @@ public class SoapExchangeJpaRepository extends SoapExchangeRepository {
         LOGGER.debug("get soap exchanges from db");
         EntityManager em = emf.createEntityManager();
 
-        // TODO : as long as loadgraph doesnt work in EclipseLink
-        // EclipseLink produces 2 queries ! One for normal graph and one for added nodes. Too bad
-        // So we need to use a fetch graph and to add all attributes to use a fetch graph ! So ugly !
         EntityGraph<SoapExchange> fetchGraph = em.createEntityGraph(SoapExchange.class);
         fetchGraph.addAttributeNodes("frontEndRequest", "backEndResponse", "frontEndRequestHeaders", "backEndResponseHeaders");
         fetchGraph.addAttributeNodes(SOAP_EXCHANGE_FIELDS);

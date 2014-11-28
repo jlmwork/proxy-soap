@@ -77,7 +77,6 @@ $(function () {
     });
 
     $('#exchangestable').on('column-switch.bs.table', function (e, field, checked) {
-        // TODO : set httpOnly on the cookie to avoid sending it to server via ajax
         // read
         var fields = $.cookie('exchanges.fields');
         if (fields === undefined) {

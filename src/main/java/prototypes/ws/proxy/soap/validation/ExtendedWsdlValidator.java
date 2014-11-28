@@ -69,9 +69,8 @@ public class ExtendedWsdlValidator extends WsdlValidator {
 
     /**
      *
-     * // TODO : check if found headers were expected in operation //
-     * definition BindingOperation bindingOperation =
-     * operation.getBindingOperation();
+     * TODO : check if found headers were expected in operation definition
+     * BindingOperation bindingOperation = operation.getBindingOperation();
      * WsdlUtils.getInputParts(bindingOperation);
      *
      * List<WsdlUtils.SoapHeader> list = WsdlUtils

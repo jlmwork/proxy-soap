@@ -50,7 +50,10 @@ public class ZipOut {
 
     public PrintWriter getFileWriter(String fileName) {
         try {
-            // TODO : if currentWriter != null, a file is already being written
+            if (currentWriter != null) {
+                //a file is already being written
+                throw new IllegalStateException("A file is already written");
+            }
             ZipParameters parameters = new ZipParameters();
             parameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
             // for file generation on-the-fly

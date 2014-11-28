@@ -239,11 +239,9 @@ public final class ProxyConfiguration extends HashMap<String, Object> {
                     this.persistenceDbProperties = value;
                 }
             } else if (ApplicationConfig.PROP_EXPRESSIONS_CAPTURE.equals(key) && !Strings.isNullOrEmpty(value)) {
-                // TODO : load capture expressions
                 this.captureExpressions.addAll(expressionHelper.parseCaptureExpressions(value));
             } else if (ApplicationConfig.PROP_EXPRESSIONS_IGNORE.equals(key)) {
                 if (!Strings.isNullOrEmpty(value)) {
-                    // TODO : load ignore expressions
                     this.ignoreExpressions.addAll(expressionHelper.parseBooleanExecutableExpressions(value));
                 }
             }
