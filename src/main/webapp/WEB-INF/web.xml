@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="2.5"
-         metadata-complete="true"
-         xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+<web-app metadata-complete="true" version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
     <listener>
         <description>ServletContextListener</description>
-        <listener-class>prototypes.ws.proxy.soap.web.listener.ApplicationInitListener</listener-class>
+        <listener-class>prototypes.ws.proxy.soap.application.ApplicationInitListener</listener-class>
     </listener>
     <servlet>
         <servlet-name>ProxyServlet</servlet-name>
-        <servlet-class>prototypes.ws.proxy.soap.web.servlet.ProxyServlet</servlet-class>
+        <servlet-class>prototypes.ws.proxy.soap.proxy.ProxyServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet>
@@ -17,14 +15,14 @@
     </servlet>
     <servlet>
         <servlet-name>UiServlet</servlet-name>
-        <servlet-class>prototypes.ws.proxy.soap.web.servlet.UiServlet</servlet-class>
+        <servlet-class>prototypes.ws.proxy.soap.ui.UiServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>Jersey Web Application</servlet-name>
         <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
         <init-param>
             <param-name>javax.ws.rs.Application</param-name>
-            <param-value>prototypes.ws.proxy.soap.web.rest.App</param-value>
+            <param-value>prototypes.ws.proxy.soap.application.RestApplication</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
@@ -55,11 +53,11 @@
     <filter>
         <display-name>ValidationFilter</display-name>
         <filter-name>ValidationFilter</filter-name>
-        <filter-class>prototypes.ws.proxy.soap.web.filter.ValidationFilter</filter-class>
+        <filter-class>prototypes.ws.proxy.soap.validation.ValidationFilter</filter-class>
     </filter>
     <filter>
         <filter-name>ExchangeTracerFilter</filter-name>
-        <filter-class>prototypes.ws.proxy.soap.web.filter.ExchangeTracerFilter</filter-class>
+        <filter-class>prototypes.ws.proxy.soap.exchange.ExchangeTracerFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>ExchangeTracerFilter</filter-name>

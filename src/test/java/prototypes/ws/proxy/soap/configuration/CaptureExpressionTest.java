@@ -19,7 +19,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
-import prototypes.ws.proxy.soap.model.SoapExchange;
+import prototypes.ws.proxy.soap.exchange.SoapExchange;
 
 /**
  *

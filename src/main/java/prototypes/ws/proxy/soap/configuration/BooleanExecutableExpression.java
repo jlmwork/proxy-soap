@@ -26,8 +26,8 @@ import javax.script.CompiledScript;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import prototypes.ws.proxy.soap.constants.Messages;
-import prototypes.ws.proxy.soap.reflect.Classes;
+import prototypes.ws.proxy.soap.commons.messages.Messages;
+import prototypes.ws.proxy.soap.commons.reflect.Classes;
 
 /**
  *

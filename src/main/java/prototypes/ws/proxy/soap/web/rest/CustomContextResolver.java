@@ -14,7 +14,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import org.eclipse.persistence.jaxb.JAXBContextProperties;
 import org.slf4j.LoggerFactory;
-import prototypes.ws.proxy.soap.model.SoapExchange;
+import prototypes.ws.proxy.soap.exchange.SoapExchange;
 
 @Provider
 @Produces({"application/xml", "application/json"})

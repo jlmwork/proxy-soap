@@ -27,7 +27,8 @@ import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import prototypes.ws.proxy.soap.model.SoapExchange;
+import prototypes.ws.proxy.soap.commons.xml.XmlStrings;
+import prototypes.ws.proxy.soap.exchange.SoapExchange;
 
 public class XmlUtilsTest {
 
@@ -55,7 +56,8 @@ public class XmlUtilsTest {
         // can use direct MOXy JAXBContextFactory
         // org.eclipse.persistence.jaxb.JAXBContextFactory
         //JAXBContext jaxbContext = JAXBContextFactory.createContext(new Class[]{SoapExchange.class}, null);
-        jaxbContext = JAXBContext.newInstance(SoapExchange.class, List.class);
+        jaxbContext = JAXBContext.newInstance(SoapExchange.class);
+            //jaxbContext = JAXBContextFactory.createContext(new Class[]{SoapExchange.class}, null);
 
         soapExchange = new SoapExchange();
         Map<String, List<String>> map = new HashMap<String, List<String>>();

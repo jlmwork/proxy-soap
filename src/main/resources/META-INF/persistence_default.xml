@@ -24,7 +24,7 @@ for eclipselink custom oxm : http://www.eclipse.org/eclipselink/documentation/2.
             <property name="javax.persistence.jdbc.user" value="proxy"/>
             <property name="javax.persistence.jdbc.password" value="soap"/> -->
             <!--<property name="showSql" value="true"/>-->
-            <property name="eclipselink.logging.logger" value="prototypes.ws.proxy.soap.logging.Slf4jEclipseLinkSessionLogger"/>
+            <property name="eclipselink.logging.logger" value="prototypes.ws.proxy.soap.commons.logging.Slf4jEclipseLinkSessionLogger"/>
             <property name="eclipselink.logging.level" value="FINEST"/>
             <property name="eclipselink.logging.level.sql" value="FINE"/>
             <property name="eclipselink.logging.parameters" value="true"/>

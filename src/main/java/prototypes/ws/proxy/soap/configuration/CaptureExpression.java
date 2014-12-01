@@ -19,7 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import prototypes.ws.proxy.soap.constants.Messages;
+import prototypes.ws.proxy.soap.commons.messages.Messages;
 
 /**
  *

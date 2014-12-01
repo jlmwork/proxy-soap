@@ -23,7 +23,7 @@ import java.io.InputStreamReader;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
-import prototypes.ws.proxy.soap.io.Streams;
+import prototypes.ws.proxy.soap.commons.io.Streams;
 
 public class MultiReadHttpServletRequest extends HttpServletRequestWrapper {
 

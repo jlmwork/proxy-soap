@@ -31,8 +31,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import prototypes.ws.proxy.soap.constants.ProxyErrorConstants;
-import prototypes.ws.proxy.soap.io.Strings;
+import prototypes.ws.proxy.soap.proxy.ProxyErrorConstants;
+import prototypes.ws.proxy.soap.commons.io.Strings;
 
 public class Requests {
 

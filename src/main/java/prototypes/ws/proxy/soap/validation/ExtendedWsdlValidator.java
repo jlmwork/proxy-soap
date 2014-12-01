@@ -40,8 +40,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import prototypes.ws.proxy.soap.constants.Messages;
-import prototypes.ws.proxy.soap.reflect.Classes;
+import prototypes.ws.proxy.soap.commons.messages.Messages;
+import prototypes.ws.proxy.soap.commons.reflect.Classes;
 
 public class ExtendedWsdlValidator extends WsdlValidator {
 

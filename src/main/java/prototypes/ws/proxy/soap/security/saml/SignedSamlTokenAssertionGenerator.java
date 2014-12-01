@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import prototypes.ws.proxy.soap.security.Keystores;
-import prototypes.ws.proxy.soap.xml.XmlStrings;
+import prototypes.ws.proxy.soap.commons.xml.XmlStrings;
 
 /**
  *

@@ -17,7 +17,7 @@ package prototypes.ws.proxy.soap.configuration;
 
 import org.junit.Assert;
 import org.junit.Test;
-import prototypes.ws.proxy.soap.model.SoapExchange;
+import prototypes.ws.proxy.soap.exchange.SoapExchange;
 
 /**
  *

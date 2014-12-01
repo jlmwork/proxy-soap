@@ -23,7 +23,7 @@ import java.util.TreeMap;
 import javax.xml.namespace.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import prototypes.ws.proxy.soap.io.Files;
+import prototypes.ws.proxy.soap.commons.io.Files;
 import prototypes.ws.proxy.soap.web.io.Requests;
 
 public class SoapValidatorFactory {

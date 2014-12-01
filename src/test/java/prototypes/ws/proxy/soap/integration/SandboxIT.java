@@ -23,7 +23,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import org.eclipse.persistence.jaxb.JAXBContextProperties;
 import org.junit.Test;
-import prototypes.ws.proxy.soap.model.SoapExchange;
+import prototypes.ws.proxy.soap.exchange.SoapExchange;
 
 /**
  *

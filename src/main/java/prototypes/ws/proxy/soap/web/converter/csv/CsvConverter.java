@@ -17,7 +17,7 @@ package prototypes.ws.proxy.soap.web.converter.csv;
 
 import java.io.PrintWriter;
 import java.util.List;
-import prototypes.ws.proxy.soap.model.SoapExchange;
+import prototypes.ws.proxy.soap.exchange.SoapExchange;
 
 /**
  *

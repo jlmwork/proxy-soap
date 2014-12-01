@@ -15,11 +15,12 @@
  */
 package prototypes.ws.proxy.soap.io;
 
+import prototypes.ws.proxy.soap.commons.io.ZipOut;
 import java.io.File;
 import java.io.FileOutputStream;
 import org.junit.Assert;
 import org.junit.Test;
-import prototypes.ws.proxy.soap.constants.ApplicationConfig;
+import prototypes.ws.proxy.soap.configuration.ApplicationConfig;
 
 /**
  *

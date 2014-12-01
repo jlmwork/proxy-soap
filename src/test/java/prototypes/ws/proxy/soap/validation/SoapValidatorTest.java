@@ -20,7 +20,7 @@ import java.util.List;
 import static org.junit.Assert.fail;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import prototypes.ws.proxy.soap.io.Streams;
+import prototypes.ws.proxy.soap.commons.io.Streams;
 
 public class SoapValidatorTest {
 

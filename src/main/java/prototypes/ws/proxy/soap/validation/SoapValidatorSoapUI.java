@@ -37,10 +37,9 @@ import javax.xml.namespace.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-import prototypes.ws.proxy.soap.constants.SoapErrorConstants;
-import prototypes.ws.proxy.soap.reflect.Classes;
+import prototypes.ws.proxy.soap.commons.reflect.Classes;
 import prototypes.ws.proxy.soap.web.io.Requests;
-import prototypes.ws.proxy.soap.xml.XmlStrings;
+import prototypes.ws.proxy.soap.commons.xml.XmlStrings;
 
 public class SoapValidatorSoapUI implements SoapValidator {
 

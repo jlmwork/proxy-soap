@@ -17,7 +17,7 @@ package prototypes.ws.proxy.soap.configuration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import prototypes.ws.proxy.soap.io.Strings;
+import prototypes.ws.proxy.soap.commons.io.Strings;
 
 /**
  *

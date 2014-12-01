@@ -18,7 +18,7 @@ package prototypes.ws.proxy.soap.utils;
 import com.eviware.soapui.impl.wsdl.support.wsdl.WsdlContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import prototypes.ws.proxy.soap.reflect.Classes;
+import prototypes.ws.proxy.soap.commons.reflect.Classes;
 
 public class ClassesTest {
 

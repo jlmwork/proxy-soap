@@ -30,8 +30,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import prototypes.ws.proxy.soap.io.Files;
-import prototypes.ws.proxy.soap.model.Sample;
+import prototypes.ws.proxy.soap.commons.io.Files;
+import prototypes.ws.proxy.soap.sample.Sample;
 
 /**
  * Documentation on RestAssured :

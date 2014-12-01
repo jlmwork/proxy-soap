@@ -29,9 +29,8 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import prototypes.ws.proxy.soap.constants.ProxyErrorConstants;
-import prototypes.ws.proxy.soap.constants.SoapConstants;
-import prototypes.ws.proxy.soap.xml.XmlStrings;
+import prototypes.ws.proxy.soap.proxy.ProxyErrorConstants;
+import prototypes.ws.proxy.soap.commons.xml.XmlStrings;
 
 public class SoapMessage implements WsdlMessageExchange {
 

@@ -15,10 +15,11 @@
  */
 package prototypes.ws.proxy.soap.repository.jpa;
 
+import prototypes.ws.proxy.soap.exchange.repository.jpa.SoapExchangeJpaRepository;
 import java.util.List;
 import org.junit.Test;
 import prototypes.ws.proxy.soap.configuration.ProxyConfiguration;
-import prototypes.ws.proxy.soap.model.SoapExchange;
+import prototypes.ws.proxy.soap.exchange.SoapExchange;
 
 /**
  *
