@@ -4,7 +4,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema"
     xsi:schemaLocation="http://www.eclipse.org/eclipselink/xsds/persistence/oxm
             http://www.eclipse.org/eclipselink/xsds/eclipselink_oxm_2_4.xsd"
-    package-name="prototypes.ws.proxy.soap.model"
+    package-name="prototypes.ws.proxy.soap.exchange"
 
     >
     <!-- xml-name-transformer="prototypes.ws.proxy.soap.web.rest.NameGenerator"
